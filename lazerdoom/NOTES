@@ -1,0 +1,22 @@
+***
+Dev-Notes:
+
+- modular environment:
+	pass static iterators for efficient playback&adaptive blocksizes?
+	subpatches? how?
+	
+	dataflow based + state indicators (i.e. aimed for recording)
+	
+	side note: pull based signal processing? precaching?
+	
+- seqview: type based sequence lookup for quick routing in a side pane etc.
+
+- central facility to manage/lookup all used sequences name and type based
+- central facility for colorcoding based on types & objects used (sequences)
+- central system wide easy to use lookup/autocompletion facilities for:
+	- quick routing
+	- VALUERANGE lookup -> pattern sequencer stuff for known sequences
+	- scripting
+	
+
+- playheads as timeline animation (qt) for constant updates regardless of the fps

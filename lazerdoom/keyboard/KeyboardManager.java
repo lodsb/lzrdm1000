@@ -8,7 +8,7 @@ import com.trolltech.qt.core.QObject;
 import com.trolltech.qt.gui.QAction;
 import com.trolltech.qt.gui.QKeySequence;
 
-public class KeyboardManager {
+public class KeyboardManager extends QObject {
 	// TODO: propper exceptions
 	
 	// unregister qobjects?
@@ -117,6 +117,7 @@ public class KeyboardManager {
 	}
 	
 	public void unregisterChild(QObject child) {
+		// TODO: registerKeyBinding: not yet implemented
 		System.out.println("registerKeyBinding: not yet implemented");
 	}
 	

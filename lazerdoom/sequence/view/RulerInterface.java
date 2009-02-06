@@ -1,6 +1,6 @@
 package sequence.view;
 
-public interface RulerInterface<P> extends Zoomable {
+public interface RulerInterface<P> extends Zoomable, CursorInterface<P> {
 	public void updateRange(P start, P end);
 	
 	// pos must be centered to view

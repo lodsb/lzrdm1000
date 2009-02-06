@@ -1,6 +1,6 @@
 package sequence;
 
-public abstract class AbstractSequence<P,T> {
+public abstract class AbstractSequence<P,T> implements SequenceInterface {
 	abstract void insert(P point, T o);
 	abstract void insertSequence(P point, AbstractSequence<P,T> s);
 	

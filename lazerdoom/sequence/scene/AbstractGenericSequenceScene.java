@@ -6,7 +6,9 @@ import java.util.Map;
 import com.mallardsoft.tuple.*;
 
 import sequence.GenericSequenceController;
+import types.TypeHandlerInterface;
 
+import com.trolltech.qt.core.QPointF;
 import com.trolltech.qt.gui.*;
 
 public abstract class AbstractGenericSequenceScene<P,T> extends QGraphicsScene {
@@ -52,13 +54,45 @@ public abstract class AbstractGenericSequenceScene<P,T> extends QGraphicsScene {
 	
 	public Signal2<SequenceSceneItemInterface<T>,T> sequenceItemModifying = new Signal2<SequenceSceneItemInterface<T>,T>();
 	public Signal2<SequenceSceneItemInterface<T>,T> sequenceItemModified = new Signal2<SequenceSceneItemInterface<T>,T>();
+	public Signal2<SequenceSceneItemInterface<T>,T> sequenceItemAdded = new Signal2<SequenceSceneItemInterface<T>,T>();
+	public Signal1<SequenceSceneItemInterface<T>> sequenceItemRemoved = new Signal1<SequenceSceneItemInterface<T>>();
 	
 	private GenericSequenceController<P,T> currentSequenceController = null;
+	
+	private TypeHandlerInterface<T> entryTypeHandler;
+	private TypeHandlerInterface<P> pointTypeHandler;
 	
 	// This container is used to map sequences to their respecitve graphic items (used for toggling show etc)
 	// qgraphicsitemgroups are not used since the parent item merges the childrens' events etc.
 	
 	private LinkedHashMap<GenericSequenceController<P,T>, GenericSequenceSceneSequenceItemGroup<P,T>> sequenceControllersToSequenceItems = new LinkedHashMap<GenericSequenceController<P,T>, GenericSequenceSceneSequenceItemGroup<P,T>>(); 
+	
+	public void setTypeHandlers(TypeHandlerInterface<T> eHandler, TypeHandlerInterface<P> pHandler) {
+		entryTypeHandler = eHandler;
+		pointTypeHandler = pHandler;
+	}
+	
+	// Hooks for extension:
+	protected T entryFromScenePosHandlerCallback(TypeHandlerInterface<T> handler, QPointF pos) {
+		return entryTypeHandler.createNewFromScenePos(pos);
+	} 
+	protected P pointFromScenePosHandlerCallback(TypeHandlerInterface<P> handler, QPointF pos) {
+		return pointTypeHandler.createNewFromScenePos(pos);
+	} 
+	protected abstract SequenceSceneItemInterface<T> createSequenceItem(T entry);
+	protected abstract void addGraphicsItemToScene(P point, QGraphicsItem item);
+	
+	
+	public void createNewEntryFromScenePos(QPointF pos) {
+		if(entryTypeHandler != null && pointTypeHandler != null) {
+			T entry = this.entryFromScenePosHandlerCallback(entryTypeHandler, pos);
+			P point = this.pointFromScenePosHandlerCallback(pointTypeHandler, pos);
+			
+			if(entry != null && point != null) {
+				this.entryAddedToSequence(point, entry);
+			}
+		}
+	}
 	
 	public void addSequenceController(GenericSequenceController<P,T> sequenceController) {
 		currentSequenceController = sequenceController;
@@ -86,10 +120,6 @@ public abstract class AbstractGenericSequenceScene<P,T> extends QGraphicsScene {
 		
 		currentSequenceController = sequenceController;
 	}
-	
-	protected abstract SequenceSceneItemInterface<T> createSequenceItem(T entry);
-	
-	protected abstract void addGraphicsItemToScene(P point, QGraphicsItem item);
 	
 	public void removeSequenceController(GenericSequenceController<P,T> sequenceController) {
 		GenericSequenceSceneSequenceItemGroup<P,T> sceneItems = sequenceControllersToSequenceItems.get(sequenceController);
@@ -143,6 +173,8 @@ public abstract class AbstractGenericSequenceScene<P,T> extends QGraphicsScene {
 				graphicsItem.show();
 				
 				sceneItems.put(point, sceneItem);
+				
+				sequenceItemAdded.emit(sceneItem, entry);
 			}
 		} 
 	}
@@ -159,6 +191,8 @@ public abstract class AbstractGenericSequenceScene<P,T> extends QGraphicsScene {
 					QGraphicsItem graphicsItem = sceneItem.getRepresentation();
 					this.removeItem(graphicsItem);
 					sceneItems.remove(point);
+					
+					sequenceItemRemoved.emit(sceneItem);
 				}
 			}
 		} 
@@ -174,6 +208,7 @@ public abstract class AbstractGenericSequenceScene<P,T> extends QGraphicsScene {
 				SequenceSceneItemInterface<T> sceneItem;
 				if((sceneItem = sceneItems.get(point)) != null) {
 					sceneItem.update(entry);
+					
 					sequenceItemModified.emit(sceneItem, entry);
 				}
 			}

@@ -19,18 +19,20 @@ public class GenericSequenceGraphicsView extends QGraphicsView {
 	
 	protected void mouseMoveEvent(QMouseEvent e) {
 		mouseAtScenePos.emit(this.mapToScene(e.pos()));
+		super.mouseMoveEvent(e);
 	}
 	
 	protected void mouseDoubleClickEvent(QMouseEvent e) {
 		createItemAtScenePos.emit(this.mapToScene(e.pos()));
+		super.mouseDoubleClickEvent(e);
 	}
 	
 	protected void mousePressEvent(QMouseEvent e) {
-		
+		super.mousePressEvent(e);
 	}
 	
 	protected void mouseReleaseEvent(QMouseEvent e) {
-		
+		super.mouseReleaseEvent(e);
 	}
 
 	

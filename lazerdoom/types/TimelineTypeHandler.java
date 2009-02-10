@@ -6,98 +6,52 @@ public class TimelineTypeHandler implements ZoomContextSensitiveTypeHandler<Doub
 
 	@Override
 	public Double createNewFromScenePos(QPointF point) {
-		// TODO Auto-generated method stub
-		return null;
+		return point.x();
 	}
 
 	@Override
 	public Double dec(Double v) {
-		// TODO Auto-generated method stub
-		return null;
+		return --v;
 	}
 
 	@Override
-	public String getName() {
-		// TODO Auto-generated method stub
-		return null;
+	public String getTypeName() {
+		return "Timeline";
 	}
 
 	@Override
 	public Double inc(Double v) {
-		// TODO Auto-generated method stub
-		return null;
+		return ++v;
 	}
 
 	@Override
 	public Double max() {
-		// TODO Auto-generated method stub
-		return null;
+		return Double.MAX_VALUE;
 	}
 
 	@Override
 	public Double min() {
-		// TODO Auto-generated method stub
-		return null;
+		return Double.MIN_VALUE;
 	}
 
 	@Override
 	public QPointF scenePosFromType(Double v) {
-		// TODO Auto-generated method stub
-		return null;
+		return new QPointF(v,0);
 	}
 
 	@Override
 	public Double stepSize() {
-		// TODO Auto-generated method stub
-		return null;
+		return 1.0;
 	}
 
 	@Override
 	public Double dec(Double v, double zoom) {
-		// TODO Auto-generated method stub
-		return null;
+		return v-zoom;
 	}
 
 	@Override
 	public Double inc(Double v, double zoom) {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	@Override
-	public void decZoomH() {
-		// TODO Auto-generated method stub
-		
-	}
-
-	@Override
-	public void decZoomV() {
-		// TODO Auto-generated method stub
-		
-	}
-
-	@Override
-	public void incZoomH() {
-		// TODO Auto-generated method stub
-		
-	}
-
-	@Override
-	public void incZoomV() {
-		// TODO Auto-generated method stub
-		
-	}
-
-	@Override
-	public void resetZoomH() {
-		// TODO Auto-generated method stub
-		
-	}
-
-	@Override
-	public void resetZoomV() {
-		// TODO Auto-generated method stub
-		
+		return v+zoom;
 	}
 
 }

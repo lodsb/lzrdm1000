@@ -7,5 +7,5 @@ public interface SequenceSceneItemInterface<T> {
 	public Signal2<SequenceSceneItemInterface, T> getModifiedSignal();
 	public Signal2<SequenceSceneItemInterface, T> getModifyingSignal();
 	public QGraphicsItem getRepresentation();
-	public void update(T entry);
+	public void updateEntry(T entry);
 }

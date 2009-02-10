@@ -207,7 +207,7 @@ public abstract class AbstractGenericSequenceScene<P,T> extends QGraphicsScene {
 			if(sceneItems != null) {
 				SequenceSceneItemInterface<T> sceneItem;
 				if((sceneItem = sceneItems.get(point)) != null) {
-					sceneItem.update(entry);
+					sceneItem.updateEntry(entry);
 					
 					sequenceItemModified.emit(sceneItem, entry);
 				}

@@ -1,12 +1,18 @@
 package sequence.view;
 
 import sequence.scene.AbstractGenericSequenceScene;
+import sequence.view.item.types.DoublePoint;
+import sequence.view.item.types.Node;
 
 import com.trolltech.qt.QSignalEmitter.Signal1;
+import com.trolltech.qt.core.QFile;
 import com.trolltech.qt.core.QPointF;
+import com.trolltech.qt.gui.QGraphicsScene;
 import com.trolltech.qt.gui.QGraphicsView;
 import com.trolltech.qt.gui.QGridLayout;
 import com.trolltech.qt.gui.QWidget;
+import com.trolltech.qt.svg.QGraphicsSvgItem;
+import com.trolltech.qt.svg.QSvgRenderer;
 
 public class GenericSequenceViewWidget<P,T> extends QWidget implements GenericSequenceViewInterface<P, T> {
 
@@ -28,6 +34,10 @@ public class GenericSequenceViewWidget<P,T> extends QWidget implements GenericSe
 		
 		layout = new QGridLayout();
 		gView = new GenericSequenceGraphicsView(this);
+		
+		QGraphicsScene scene = new QGraphicsScene();
+		
+		gView.setScene(scene);
 		
 		layout.addWidget(gView, 1,1);
 		this.setLayout(layout);

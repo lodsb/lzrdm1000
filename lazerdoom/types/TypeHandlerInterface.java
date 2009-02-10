@@ -3,7 +3,7 @@ package types;
 import com.trolltech.qt.core.QPointF;
 
 public interface TypeHandlerInterface<T> {
-	String getName();
+	String getTypeName();
 	
 	T min();
 	T max();

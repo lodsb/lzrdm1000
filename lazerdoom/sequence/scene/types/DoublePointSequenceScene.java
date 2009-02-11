@@ -4,19 +4,20 @@ import com.trolltech.qt.gui.QGraphicsItem;
 
 import sequence.scene.AbstractGenericSequenceScene;
 import sequence.scene.SequenceSceneItemInterface;
+import sequence.view.item.types.DoublePoint;
 
-public class DoublePointSequenceScene extends AbstractGenericSequenceScene {
+public class DoublePointSequenceScene extends AbstractGenericSequenceScene<Double, Double> {
 
 	@Override
-	protected void addGraphicsItemToScene(Object point, QGraphicsItem item) {
-		
-
+	protected void addGraphicsItemToScene(Double point, QGraphicsItem item) {
+		this.addItem(item);
+		item.setPos(point, 0);
 	}
 
 	@Override
-	protected SequenceSceneItemInterface createSequenceItem(Object entry) {
-		// TODO Auto-generated method stub
-		return null;
+	protected SequenceSceneItemInterface<Double> createSequenceItem(Double entry) {
+		return new DoublePoint(entry);
 	}
+
 
 }

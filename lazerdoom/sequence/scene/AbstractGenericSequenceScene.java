@@ -51,14 +51,13 @@ public abstract class AbstractGenericSequenceScene<P,T> extends QGraphicsScene {
 			return sceneItemsToTimestamp.get(item);
 		}
 	}
-	
-	public Signal2<SequenceSceneItemInterface<T>,T> sequenceItemModifying = new Signal2<SequenceSceneItemInterface<T>,T>();
-	public Signal2<SequenceSceneItemInterface<T>,T> sequenceItemModified = new Signal2<SequenceSceneItemInterface<T>,T>();
-	public Signal2<SequenceSceneItemInterface<T>,T> sequenceItemAdded = new Signal2<SequenceSceneItemInterface<T>,T>();
-	public Signal1<SequenceSceneItemInterface<T>> sequenceItemRemoved = new Signal1<SequenceSceneItemInterface<T>>();
-	
+
+	public Signal2<SequenceSceneItemInterface,Object> sequenceItemModifying = new Signal2<SequenceSceneItemInterface,Object>();
+	public Signal2<SequenceSceneItemInterface,Object> sequenceItemModified = new Signal2<SequenceSceneItemInterface,Object>();
+	public Signal2<SequenceSceneItemInterface,Object> sequenceItemAdded = new Signal2<SequenceSceneItemInterface,Object>();
+	public Signal1<SequenceSceneItemInterface> sequenceItemRemoved = new Signal1<SequenceSceneItemInterface>();
 	private GenericSequenceController<P,T> currentSequenceController = null;
-	
+
 	private TypeHandlerInterface<T> entryTypeHandler;
 	private TypeHandlerInterface<P> pointTypeHandler;
 	
@@ -105,8 +104,8 @@ public abstract class AbstractGenericSequenceScene<P,T> extends QGraphicsScene {
 				SequenceSceneItemInterface<T> sceneItem = createSequenceItem(entry.getValue());
 				QGraphicsItem graphicsItem = sceneItem.getRepresentation();
 				
-				sceneItem.getModifiedSignal().connect(this, "sequenceItemModified(SequenceSceneItemInterface<T> item, T entry)");
-				sceneItem.getModifyingSignal().connect(this, "sequenceItemModifying(SequenceSceneItemInterface<T> item, T entry)");
+				sceneItem.getModifiedSignal().connect(this, "qt_seqItemModifiedgHook(SequenceSceneItemInterface item, Object entry)");
+				sceneItem.getModifyingSignal().connect(this, "qt_seqItemModifyingHook(SequenceSceneItemInterface item, Object entry)");
 				
 				P point = entry.getKey();
 				
@@ -119,6 +118,14 @@ public abstract class AbstractGenericSequenceScene<P,T> extends QGraphicsScene {
 		}
 		
 		currentSequenceController = sequenceController;
+	}
+	
+	private void qt_seqItemModifyingHook(SequenceSceneItemInterface item, Object entry) {
+		sequenceItemModifying((SequenceSceneItemInterface<T>)item, (T) entry);
+	}
+	
+	private void qt_seqItemModifiedHook(SequenceSceneItemInterface item, Object entry) {
+		sequenceItemModifying((SequenceSceneItemInterface<T>)item, (T) entry);
 	}
 	
 	public void removeSequenceController(GenericSequenceController<P,T> sequenceController) {
@@ -161,7 +168,7 @@ public abstract class AbstractGenericSequenceScene<P,T> extends QGraphicsScene {
 	
 	private void entryAddedToSequence(P point, T entry) {
 		GenericSequenceSceneSequenceItemGroup<P,T> sceneItems;
-		
+		System.out.println("sdfjksdf");
 		// FIXME: possible bug when no controller has been added
 		if(currentSequenceController != null) {
 			sceneItems = sequenceControllersToSequenceItems.get(currentSequenceController);

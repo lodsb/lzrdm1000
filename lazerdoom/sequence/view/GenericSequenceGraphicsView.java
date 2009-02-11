@@ -15,6 +15,8 @@ public class GenericSequenceGraphicsView extends QGraphicsView {
 		super(parent);
 		
 		parentWidget = parent;
+		
+		//this.setViewportUpdateMode(QGraphicsView.ViewportUpdateMode.SmartViewportUpdate);
 	}
 	
 	protected void mouseMoveEvent(QMouseEvent e) {
@@ -24,6 +26,7 @@ public class GenericSequenceGraphicsView extends QGraphicsView {
 	
 	protected void mouseDoubleClickEvent(QMouseEvent e) {
 		createItemAtScenePos.emit(this.mapToScene(e.pos()));
+		System.out.println("moo");
 		super.mouseDoubleClickEvent(e);
 	}
 	

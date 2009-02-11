@@ -10,11 +10,11 @@ import com.trolltech.qt.core.*;
 public class GenericSequenceController<P,T> extends QObject {
 	private AbstractSequence<P,T> model;
 	
-	public Signal2<P, T> 	entryAdded;
-	public Signal2<P, T> 	entryChanged;
-	public Signal1<P>		entryRemoved;
+	public Signal2<Object, Object> 	entryAdded;
+	public Signal2<Object, Object> 	entryChanged;
+	public Signal1<Object>		entryRemoved;
 	
-	GenericSequenceController(AbstractSequence<P,T> model) {
+	public GenericSequenceController(AbstractSequence<P,T> model) {
 		this.model = model;
 		
 	}
@@ -34,6 +34,6 @@ public class GenericSequenceController<P,T> extends QObject {
 	}
 	
 	public HashMap<P,T> getAllEntries() {
-		return null;
+		return model.getAllEntries();
 	}
 }

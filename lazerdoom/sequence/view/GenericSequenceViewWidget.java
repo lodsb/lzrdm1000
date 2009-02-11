@@ -1,6 +1,9 @@
 package sequence.view;
 
+import sequence.GenericSequenceController;
 import sequence.scene.AbstractGenericSequenceScene;
+import sequence.scene.types.DoublePointSequence;
+import sequence.scene.types.DoublePointSequenceScene;
 import sequence.view.item.types.DoublePoint;
 import sequence.view.item.types.Node;
 
@@ -35,9 +38,16 @@ public class GenericSequenceViewWidget<P,T> extends QWidget implements GenericSe
 		layout = new QGridLayout();
 		gView = new GenericSequenceGraphicsView(this);
 		
-		QGraphicsScene scene = new QGraphicsScene();
+		DoublePointSequenceScene scene = new DoublePointSequenceScene();
 		
-		gView.setScene(scene);
+		scene.setTypeHandlers(types.TypeSystem.doubleTypeHandler,types.TypeSystem.timelineTypeHandler);
+		
+		DoublePointSequence sequence = new DoublePointSequence();
+		GenericSequenceController<Double,Double> controller = new GenericSequenceController<Double, Double>(sequence);
+		
+		scene.addSequenceController(controller);
+		
+		this.setSequenceScene((AbstractGenericSequenceScene<P, T>) scene);
 		
 		layout.addWidget(gView, 1,1);
 		this.setLayout(layout);

@@ -52,6 +52,7 @@ public class DoublePoint extends QGraphicsItem implements SequenceSceneItemInter
 		
 		markedPen.setColor(QColor.red);		
 		markedPen.setWidth(2);
+		
 	}
 	
 	public void setTypeHandler(TypeHandlerInterface<? extends Double> handler) {
@@ -59,7 +60,7 @@ public class DoublePoint extends QGraphicsItem implements SequenceSceneItemInter
 	}
 	
 	private void nodeMouseMoveEvent(QPointF pos) {
-		double val = typeHandler.createNewFromScenePos(this.mapFromItem(headNode, pos.x(), pos.y()+headNode.boundingRect().height()/2))*-1.0;
+		double val = typeHandler.createNewFromScenePos(this.mapFromItem(headNode, pos.x(), pos.y()+headNode.boundingRect().height()/2));
 		this.updateEntry(val);
 		
 		modifying.emit(this, val);
@@ -75,12 +76,14 @@ public class DoublePoint extends QGraphicsItem implements SequenceSceneItemInter
 	}
 	
 	private void nodeHoverEnterEvent() {
+		System.out.println("he");
 		marked = true;
 		headNode.setEditing(true);
 		this.update();
 	}
 	
 	private void nodeHoverLeaveEvent() {
+		System.out.println("hl");
 		marked = false;
 		headNode.setEditing(false);
 		this.update();	
@@ -107,6 +110,9 @@ public class DoublePoint extends QGraphicsItem implements SequenceSceneItemInter
 
 	@Override
 	public void paint(QPainter painter, QStyleOptionGraphicsItem option, QWidget widget) {
+		//FIXME: update only works for children, why?
+		// line is not visible/partial repaint when only partially in view/boundingbox clips with viewport.
+		System.out.println("repaint");
 		QRectF headBound = headNode.boundingRect();
 		QPointF pos = this.pos();
 		
@@ -119,9 +125,10 @@ public class DoublePoint extends QGraphicsItem implements SequenceSceneItemInter
 		}
 		
 		
-		painter.drawLine((int)pos.x(),0, (int)pos.x(), (int)-currentValue);
-		painter.drawLine((int)(pos.x()-headBound.width()/2),0, (int)(pos.x()+headBound.width()/2), 0);
-		
+		painter.drawLine(0,0, 0, (int)-currentValue);
+		painter.drawLine((int)(-headBound.width()/2),0, (int)(headBound.width()/2), 0);
+		//painter.setPen(QColor.blue);
+		//painter.drawRect(boundingRect());
 		//headNode.paint(painter, option, widget);
 	}
 
@@ -149,8 +156,7 @@ public class DoublePoint extends QGraphicsItem implements SequenceSceneItemInter
 		
 		this.prepareGeometryChange();
 		
-		headNode.setPos(pos.x()-(headBound.width()/2), -entry-(headBound.height()/2));
-		
+		headNode.setPos(-headBound.width()/2, -entry-(headBound.height()/2));
 		this.update();
 	}
 

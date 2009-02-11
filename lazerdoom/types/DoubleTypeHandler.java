@@ -6,7 +6,7 @@ public class DoubleTypeHandler implements TypeHandlerInterface<Double> {
 
 	@Override
 	public Double createNewFromScenePos(QPointF point) {
-		return point.y();
+		return -point.y();
 	}
 
 	@Override
@@ -36,7 +36,7 @@ public class DoubleTypeHandler implements TypeHandlerInterface<Double> {
 
 	@Override
 	public QPointF scenePosFromType(Double v) {
-		return new QPointF(0,v);
+		return new QPointF(0,-v);
 	}
 
 	@Override

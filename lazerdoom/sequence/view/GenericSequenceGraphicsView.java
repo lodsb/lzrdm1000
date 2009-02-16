@@ -1,12 +1,19 @@
 package sequence.view;
 
+import com.trolltech.qt.core.QEvent;
 import com.trolltech.qt.core.QPointF;
+import com.trolltech.qt.core.QRect;
+import com.trolltech.qt.core.QRectF;
+import com.trolltech.qt.core.QEvent.Type;
 import com.trolltech.qt.gui.QGraphicsView;
 import com.trolltech.qt.gui.QKeyEvent;
 import com.trolltech.qt.gui.QMouseEvent;
+import com.trolltech.qt.gui.QResizeEvent;
 
 public class GenericSequenceGraphicsView extends QGraphicsView {
 	private GenericSequenceViewWidget parentWidget;
+	
+	public Signal0 viewChanged = new Signal0();
 	
 	public Signal1<QPointF> createItemAtScenePos = new Signal1<QPointF>();
 	public Signal1<QPointF> mouseAtScenePos = new Signal1<QPointF>();
@@ -16,9 +23,20 @@ public class GenericSequenceGraphicsView extends QGraphicsView {
 		
 		parentWidget = parent;
 		
+		this.horizontalScrollBar().valueChanged.connect(viewChanged);
+		this.verticalScrollBar().valueChanged.connect(viewChanged);
+		
 		//this.setViewportUpdateMode(QGraphicsView.ViewportUpdateMode.SmartViewportUpdate);
 	}
+	protected QRectF visibleRect() {
+		return new QRectF(this.mapToScene(0,0), this.mapToScene(width(),height()));
+	}
 	
+	protected void resizeEvent(QResizeEvent event) {
+		super.resizeEvent(event);
+		viewChanged.emit();
+	}
+
 	protected void mouseMoveEvent(QMouseEvent e) {
 		mouseAtScenePos.emit(this.mapToScene(e.pos()));
 		super.mouseMoveEvent(e);

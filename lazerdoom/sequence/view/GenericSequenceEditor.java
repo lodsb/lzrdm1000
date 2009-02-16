@@ -1,6 +1,7 @@
 package sequence.view;
 
 import sequence.view.form.ListSelectionWidget;
+import sequence.view.types.DoublePointSequenceEditor;
 
 import com.trolltech.qt.gui.*;
 
@@ -17,11 +18,15 @@ public class GenericSequenceEditor<P,T> extends QWidget {
 	private GenericSequenceViewWidget<P,T> sequenceView;
 
 
+	protected GenericSequenceViewWidget<P,T> getSequenceViewWidget() {
+		return sequenceView;
+	}
+	
     public static void main(String[] args) {
         QApplication.initialize(args);
         QApplication.setStyle(new QPlastiqueStyle());
 
-        GenericSequenceEditor<Double, Double> testGenericSequenceEditor = new GenericSequenceEditor<Double, Double>();
+        DoublePointSequenceEditor testGenericSequenceEditor = new DoublePointSequenceEditor();
         testGenericSequenceEditor.show();
 
         QApplication.exec();

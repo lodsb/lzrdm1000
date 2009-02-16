@@ -10,9 +10,14 @@ import sequence.view.item.types.Node;
 import com.trolltech.qt.QSignalEmitter.Signal1;
 import com.trolltech.qt.core.QFile;
 import com.trolltech.qt.core.QPointF;
+import com.trolltech.qt.core.QRectF;
+import com.trolltech.qt.core.QSize;
 import com.trolltech.qt.gui.QGraphicsScene;
 import com.trolltech.qt.gui.QGraphicsView;
 import com.trolltech.qt.gui.QGridLayout;
+import com.trolltech.qt.gui.QHBoxLayout;
+import com.trolltech.qt.gui.QLabel;
+import com.trolltech.qt.gui.QVBoxLayout;
 import com.trolltech.qt.gui.QWidget;
 import com.trolltech.qt.svg.QGraphicsSvgItem;
 import com.trolltech.qt.svg.QSvgRenderer;
@@ -31,32 +36,39 @@ public class GenericSequenceViewWidget<P,T> extends QWidget implements GenericSe
 	
 	private QGridLayout layout;
 	
-	
 	public GenericSequenceViewWidget(QWidget parent) {
 		super(parent);
 		
 		layout = new QGridLayout();
+		
 		gView = new GenericSequenceGraphicsView(this);
 		
-		DoublePointSequenceScene scene = new DoublePointSequenceScene();
-		
-		scene.setTypeHandlers(types.TypeSystem.doubleTypeHandler,types.TypeSystem.timelineTypeHandler);
-		
-		DoublePointSequence sequence = new DoublePointSequence();
-		GenericSequenceController<Double,Double> controller = new GenericSequenceController<Double, Double>(sequence);
-		
-		scene.addSequenceController(controller);
-		
-		this.setSequenceScene((AbstractGenericSequenceScene<P, T>) scene);
-		
+		layout.setColumnMinimumWidth(0, 20);
+		layout.setRowMinimumHeight(0, 20);
 		layout.addWidget(gView, 1,1);
+				
 		this.setLayout(layout);
+		
 		
 		
 		gView.createItemAtScenePos.connect(this, "createItemAtScenePos(QPointF)");
 		gView.mouseAtScenePos.connect(this, "mouseAtScenePos(QPointF)");
+		
+		gView.viewChanged.connect(this, "viewUpdated()");
 	}
-
+	
+	protected void viewUpdated() {
+		QRectF viewBounds = gView.visibleRect();
+		
+		if(vRuler != null) {
+			vRuler.updateVisibleRange(viewBounds.top(), viewBounds.bottom());
+		}
+		
+		if(hRuler != null) {
+			hRuler.updateVisibleRange(viewBounds.left(), viewBounds.right());
+		}
+		
+	}
 	
 	private void createItemAtScenePos(QPointF pos) {
 		if(sequenceScene != null) {
@@ -72,6 +84,8 @@ public class GenericSequenceViewWidget<P,T> extends QWidget implements GenericSe
 		sequenceScene = scene;
 		
 		gView.setScene(scene);
+		
+		scene.changed.connect(this, "viewUpdated()");
 	}
 	
 	@Override
@@ -81,7 +95,12 @@ public class GenericSequenceViewWidget<P,T> extends QWidget implements GenericSe
 		}
 		
 		hRuler = ruler;
-		layout.addWidget(hRuler, 0,0);
+		
+		layout.addWidget(hRuler, 0,1);
+		
+		this.viewUpdated();
+		
+		//layout.addWidget(new QLabel("sdfsdf"),0,0);
 	}
 	@Override
 	public void addVerticalRuler(VerticalRuler<P> ruler) {
@@ -91,6 +110,8 @@ public class GenericSequenceViewWidget<P,T> extends QWidget implements GenericSe
 		
 		vRuler = ruler;
 		layout.addWidget(vRuler, 1,0);
+
+		this.viewUpdated();
 	}
 
 	@Override

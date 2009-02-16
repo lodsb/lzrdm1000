@@ -1,7 +1,10 @@
 package sequence.view;
 
-public interface RulerInterface<P> extends Zoomable, CursorInterface<P> {
+import com.trolltech.qt.core.QPointF;
+
+public interface RulerInterface<P> extends Zoomable, CursorInterface<P>, TypehandlerDependent<P> {
 	public void updateRange(P start, P end);
+	public void updateVisibleRange(double start, double end);
 	
 	// pos must be centered to view
 	public void scrollTo(P pos);

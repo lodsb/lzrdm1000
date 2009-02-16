@@ -9,9 +9,13 @@ import com.trolltech.qt.core.QPointF;
 import com.trolltech.qt.core.QRectF;
 import com.trolltech.qt.core.Qt;
 import com.trolltech.qt.gui.QColor;
+import com.trolltech.qt.gui.QFont;
+import com.trolltech.qt.gui.QFontMetrics;
 import com.trolltech.qt.gui.QGraphicsItem;
+import com.trolltech.qt.gui.QGraphicsLineItem;
 import com.trolltech.qt.gui.QGraphicsSceneHoverEvent;
 import com.trolltech.qt.gui.QGraphicsSceneMouseEvent;
+import com.trolltech.qt.gui.QGraphicsTextItem;
 import com.trolltech.qt.gui.QPainter;
 import com.trolltech.qt.gui.QPen;
 import com.trolltech.qt.gui.QStyleOptionGraphicsItem;
@@ -22,6 +26,14 @@ public class DoublePoint extends QGraphicsItem implements SequenceSceneItemInter
 	Signal2<SequenceSceneItemInterface, Double> modifying = new Signal2<SequenceSceneItemInterface, Double>();
 	
 	private Node headNode = new Node(Node.NodeType.pointNode, Node.NodeType.pointNodeEditing);
+	private QGraphicsTextItem textLabel = new QGraphicsTextItem(this); 
+	private QGraphicsLineItem entryLine = new QGraphicsLineItem(this);
+	private QGraphicsLineItem bottomLine = new QGraphicsLineItem(this);
+	
+	private QFontMetrics fontMetric = new QFontMetrics(textLabel.font());
+	private int fontHeight = fontMetric.height();
+	
+	
 	
 	private Double currentValue;
 	
@@ -31,6 +43,7 @@ public class DoublePoint extends QGraphicsItem implements SequenceSceneItemInter
 	
 	private QPen selectionPen = new QPen();
 	private QPen markedPen = new QPen();
+	private QPen normalPen = new QPen(QColor.black);
 	
 	
 	public DoublePoint(Double entry) {
@@ -53,6 +66,20 @@ public class DoublePoint extends QGraphicsItem implements SequenceSceneItemInter
 		markedPen.setColor(QColor.red);		
 		markedPen.setWidth(2);
 		
+		
+		QRectF headBound = headNode.boundingRect();
+		bottomLine.setPos(-headBound.width()/2,0);
+		entryLine.setPos(0,0);
+		
+		bottomLine.setZValue(-1.0);
+		entryLine.setZValue(-1.0);
+		
+		bottomLine.setLine(0,0, headBound.width(), 0);
+		
+		bottomLine.setPen(markedPen);
+		entryLine.setPen(markedPen);
+
+		
 	}
 	
 	public void setTypeHandler(TypeHandlerInterface<? extends Double> handler) {
@@ -69,6 +96,9 @@ public class DoublePoint extends QGraphicsItem implements SequenceSceneItemInter
 	private void nodeMousePressEvent() {
 		System.out.println("n mpe");
 		this.setSelected(true);
+		
+		bottomLine.setPen(selectionPen);
+		entryLine.setPen(selectionPen);
 	}
 	
 	private void nodeMouseReleaseEvent() {
@@ -79,14 +109,19 @@ public class DoublePoint extends QGraphicsItem implements SequenceSceneItemInter
 		System.out.println("he");
 		marked = true;
 		headNode.setEditing(true);
-		this.update();
+		
+		bottomLine.setPen(markedPen);
+		entryLine.setPen(markedPen);
 	}
 	
 	private void nodeHoverLeaveEvent() {
 		System.out.println("hl");
 		marked = false;
 		headNode.setEditing(false);
-		this.update();	
+		
+		bottomLine.setPen(normalPen);
+		entryLine.setPen(normalPen);
+		
 	}
 	
 	public void mousePressEvent( QGraphicsSceneMouseEvent  event ) {
@@ -108,28 +143,8 @@ public class DoublePoint extends QGraphicsItem implements SequenceSceneItemInter
 		return ret;
 	}
 
-	@Override
 	public void paint(QPainter painter, QStyleOptionGraphicsItem option, QWidget widget) {
-		//FIXME: update only works for children, why?
-		// line is not visible/partial repaint when only partially in view/boundingbox clips with viewport.
-		System.out.println("repaint");
-		QRectF headBound = headNode.boundingRect();
-		QPointF pos = this.pos();
-		
-		if(marked) {
-			painter.setPen(markedPen);
-		} else if(this.isSelected()) {
-			painter.setPen(selectionPen);
-		} else {
-			painter.setPen(QColor.black);
-		}
-		
-		
-		painter.drawLine(0,0, 0, (int)-currentValue);
-		painter.drawLine((int)(-headBound.width()/2),0, (int)(headBound.width()/2), 0);
-		//painter.setPen(QColor.blue);
-		//painter.drawRect(boundingRect());
-		//headNode.paint(painter, option, widget);
+	
 	}
 
 	@Override
@@ -157,7 +172,17 @@ public class DoublePoint extends QGraphicsItem implements SequenceSceneItemInter
 		this.prepareGeometryChange();
 		
 		headNode.setPos(-headBound.width()/2, -entry-(headBound.height()/2));
-		this.update();
+		
+		textLabel.setPlainText(entry.toString());
+		
+		if(entry >= 0) {
+			textLabel.setPos(-fontMetric.width(entry.toString())/2,-entry-(headBound.height()/2+fontHeight));
+		} else {
+			textLabel.setPos(-fontMetric.width(entry.toString())/2,-entry+(headBound.height()/2));
+		}
+
+		entryLine.setLine(0,0,headNode.x()+headBound.width()/2, headNode.y()+headBound.height()/2);
+		
 	}
 
 }

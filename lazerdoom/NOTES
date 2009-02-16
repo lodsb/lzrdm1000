@@ -1,6 +1,11 @@
+FIXMES:
+fix wrong offset in doublepointverticalruler 0 in gview and scale are not the same!
+fix refresh problem in gview!
+
 ***
 Dev-Notes:
 
+- resource handlers -> xml should have a facility to register on startup
 - modular environment:
 	pass static iterators for efficient playback&adaptive blocksizes?
 	subpatches? how?
@@ -12,7 +17,7 @@ Dev-Notes:
 - seqview: type based sequence lookup for quick routing in a side pane etc.
 
 - central facility to manage/lookup all used sequences name and type based
-- central facility for colorcoding based on types & objects used (sequences)
+- central facility for colorcoding based on types & objects used (sequences, conntections, etc)
 - central system wide easy to use lookup/autocompletion facilities for:
 	- quick routing
 	- VALUERANGE lookup -> pattern sequencer stuff for known sequences

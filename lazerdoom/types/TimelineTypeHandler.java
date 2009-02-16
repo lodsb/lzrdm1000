@@ -54,4 +54,16 @@ public class TimelineTypeHandler implements ZoomContextSensitiveTypeHandler<Doub
 		return v+zoom;
 	}
 
+	@Override
+	public String getValueStringFromScenePos(QPointF point) {
+		// TODO Auto-generated method stub
+		return this.createNewFromScenePos(point).toString();
+	}
+
+	@Override
+	public Double center() {
+		// TODO Auto-generated method stub
+		return 0.0;
+	}
+
 }

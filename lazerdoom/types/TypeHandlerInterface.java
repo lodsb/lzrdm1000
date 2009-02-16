@@ -13,6 +13,10 @@ public interface TypeHandlerInterface<T> {
 	T inc(T v);
 	T dec(T v);
 	
+	T center();
+	
 	T createNewFromScenePos(QPointF point);
+	String getValueStringFromScenePos(QPointF point);
+	
 	QPointF scenePosFromType(T v);
 }

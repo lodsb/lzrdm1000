@@ -44,4 +44,15 @@ public class DoubleTypeHandler implements TypeHandlerInterface<Double> {
 		return 1.0;
 	}
 
+	@Override
+	public String getValueStringFromScenePos(QPointF point) {
+		// TODO Auto-generated method stub
+		return this.createNewFromScenePos(point).toString();
+	}
+
+	@Override
+	public Double center() {
+		// TODO Auto-generated method stub
+		return 0.0;
+	}
 }

@@ -27,7 +27,7 @@ public class DoublePointSequenceEditor extends GenericSequenceEditor<Double, Dou
 		viewWidget.setSequenceScene((AbstractGenericSequenceScene<Double, Double>) scene);
 		
 		viewWidget.addVerticalRuler(new DoublePointVerticalRuler(this, types.TypeSystem.doubleTypeHandler));
-		viewWidget.addHorizontalRuler(new HorizontalRuler<Double>(this, types.TypeSystem.doubleTypeHandler));
+		viewWidget.addHorizontalRuler(new TimeLineHorizontalRuler(this, types.TypeSystem.timelineTypeHandler));
 
 		
 	}

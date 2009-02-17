@@ -59,7 +59,20 @@ public class TimelineTypeHandler implements ZoomContextSensitiveTypeHandler<Doub
 		// TODO Auto-generated method stub
 		return this.createNewFromScenePos(point).toString();
 	}
+	
+	public String getMSValueStringFromScenePos(QPointF point) {
+		return new Double(((this.createNewFromScenePos(point))%1000)).toString();
+	}
+	
+	public String getSecondValueStringFromScenePos(QPointF point) {
+		return new Double(((this.createNewFromScenePos(point))/1000)%60).toString();
+	}
 
+	public String getMinuteValueStringFromScenePos(QPointF point) {
+		return new Double((((this.createNewFromScenePos(point))/1000)/60)%60).toString();
+	}
+
+	
 	@Override
 	public Double center() {
 		// TODO Auto-generated method stub

@@ -1,5 +1,7 @@
 package sequence.view;
 
+import types.TypeHandlerInterface;
+
 import com.trolltech.qt.core.QPointF;
 
 public interface RulerInterface<P> extends Zoomable, CursorInterface<P>, TypehandlerDependent<P> {
@@ -13,4 +15,5 @@ public interface RulerInterface<P> extends Zoomable, CursorInterface<P>, Typehan
 	
 	public void highlightPosition(P pos);
 	public void highlightRange(P posStart, P posEnd);
+	
 }

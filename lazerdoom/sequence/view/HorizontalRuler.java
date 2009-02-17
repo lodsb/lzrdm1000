@@ -12,6 +12,19 @@ public class HorizontalRuler<P> extends QWidget implements HorizontalRulerInterf
 	private double start = -1.0;
 	private double end = 1.0;
 	
+	protected double getStart() {
+		return start;
+	}
+	
+	protected double getEnd() {
+		return end;
+	}
+	
+	protected TypeHandlerInterface<P> getTypeHandler() {
+		return typeHandler;
+	}
+	
+	
 	public HorizontalRuler(QWidget parent, TypeHandlerInterface<P> typehandler) {
 		super(parent);
 		typeHandler = typehandler;
@@ -107,9 +120,12 @@ public class HorizontalRuler<P> extends QWidget implements HorizontalRulerInterf
 
 	@Override
 	public void updateVisibleRange(double start, double end) {
-		this.start = start;
-		this.end = end;
-		
+		if(start != this.start && end != this.end) {
+			this.start = start;
+			this.end = end;
+			this.update();
+		}
 	}
+	
 
 }

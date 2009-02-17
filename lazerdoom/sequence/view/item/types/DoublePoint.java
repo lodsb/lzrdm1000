@@ -169,8 +169,6 @@ public class DoublePoint extends QGraphicsItem implements SequenceSceneItemInter
 		QPointF pos = this.pos();
 		QRectF headBound = headNode.boundingRect();
 		
-		this.prepareGeometryChange();
-		
 		headNode.setPos(-headBound.width()/2, -entry-(headBound.height()/2));
 		
 		textLabel.setPlainText(entry.toString());

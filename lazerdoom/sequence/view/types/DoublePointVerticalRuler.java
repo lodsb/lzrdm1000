@@ -32,7 +32,6 @@ public class DoublePointVerticalRuler extends VerticalRuler<Double> {
 		painter.setFont(font);
 		
 		int offset = (int)(typeHandler.center()-start)%10;
-		System.out.println(offset);
 		
 		for(int i = 1; i < height()-(10+offset); i++) {
 			if(i%(10) == 0) {

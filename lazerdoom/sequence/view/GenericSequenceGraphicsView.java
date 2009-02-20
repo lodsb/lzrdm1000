@@ -4,6 +4,7 @@ import com.trolltech.qt.core.QEvent;
 import com.trolltech.qt.core.QPointF;
 import com.trolltech.qt.core.QRect;
 import com.trolltech.qt.core.QRectF;
+import com.trolltech.qt.core.Qt;
 import com.trolltech.qt.core.QEvent.Type;
 import com.trolltech.qt.gui.QGraphicsView;
 import com.trolltech.qt.gui.QKeyEvent;
@@ -23,12 +24,14 @@ public class GenericSequenceGraphicsView extends QGraphicsView {
 		
 		parentWidget = parent;
 		
+		this.setHorizontalScrollBarPolicy(Qt.ScrollBarPolicy.ScrollBarAlwaysOn);
+		this.setVerticalScrollBarPolicy(Qt.ScrollBarPolicy.ScrollBarAlwaysOn);
 		this.horizontalScrollBar().valueChanged.connect(viewChanged);
 		this.verticalScrollBar().valueChanged.connect(viewChanged);
 		
 		//this.setViewportUpdateMode(QGraphicsView.ViewportUpdateMode.SmartViewportUpdate);
 	}
-	protected QRectF visibleRect() {
+	public QRectF visibleRect() {
 		return new QRectF(this.mapToScene(0,0), this.mapToScene(width(),height()));
 	}
 	

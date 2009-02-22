@@ -17,6 +17,7 @@ public class GenericSequenceGraphicsView extends QGraphicsView {
 	public Signal0 viewChanged = new Signal0();
 	
 	public Signal1<QPointF> createItemAtScenePos = new Signal1<QPointF>();
+	public Signal1<QPointF> placeCursorAtScenePos = new Signal1<QPointF>();
 	public Signal1<QPointF> mouseAtScenePos = new Signal1<QPointF>();
 	
 	GenericSequenceGraphicsView(GenericSequenceViewWidget parent) {
@@ -52,6 +53,7 @@ public class GenericSequenceGraphicsView extends QGraphicsView {
 	}
 	
 	protected void mousePressEvent(QMouseEvent e) {
+		placeCursorAtScenePos.emit(this.mapToScene(e.pos()));
 		super.mousePressEvent(e);
 	}
 	

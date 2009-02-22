@@ -18,6 +18,10 @@ public class GenericSequenceEditor<P,T> extends QWidget {
 	private ListSelectionWidget sequenceListForm;
 	
 	private GenericSequenceViewWidget<P,T> sequenceView;
+	
+	private QWidget toolsWidget;
+	private QVBoxLayout toolsLayout;
+	
 
 
 	protected GenericSequenceViewWidget<P,T> getSequenceViewWidget() {
@@ -34,6 +38,10 @@ public class GenericSequenceEditor<P,T> extends QWidget {
         QApplication.exec();
     }
 
+    public void addToolBoxWidget(QWidget widget) {
+    	toolsLayout.addWidget(widget);
+    }
+    
     public void init() {
     	layout = new QGridLayout();
     	
@@ -42,8 +50,8 @@ public class GenericSequenceEditor<P,T> extends QWidget {
     	createSidePanel();
     	layout.addWidget(toolBox, 0, 1);
     	
-    	layout.setColumnStretch(0, 75);
-    	layout.setColumnStretch(1, 25);
+    	layout.setColumnStretch(0, 70);
+    	layout.setColumnStretch(1, 30);
     	
     	this.setLayout(layout);
     	
@@ -71,19 +79,19 @@ public class GenericSequenceEditor<P,T> extends QWidget {
     private void createSidePanel() {
     	toolBox = new QToolBox(this);
     	
-    	QWidget buttonWidget = new QWidget(this);
-    	QVBoxLayout buttonLayout = new QVBoxLayout();
-    	buttonWidget.setLayout(buttonLayout);
+    	toolsWidget = new QWidget(this);
+    	toolsLayout = new QVBoxLayout();
+    	toolsWidget.setLayout(toolsLayout);
     	
     	compactifyButton = new QPushButton(tr("Compact view"),this);
     	compactifyButton.setCheckable(true);
     	
-    	buttonLayout.addWidget(compactifyButton);
+    	toolsLayout.addWidget(compactifyButton);
     	
     	sequenceListForm = new ListSelectionWidget(this, tr("Sequences"), tr("Sequence"), tr("Shown sequences"));
     	routingForm = new ListSelectionWidget(this, tr("Routing"), tr("Output"), tr("Possible Connections"));
     	
-    	toolBox.addItem(buttonWidget, tr("Tools"));
+    	toolBox.addItem(toolsWidget, tr("Tools"));
     	toolBox.addItem(sequenceListForm, tr("Sequences"));
     	toolBox.addItem(routingForm, tr("Routing"));
     	

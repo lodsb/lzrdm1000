@@ -13,7 +13,7 @@ import com.trolltech.qt.gui.QWidget;
 import com.trolltech.qt.svg.QGraphicsSvgItem;
 import com.trolltech.qt.svg.QSvgRenderer;
 
-public class Cursor extends QGraphicsLineItem {
+public class TimelineCursor extends QGraphicsLineItem implements CursorInterface<Double> {
 
 	private GenericSequenceGraphicsView viewport;
 	private QGraphicsSvgItem topArrow = new QGraphicsSvgItem();
@@ -24,7 +24,9 @@ public class Cursor extends QGraphicsLineItem {
 	private QPen cursorPen = new QPen(cursorColor);
 	
 	private static int frames = 50;
-	private static int time = 4000;
+	private static int time = 1500;
+	
+	private Signal1<Double> positionChanged = new Signal1<Double>();
 	
 	private QTimeLine blinkerTimeline = new QTimeLine(time);
 	
@@ -34,7 +36,7 @@ public class Cursor extends QGraphicsLineItem {
 	private static String resourceFile = new String("classpath:sequence/view/icons/cursor.svg");
 	private static QSvgRenderer renderer = new QSvgRenderer(resourceFile);
 	
-	public Cursor(GenericSequenceGraphicsView view) {
+	public TimelineCursor(GenericSequenceGraphicsView view) {
 		viewport = view;
 		view.viewChanged.connect(this, "updateGeometries()");
 		
@@ -49,8 +51,6 @@ public class Cursor extends QGraphicsLineItem {
 		
 		updateGeometries();
 		
-		this.setPos(100, 0);
-		
 		blinkerTimeline.setFrameRange(0, frames);
 		
 		this.setPen(cursorPen);
@@ -58,7 +58,7 @@ public class Cursor extends QGraphicsLineItem {
 		blinkerTimeline.frameChanged.connect(this, "updateBlinker(int)");
 		blinkerTimeline.finished.connect(this,"restartBlinker()");
 		blinkerTimeline.start();
-		blinkerTimeline.setCurveShape(QTimeLine.CurveShape.CosineCurve);
+		blinkerTimeline.setCurveShape(QTimeLine.CurveShape.EaseInCurve);
 		
 		cursorPen.setWidth(1);
 	}
@@ -80,9 +80,23 @@ public class Cursor extends QGraphicsLineItem {
 			viewTop = viewport.visibleRect().top();
 			viewBottom = viewport.visibleRect().bottom();
 			
-			this.setLine(this.pos().x(),viewTop+1,this.pos().x(),viewBottom-20);
-			topArrow.setPos(this.pos().x()-topArrow.boundingRect().width()/2,viewTop);
-			bottomArrow.setPos(this.pos().x()-bottomArrow.boundingRect().width()/2,viewBottom-bottomArrow.boundingRect().height()-20);
+			this.setLine(0,viewTop+1,0,viewBottom-20);
+			topArrow.setPos(0.5-topArrow.boundingRect().width()/2,viewTop);
+			bottomArrow.setPos(0.5-bottomArrow.boundingRect().width()/2,viewBottom-bottomArrow.boundingRect().height()-20);
+			
+			//FIXME: implementation sucks
+			this.updateGeometries();
 		}
+	}
+
+	@Override
+	public void setPosition(Double t) {
+		this.setPos(t, 0);
+		positionChanged.emit(t);
+	}
+
+	@Override
+	public Signal1<Double> getPositionChangedSignal() {
+		return positionChanged;
 	}
 }

@@ -39,6 +39,7 @@ public class GenericSequenceViewWidget<P,T> extends QWidget implements GenericSe
 	private double zoomFactorV = 1.0;
 	
 	public Signal1<QPointF> mouseAtScenePos = new Signal1<QPointF>();
+	public Signal1<QPointF> placeCursorAtScenePos = new Signal1<QPointF>();
 	
 	private AbstractGenericSequenceScene<P, T> sequenceScene = null;
 	
@@ -55,6 +56,8 @@ public class GenericSequenceViewWidget<P,T> extends QWidget implements GenericSe
 	private ViewInfo viewInfoWidget = new ViewInfo(this);
 	private EditWidget editWidget = new EditWidget(this);
 	
+	private CursorInterface<P> cursor;
+	
 	public GenericSequenceViewWidget(QWidget parent) {
 		super(parent);
 		
@@ -70,8 +73,10 @@ public class GenericSequenceViewWidget<P,T> extends QWidget implements GenericSe
 		gView = new GenericSequenceGraphicsView(this);
 		layout.addWidget(gView, 1,1);
 		gView.createItemAtScenePos.connect(this, "createItemAtScenePos(QPointF)");
+		gView.placeCursorAtScenePos.connect(placeCursorAtScenePos);
 		gView.mouseAtScenePos.connect(this, "mouseAtScenePos(QPointF)");
 		gView.viewChanged.connect(this, "viewUpdated()");
+		
 		
 		layout.addWidget(editWidget,2,1);
 		layout.addWidget(viewInfoWidget,3,1);
@@ -80,6 +85,10 @@ public class GenericSequenceViewWidget<P,T> extends QWidget implements GenericSe
 	public GenericSequenceGraphicsView getGraphicsView() {
 		return gView;
 	}
+	
+	protected void placeCursorAtScenePos(QPointF pos) {
+		placeCursorAtScenePos.emit(pos);
+	} 
 	
 	public void setCompactView(boolean compact) {
 		if(compact) {

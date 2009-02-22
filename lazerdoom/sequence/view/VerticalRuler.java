@@ -120,4 +120,16 @@ public class VerticalRuler<P> extends QWidget implements VerticalRulerInterface<
 		}
 	}
 
+	@Override
+	public Signal1<P> getPositionChangedSignal() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public void setPosition(P t) {
+		// TODO Auto-generated method stub
+		
+	}
+
 }

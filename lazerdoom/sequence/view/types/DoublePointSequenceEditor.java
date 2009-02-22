@@ -9,15 +9,36 @@ import sequence.GenericSequenceController;
 import sequence.scene.AbstractGenericSequenceScene;
 import sequence.scene.types.DoublePointSequence;
 import sequence.scene.types.DoublePointSequenceScene;
-import sequence.view.Cursor;
+import sequence.view.TimelineCursor;
 import sequence.view.GenericSequenceEditor;
 import sequence.view.GenericSequenceViewWidget;
 import sequence.view.HorizontalRuler;
 import sequence.view.VerticalRuler;
+import sequence.view.form.CursorToolBox;
 import sequence.view.item.types.DoublePoint;
 import types.TimelineTypeHandler;
 
 public class DoublePointSequenceEditor extends GenericSequenceEditor<Double, Double> {
+	
+	
+/*
+ *  *.*.*... for bars
+ *  *:*:...for time
+ *  +/-*.*. next/prev bar
+ *  +/-*:*. next/prev time
+ *  
+ *  selection like basic math expressions
+ *  
+ *  python interface for all commands?!
+ *  qaction->python script?!
+ *  
+ *  jflex->commandshortcuts->python scripts via something like p	
+ */
+	
+	private TimelineCursor cursor;
+	
+	private CursorToolBox cursorToolBox = new CursorToolBox(this);
+	
 	public DoublePointSequenceEditor() {
 		super();
 		
@@ -39,8 +60,18 @@ public class DoublePointSequenceEditor extends GenericSequenceEditor<Double, Dou
 		viewWidget.addHorizontalRuler(new BeatMeasureTimeLineHorizontalRuler(this, types.TypeSystem.timelineTypeHandler));
 		viewWidget.getGraphicsView().setAlignment(Qt.AlignmentFlag.AlignLeft);
 		
-		scene.addItem(new Cursor(viewWidget.getGraphicsView()));
+		this.addToolBoxWidget(cursorToolBox);
+		
+		cursor = new TimelineCursor(viewWidget.getGraphicsView());
+		viewWidget.placeCursorAtScenePos.connect(this, "placeCursorAtScenePos(QPointF)");
+		
+		scene.addItem(cursor);
+		
 	}
+	
+	protected void placeCursorAtScenePos(QPointF pos) {
+		cursor.setPosition(types.TypeSystem.timelineTypeHandler.createNewFromScenePos(pos));
+	} 
 	
 	protected void mouseAtScenePos(QPointF pos) {
 		super.mouseAtScenePos(pos);

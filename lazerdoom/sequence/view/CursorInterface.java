@@ -1,5 +1,8 @@
 package sequence.view;
 
-public interface CursorInterface<T> {
+import com.trolltech.qt.QSignalEmitter.Signal1;
 
+public interface CursorInterface<T> {
+	Signal1<T> getPositionChangedSignal();
+	void setPosition(T t);
 }

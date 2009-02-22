@@ -12,6 +12,7 @@ import com.trolltech.qt.gui.QPainter;
 import com.trolltech.qt.gui.QPainterPath;
 import com.trolltech.qt.gui.QStyleOptionGraphicsItem;
 import com.trolltech.qt.gui.QWidget;
+import com.trolltech.qt.gui.QPainter.RenderHint;
 
 public class PatchNodeTab extends QGraphicsRectItem {
 	
@@ -56,6 +57,7 @@ public class PatchNodeTab extends QGraphicsRectItem {
 		path.cubicTo(new QPointF(rect.left()+rect.width()/5, rect.bottomLeft().y()-margin), new QPointF(rect.left(),rect.bottomLeft().y()-margin),new QPointF(rect.left(), rect.bottomLeft().y()-2*margin));
 		
 
+		painter.setRenderHint(RenderHint.Antialiasing);
 		painter.setBrush(new QBrush(QColor.red));
 		
 		

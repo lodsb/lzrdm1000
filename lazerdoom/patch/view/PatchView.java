@@ -6,6 +6,7 @@ import com.trolltech.qt.core.QPointF;
 import com.trolltech.qt.gui.QDragMoveEvent;
 import com.trolltech.qt.gui.QGraphicsView;
 import com.trolltech.qt.gui.QMouseEvent;
+import com.trolltech.qt.opengl.QGLWidget;
 
 public class PatchView extends QGraphicsView {
 	public Signal1<QPointF> mouseAtScenePos = new Signal1<QPointF>();
@@ -13,6 +14,7 @@ public class PatchView extends QGraphicsView {
 	
 	public PatchView(PatchScene patchScene) {
 		super(patchScene);
+		this.setupViewport(new QGLWidget());
 	}
 
 	public void mouseMoveEvent(QMouseEvent event) {

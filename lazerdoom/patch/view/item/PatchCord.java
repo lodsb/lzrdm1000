@@ -8,9 +8,13 @@ import com.trolltech.qt.gui.QGraphicsLineItem;
 import com.trolltech.qt.gui.QGraphicsPathItem;
 import com.trolltech.qt.gui.QGraphicsSceneHoverEvent;
 import com.trolltech.qt.gui.QLine;
+import com.trolltech.qt.gui.QPainter;
 import com.trolltech.qt.gui.QPainterPath;
 import com.trolltech.qt.gui.QPen;
+import com.trolltech.qt.gui.QStyleOptionGraphicsItem;
+import com.trolltech.qt.gui.QWidget;
 import com.trolltech.qt.gui.QGraphicsItem.GraphicsItemFlag;
+import com.trolltech.qt.gui.QPainter.RenderHint;
 
 
 public class PatchCord extends QGraphicsPathItem {
@@ -88,5 +92,10 @@ public class PatchCord extends QGraphicsPathItem {
 		path.addEllipse(targetX-connectorSize/2,targetY-connectorSize/2, connectorSize, connectorSize);
 		
 		this.setPath(path);
+	}
+	
+	public void paint(QPainter painter, QStyleOptionGraphicsItem option, QWidget w) {
+		painter.setRenderHint(RenderHint.Antialiasing);
+		super.paint(painter, option, w);
 	}
 }

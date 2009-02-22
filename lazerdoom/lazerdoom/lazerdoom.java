@@ -1,4 +1,5 @@
 package lazerdoom;
+import com.trolltech.qt.core.QPointF;
 import com.trolltech.qt.core.Qt.DockWidgetArea;
 import com.trolltech.qt.gui.*;
 import com.trolltech.qt.sql.QSqlTableModel;
@@ -10,6 +11,7 @@ import patch.view.PatchView;
 
 import sequence.GenericTimelineSequence;
 import sequence.view.GenericSequenceEditor;
+import sequence.view.SequenceEditorStack;
 import sequence.view.types.DoublePointSequenceEditor;
 
 public class lazerdoom extends QMainWindow{
@@ -37,11 +39,26 @@ public class lazerdoom extends QMainWindow{
         patchViewDock.setWidget(patchView);
         this.addDockWidget(DockWidgetArea.LeftDockWidgetArea, patchViewDock);
         
-        DoublePointSequenceEditor testGenericSequenceEditor = new DoublePointSequenceEditor();
+        SequenceEditorStack editorStack = new SequenceEditorStack();
         QDockWidget sequenceEditorDock = new QDockWidget(this);
         sequenceEditorDock.setWindowTitle("Editor");
-        sequenceEditorDock.setWidget(testGenericSequenceEditor);
+        sequenceEditorDock.setWidget(editorStack);
         this.addDockWidget(DockWidgetArea.RightDockWidgetArea, sequenceEditorDock);
         
+        patchScene.addNode(new QPointF(200,200));
+        patchScene.addNode(new QPointF(200,400));
+        patchScene.addNode(new QPointF(400,200));
+        patchScene.addNode(new QPointF(600,200));
+        patchScene.addNode(new QPointF(200,600));
+        
+       
+        editorStack.addSequenceEditor(new DoublePointSequenceEditor());
+        editorStack.addSequenceEditor(new DoublePointSequenceEditor());
+        editorStack.addSequenceEditor(new DoublePointSequenceEditor());
+        editorStack.addSequenceEditor(new DoublePointSequenceEditor());
+        editorStack.addSequenceEditor(new DoublePointSequenceEditor());
+        editorStack.addSequenceEditor(new DoublePointSequenceEditor());
+        editorStack.addSequenceEditor(new DoublePointSequenceEditor());
+       
     }
 }

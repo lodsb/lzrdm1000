@@ -15,6 +15,7 @@ import com.trolltech.qt.gui.QPainter;
 import com.trolltech.qt.gui.QStyleOptionGraphicsItem;
 import com.trolltech.qt.gui.QWidget;
 import com.trolltech.qt.gui.QGraphicsItem.GraphicsItemFlag;
+import com.trolltech.qt.gui.QPainter.RenderHint;
 
 public class Inlet extends QGraphicsItem {
 
@@ -96,6 +97,8 @@ System.out.println("sdjksdfkljfsd");
 		if(hover) {
 			painter.setPen(hoverColor);
 		}
+		
+		painter.setRenderHint(RenderHint.Antialiasing);
 		
 		painter.drawEllipse(sizeRect);
 		painter.setPen(color);

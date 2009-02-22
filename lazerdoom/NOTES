@@ -3,6 +3,11 @@ fix wrong offset in doublepointverticalruler 0 in gview and scale are not the sa
 fix refresh problem in gview!
 interfaces for typhandler based and viewgeometry based stuff
 ***
+
+improve speed when dragging node arround:
+maybe setting the tab as parent for the node will fix the issues with having all the signal/slot mechanisms
+
+
 Dev-Notes:
 
 - resource handlers -> xml should have a facility to register on startup

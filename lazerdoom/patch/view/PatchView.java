@@ -14,7 +14,7 @@ public class PatchView extends QGraphicsView {
 	
 	public PatchView(PatchScene patchScene) {
 		super(patchScene);
-		this.setupViewport(new QGLWidget());
+		//this.setupViewport(new QGLWidget());
 	}
 
 	public void mouseMoveEvent(QMouseEvent event) {

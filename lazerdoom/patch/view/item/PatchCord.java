@@ -22,8 +22,8 @@ public class PatchCord extends QGraphicsPathItem {
 	private final int inOutLetMargin = 100;
 	private final int connectorSize = 10;
 	
-	private final double normalZLevel = -1.0;
-	private final double raisedZLevel = 1000.0;
+	private final double normalZLevel = 1.0;
+	private final double raisedZLevel = 20.0;
 	
 	private static QPen pen = new QPen(QColor.black);
 	

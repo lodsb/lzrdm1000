@@ -1,7 +1,7 @@
 /********************************************************************************
 ** Form generated from reading ui file 'ViewInfo.jui'
 **
-** Created: Do Feb 19 19:25:50 2009
+** Created: Mo Feb 23 05:41:42 2009
 **      by: Qt User Interface Compiler version 4.4.2
 **
 ** WARNING! All changes made in this file will be lost when recompiling ui file!
@@ -15,9 +15,7 @@ import com.trolltech.qt.gui.*;
 public class Ui_ViewInfo
 {
     public QHBoxLayout horizontalLayout_3;
-    public QGroupBox cursorBox;
-    public QHBoxLayout horizontalLayout_2;
-    public QLineEdit cursorPositionP;
+    public QSpacerItem horizontalSpacer;
     public QGroupBox mousePositionBox;
     public QHBoxLayout horizontalLayout;
     public QLabel positionP;
@@ -34,19 +32,9 @@ public class Ui_ViewInfo
         ViewInfo.setAutoFillBackground(false);
         horizontalLayout_3 = new QHBoxLayout(ViewInfo);
         horizontalLayout_3.setObjectName("horizontalLayout_3");
-        cursorBox = new QGroupBox(ViewInfo);
-        cursorBox.setObjectName("cursorBox");
-        cursorBox.setMaximumSize(new QSize(16777215, 75));
-        horizontalLayout_2 = new QHBoxLayout(cursorBox);
-        horizontalLayout_2.setObjectName("horizontalLayout_2");
-        cursorPositionP = new QLineEdit(cursorBox);
-        cursorPositionP.setObjectName("cursorPositionP");
-        cursorPositionP.setFocusPolicy(com.trolltech.qt.core.Qt.FocusPolicy.StrongFocus);
+        horizontalSpacer = new QSpacerItem(0, 0, com.trolltech.qt.gui.QSizePolicy.Policy.Expanding, com.trolltech.qt.gui.QSizePolicy.Policy.Minimum);
 
-        horizontalLayout_2.addWidget(cursorPositionP);
-
-
-        horizontalLayout_3.addWidget(cursorBox);
+        horizontalLayout_3.addItem(horizontalSpacer);
 
         mousePositionBox = new QGroupBox(ViewInfo);
         mousePositionBox.setObjectName("mousePositionBox");
@@ -80,7 +68,6 @@ public class Ui_ViewInfo
     void retranslateUi(QWidget ViewInfo)
     {
         ViewInfo.setWindowTitle(com.trolltech.qt.core.QCoreApplication.translate("ViewInfo", "Form"));
-        cursorBox.setTitle(com.trolltech.qt.core.QCoreApplication.translate("ViewInfo", "Cursor"));
         mousePositionBox.setTitle(com.trolltech.qt.core.QCoreApplication.translate("ViewInfo", "Position"));
         positionP.setText(com.trolltech.qt.core.QCoreApplication.translate("ViewInfo", ""));
         positionT.setText(com.trolltech.qt.core.QCoreApplication.translate("ViewInfo", ""));

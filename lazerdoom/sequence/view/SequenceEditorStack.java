@@ -22,7 +22,7 @@ public class SequenceEditorStack extends QScrollArea {
 	@SuppressWarnings("unchecked")
 	public void addSequenceEditor(GenericSequenceEditor editor) {
 		layout.addWidget(editor);
-		containerWidget.adjustSize();
+		//containerWidget.adjustSize();
 
 	}
 }

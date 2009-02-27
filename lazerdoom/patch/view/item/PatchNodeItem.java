@@ -33,7 +33,7 @@ public class PatchNodeItem extends QGraphicsProxyWidget {
 	
 	private final int marginSize = 5;
 	public final double normalZLevel = -2.0;
-	public final double raisedZLevel = 1.0;
+	public final double raisedZLevel = 10.0;
 	private final int tabWidth = 20;
 	
 	private QGridLayout layout = new QGridLayout();

@@ -108,7 +108,34 @@ public class GenericSequenceViewWidget<P,T> extends QWidget implements GenericSe
 			
 			layout.setRowMinimumHeight(0, currentHRulerMinHeight);
 			layout.setColumnMinimumWidth(0, currentVRulerMinWidth);
-			
+		}
+	}
+	
+	public void setShowHorizontalRuler(Boolean show) {
+		if(!show) {
+			hRulerWidget.hide();
+			layout.setRowMinimumHeight(0, 0);
+		} else {
+			hRulerWidget.show();
+			layout.setRowMinimumHeight(0, currentHRulerMinHeight);
+		}
+	}
+	
+	public void setShowVerticalRuler(Boolean show) {
+		if(!show) {
+			vRulerWidget.hide();
+			layout.setColumnMinimumWidth(0, 0);
+		} else {
+			vRulerWidget.show();
+			layout.setColumnMinimumWidth(0, currentVRulerMinWidth);
+		}
+	}
+	
+	public void showViewInfoWidget(Boolean show) {
+		if(!show) {
+			viewInfoWidget.hide();
+		} else {
+			viewInfoWidget.show();
 		}
 	}
 	
@@ -258,5 +285,4 @@ public class GenericSequenceViewWidget<P,T> extends QWidget implements GenericSe
 		
 		this.gView.scale(zh, zv);
 	}
-
 }

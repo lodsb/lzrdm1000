@@ -6,8 +6,10 @@ import com.trolltech.qt.core.QPointF;
 import com.trolltech.qt.core.QRectF;
 import com.trolltech.qt.gui.QBrush;
 import com.trolltech.qt.gui.QColor;
+import com.trolltech.qt.gui.QGradient;
 import com.trolltech.qt.gui.QGraphicsRectItem;
 import com.trolltech.qt.gui.QGraphicsSceneMouseEvent;
+import com.trolltech.qt.gui.QLinearGradient;
 import com.trolltech.qt.gui.QPainter;
 import com.trolltech.qt.gui.QPainterPath;
 import com.trolltech.qt.gui.QStyleOptionGraphicsItem;
@@ -58,7 +60,12 @@ public class PatchNodeTab extends QGraphicsRectItem {
 		
 
 		painter.setRenderHint(RenderHint.Antialiasing);
-		painter.setBrush(new QBrush(QColor.red));
+		/*
+		QLinearGradient gradient = new QLinearGradient(rect.left(), 0, rect.right(),0);
+		gradient.setColorAt(0, QColor.black);
+		gradient.setColorAt(1, QColor.red);
+		*/
+		painter.setBrush(QColor.black);
 		
 		
 		painter.drawPath(path);

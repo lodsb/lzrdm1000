@@ -126,6 +126,18 @@ public class HorizontalRuler<P> extends QWidget implements HorizontalRulerInterf
 			this.update();
 		}
 	}
+
+	@Override
+	public Signal1<P> getPositionChangedSignal() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public void setPosition(P t) {
+		// TODO Auto-generated method stub
+		
+	}
 	
 
 }

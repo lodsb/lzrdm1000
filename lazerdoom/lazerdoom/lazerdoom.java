@@ -54,11 +54,5 @@ public class lazerdoom extends QMainWindow{
        
         editorStack.addSequenceEditor(new DoublePointSequenceEditor());
         editorStack.addSequenceEditor(new DoublePointSequenceEditor());
-        editorStack.addSequenceEditor(new DoublePointSequenceEditor());
-        editorStack.addSequenceEditor(new DoublePointSequenceEditor());
-        editorStack.addSequenceEditor(new DoublePointSequenceEditor());
-        editorStack.addSequenceEditor(new DoublePointSequenceEditor());
-        editorStack.addSequenceEditor(new DoublePointSequenceEditor());
-       
     }
 }

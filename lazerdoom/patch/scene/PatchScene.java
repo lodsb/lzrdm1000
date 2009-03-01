@@ -39,6 +39,7 @@ import com.trolltech.qt.gui.QRadioButton;
 import com.trolltech.qt.gui.QWidget;
 import com.trolltech.qt.gui.QGraphicsItem.GraphicsItemFlag;
 import com.trolltech.qt.gui.QPainter.RenderHint;
+import edu.uci.ics.jung.*;
 
 public class PatchScene extends QGraphicsScene {
    
@@ -50,6 +51,9 @@ public class PatchScene extends QGraphicsScene {
 	private LinkedList<NewConnector> selectedInputs = new LinkedList<NewConnector>();
 	
 	private Outlet connectionStartDragOutlet;
+	
+	private PatchGraphController graphController = new PatchGraphController();
+	
 	
 	public static void main(String args[]) {
         QApplication.initialize(args);
@@ -78,7 +82,7 @@ public class PatchScene extends QGraphicsScene {
         //pt.setPos(400,400);
         //patchScene.addItem(pt);
         
-        view.createConnectionWithCurrentSelection.connect(patchScene,"createConnectionWithCurrentSelection()");
+       
         
         QApplication.exec();
     }
@@ -87,7 +91,7 @@ public class PatchScene extends QGraphicsScene {
         setSceneRect(-200, -200, 400, 400);
 	}
 	
-	private void createConnectionWithCurrentSelection() {
+	public void createConnectionWithCurrentSelection() {
 		List<QGraphicsItemInterface> items = selectedItems();
 		
 		selectedInputs.clear();
@@ -104,69 +108,25 @@ public class PatchScene extends QGraphicsScene {
 		}
 		
 		if(selectedInputs.size() != 0 && selectedOutputs.size() != 0) {
-			this.addItem(new NewPatchCord(selectedInputs.getFirst(), selectedOutputs.getFirst()));
+			// fix this with multiple connection etc etc...
+			NewConnector src = selectedInputs.getFirst();
+			NewConnector dst = selectedOutputs.getFirst();
+	
+				try {
+					connect(src.getModuleID(), dst.getModuleID());
+				} catch (Exception e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+	
 		}
 	}
 	
-	private void connectionDragStarted(Outlet item) {
-		connectionDragStarted = true;
-		
-		dragStart = item.scenePos();
-		
-		System.out.println("ksdflksdfjkl");
-		
-		patchCord = new PatchCord();
-		patchCord.setPos(dragStart.x()+item.boundingRect().width()/2, dragStart.y()+item.boundingRect().height()/2);
-		this.addItem(patchCord);
-		
-		connectionStartDragOutlet = item;
-		
-	}
-	
-	private void connectionDragAccepted(Inlet item) {
-		if(connectionStartDragOutlet != null && patchCord != null) {
-			patchCord.setInletAndOutlet(connectionStartDragOutlet, item);
-		}
-		
-		connectionDragStarted = false;
-		connectionStartDragOutlet = null;
-		patchCord = null;
-	}
-	
-	private void dragAtScenePosition(QPointF pos) {
-		if(connectionDragStarted && patchCord != null) {
-			patchCord.setDestination(pos);
-		}
-	}
-	
-	private void mouseReleasedAtScenePos(QPointF pos) {
-		if(connectionDragStarted && patchCord != null) {
-			this.removeItem(patchCord);
-			patchCord = null;
-			connectionDragStarted = false;
-		}
-	}
-	
-	public void setView(PatchView view) {
-        view.dragAtScenePos.connect(this, "dragAtScenePosition(QPointF)");
-        view.mouseReleasedAtScenePos.connect(this,"mouseReleasedAtScenePos(QPointF)");
-	}
-	
-	private void patchNodeDraggingAtScenePos(PatchNodeItem item, QPointF pos) {
-		item.setPos(pos);
+	private void connect(int srcModuleID, int dstModuleID) throws Exception {
+		graphController.connect(srcModuleID, dstModuleID);
 	}
 	
 	public void addNode(QPointF pos) {
-        PatchNodeItem w = new PatchNodeItem();
-        
-        w.connectionDragStarted.connect(this, "connectionDragStarted(Outlet)");
-        w.connectionDragAccepted.connect(this, "connectionDragAccepted(Inlet)");
-        w.patchNodeItemDraggingAtScenePos.connect(this, "patchNodeDraggingAtScenePos(PatchNodeItem, QPointF)");
-    
-        //view.setBackgroundBrush(new QBrush(QColor.black));
-        w.embedWidget(new CursorToolBox());
-        w.setPos(pos);
-        this.addItem(w);
 	}
 
 }

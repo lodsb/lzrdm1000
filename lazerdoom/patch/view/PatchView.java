@@ -19,40 +19,23 @@ import com.trolltech.qt.gui.QRadialGradient;
 import com.trolltech.qt.opengl.QGLWidget;
 
 public class PatchView extends QGraphicsView {
-	public Signal1<QPointF> mouseAtScenePos = new Signal1<QPointF>();
-	public Signal1<QPointF> mouseReleasedAtScenePos = new Signal1<QPointF>();
-	public Signal1<QPointF> dragAtScenePos = new Signal1<QPointF>(); 
 	
 	public Signal0 createConnectionWithCurrentSelection = new Signal0();
 	
 	private QColor bgColor1 = new QColor(38,50,62);
 	private QColor bgColor2 = new QColor(bgColor1.lighter(155));
 	
-	public PatchView(PatchScene patchScene) {
-		super(patchScene);
-		patchScene.setView(this);
-		//this.setupViewport(new QGLWidget());
-	}
-
-	public void mouseMoveEvent(QMouseEvent event) {
-		mouseAtScenePos.emit(this.mapToScene(event.pos()));
-		super.mouseMoveEvent(event);
-	} 
+	private PatchScene patchScene;
 	
-	public void mouseReleaseEvent(QMouseEvent event) {
-		mouseReleasedAtScenePos.emit(mapToScene(event.pos()));
-		super.mouseReleaseEvent(event);
+	public PatchView(PatchScene scene) {
+		super(scene);
+		
+		this.patchScene = scene;
 	}
-	
-	public void dragMoveEvent(QDragMoveEvent event) {
-		dragAtScenePos.emit(this.mapToScene(event.pos()));
-		super.dragMoveEvent(event);
-	}
-	
 	/*placeholder for keyboard management*/
 	public void keyPressEvent(QKeyEvent e) {
 		if(e.text().equals("c")) {
-			createConnectionWithCurrentSelection.emit();
+			patchScene.createConnectionWithCurrentSelection();
 			e.accept();
 		} 
 		
@@ -61,8 +44,6 @@ public class PatchView extends QGraphicsView {
 	
 	
     protected void drawBackground(QPainter painter, QRectF rect) {
-     
-
         // Fill
         QRadialGradient gradient = new QRadialGradient(0,0,rect.width());
         gradient.setColorAt(0, bgColor2);

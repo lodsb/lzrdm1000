@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<classpath>
+	<classpathentry kind="src" path="src"/>
+	<classpathentry kind="src" path="com"/>
+	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
+	<classpathentry kind="lib" path="/home/lodsb/diplomarbeit/multitouch/java_tuio/TUIO_JAVA/libTUIO.jar"/>
+	<classpathentry kind="src" path="Generated JUIC files"/>
+	<classpathentry kind="lib" path="/home/lodsb/jambi/qtjambi-linux32-gpl-4.4.3_01/qtjambi-4.4.3_01.jar">
+		<attributes>
+			<attribute name="javadoc_location" value="file:/home/lodsb/jambi/qtjambi-linux32-gpl-4.4.3_01/doc/html"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry kind="lib" path="/home/lodsb/jambi/qtjambi-linux32-gpl-4.4.3_01/qtjambi-designer-4.4.3_01.jar"/>
+	<classpathentry kind="lib" path="/home/lodsb/jambi/qtjambi-linux32-gpl-4.4.3_01/qtjambi-examples-4.4.3_01.jar"/>
+	<classpathentry kind="lib" path="/home/lodsb/jambi/qtjambi-linux32-gpl-4.4.3_01/qtjambi-linux32-gcc-4.4.3_01.jar">
+		<attributes>
+			<attribute name="javadoc_location" value="file:/home/lodsb/jambi/qtjambi-linux32-gpl-4.4.3_01/doc/html"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry kind="output" path="bin"/>
+</classpath>

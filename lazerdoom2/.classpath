@@ -17,5 +17,7 @@
 			<attribute name="javadoc_location" value="file:/home/lodsb/jambi/qtjambi-linux32-gpl-4.4.3_01/doc/html"/>
 		</attributes>
 	</classpathentry>
+	<classpathentry kind="lib" path="libs/jcollider/build/JCollider.jar"/>
+	<classpathentry kind="lib" path="libs/jcollider/libraries/NetUtil.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

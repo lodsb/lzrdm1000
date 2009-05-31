@@ -1,8 +1,9 @@
 package Sequencer;
 
 import Control.ControlBus;
+import Control.Types.BaseType;
 
-public interface EventSequenceInterface<EventType> extends SequenceInterface {
+public interface EventSequenceInterface<EventType extends BaseType> extends SequenceInterface {
 	public void insert(EventType t, long tick);
 	public void remove(long tick);
 	public void remove(EventType t);

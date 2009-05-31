@@ -7,6 +7,10 @@ import Control.ControlBus;
 import Control.Types.BaseType;
 
 public class EventPointsSequence<EventType extends BaseType> implements EventSequenceInterface<EventType> {
+	
+	// TODO: 1) locking event-Array & processing
+	// 		 2) implement startoffset&endpoint
+	
 	private class EventContainer<type> implements Comparable<EventContainer<type>> {
 		long tick = 0;
 		EventType event = null;

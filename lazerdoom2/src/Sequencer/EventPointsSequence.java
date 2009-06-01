@@ -1,15 +1,17 @@
 package Sequencer;
 
 import java.util.ArrayList;
-import java.util.Collections;
+import java.util.concurrent.locks.ReentrantLock;
 
 import Control.ControlBus;
 import Control.Types.BaseType;
 
 public class EventPointsSequence<EventType extends BaseType> implements EventSequenceInterface<EventType> {
 	
-	// TODO: 1) locking event-Array & processing
+	// TODO: 1) locking event-Array & processing // reentrant-lock implemented, better option available? evaluate!
 	// 		 2) implement startoffset&endpoint
+	
+	private ReentrantLock eventQueueLock = new ReentrantLock();
 	
 	private class EventContainer<type> implements Comparable<EventContainer<type>> {
 		long tick = 0;
@@ -60,6 +62,7 @@ public class EventPointsSequence<EventType extends BaseType> implements EventSeq
 		container.tick = tick;
 		container.event = t;
 		
+		eventQueueLock.lock();
 		//TODO: improve performance
 		int index = 0;
 		for(EventContainer<EventType> eventContainer: events) {
@@ -73,11 +76,16 @@ public class EventPointsSequence<EventType extends BaseType> implements EventSeq
 		currentEventListSize = events.size();
 		
 		updateSizeOfAllEvents();
+		
+		eventQueueLock.unlock();
 	}
 
 	@Override
 	public void remove(long tick) {
 		int index = -1;
+		
+		eventQueueLock.lock();
+		
 		for(EventContainer<EventType> eventContainer: events) {
 			if(eventContainer.tick == tick) {
 				break;
@@ -92,11 +100,16 @@ public class EventPointsSequence<EventType extends BaseType> implements EventSeq
 		currentEventListSize = events.size();
 		
 		updateSizeOfAllEvents();
+		
+		eventQueueLock.unlock();
 	}
 
 	@Override
 	public void remove(EventType t) {
 		int index = -1;
+		
+		eventQueueLock.lock();
+		
 		for(EventContainer<EventType> eventContainer: events) {
 			if(eventContainer.event == t) {
 				break;
@@ -111,6 +124,8 @@ public class EventPointsSequence<EventType extends BaseType> implements EventSeq
 		currentEventListSize = events.size();
 		
 		updateSizeOfAllEvents();
+		
+		eventQueueLock.unlock();
 	}
 
 	@Override
@@ -128,6 +143,8 @@ public class EventPointsSequence<EventType extends BaseType> implements EventSeq
 		EventContainer<EventType> container;
 		ArrayList<EventContainer<EventType>> eventList = new ArrayList<EventContainer<EventType>>();
 		
+		eventQueueLock.lock();
+		
 		for(EventContainer<EventType> eventContainer: events) {
 			container = new EventContainer<EventType>();
 			container.tick = eventContainer.tick;
@@ -139,6 +156,8 @@ public class EventPointsSequence<EventType extends BaseType> implements EventSeq
 		for(ControlBus<EventType> bus: controlBuses) {
 			controlBusList.add(bus);
 		}
+		
+		eventQueueLock.unlock();
 
 		return new EventPointsSequence<EventType>(eventList, controlBusList, this.startOffset, this.endPoint);
 	}
@@ -148,8 +167,10 @@ public class EventPointsSequence<EventType extends BaseType> implements EventSeq
 		if(nextEventTickSchedule == 0) {
 			
 			for(ControlBus<EventType> bus: this.controlBuses) {
-				bus.appendMessage(nextEvent);
+				bus.setValue(nextEvent);
 			}
+			
+			eventQueueLock.lock();
 			
 			if(nextEventIndex+1 < currentEventListSize) {
 				isRunning = true;
@@ -165,7 +186,10 @@ public class EventPointsSequence<EventType extends BaseType> implements EventSeq
 				EventContainer<EventType> container = events.get(0);
 				nextEventTickSchedule = (tick%sizeOfAllEvents) - container.tick; 
 				nextEvent = container.event;
+				
 			}
+			
+			eventQueueLock.unlock();
 		} 
 		
 		nextEventTickSchedule--;
@@ -178,6 +202,9 @@ public class EventPointsSequence<EventType extends BaseType> implements EventSeq
 			queueAndProcessNextEvents(tick);
 		} else {
 			int index = -1;
+			
+			eventQueueLock.lock();
+			
 			for(EventContainer<EventType> eventContainer: events) {
 				if(eventContainer.tick >= tick) {
 					break;
@@ -195,6 +222,8 @@ public class EventPointsSequence<EventType extends BaseType> implements EventSeq
 			} else {
 				isRunning= false;
 			}
+			
+			eventQueueLock.unlock();
 		}
 		
 		oldTick = tick;
@@ -208,13 +237,18 @@ public class EventPointsSequence<EventType extends BaseType> implements EventSeq
 
 	@Override
 	public void reset() {
+		
+		eventQueueLock.lock();
+		
 		EventContainer<EventType> eventContainer = null;
 		
 		if((eventContainer = events.get(0)) != null) {
 			for(ControlBus<EventType> bus: this.controlBuses) {
-				bus.appendMessage(eventContainer.event.defaultValue());
+				bus.setValue(eventContainer.event.defaultValue());
 			}
 		}
+		
+		eventQueueLock.unlock();
 	}
 
 	private void updateSizeOfAllEvents() {
@@ -233,8 +267,11 @@ public class EventPointsSequence<EventType extends BaseType> implements EventSeq
 
 	@Override
 	public void shift(long tick, long offset) {
+		
 		long lastTick = 0;
 		boolean found = false;
+		
+		eventQueueLock.lock();
 		
 		for(EventContainer<EventType> eventContainer: events) {
 			if(found || eventContainer.tick >= tick) {
@@ -264,6 +301,8 @@ public class EventPointsSequence<EventType extends BaseType> implements EventSeq
 			}
 		}
 		
+		
+		eventQueueLock.unlock();
 		
 	}
 

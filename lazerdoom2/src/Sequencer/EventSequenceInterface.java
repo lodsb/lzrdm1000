@@ -1,6 +1,6 @@
 package Sequencer;
 
-import Control.ControlBus;
+import Control.ControlBusInterface;
 import Control.Types.BaseType;
 
 public interface EventSequenceInterface<EventType extends BaseType> extends SequenceInterface {
@@ -14,7 +14,7 @@ public interface EventSequenceInterface<EventType extends BaseType> extends Sequ
 	public void setEndPoint(long ticks);
 	public long getEndPoint();
 	
-	public void addControlBus(ControlBus<EventType> cb);
-	public void removeControlBus(ControlBus<EventType> cb);
+	public void addControlBus(ControlBusInterface<EventType> cb);
+	public void removeControlBus(ControlBusInterface<EventType> cb);
 	public void removeAllControlBusses();
 }

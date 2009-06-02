@@ -3,7 +3,7 @@ package Sequencer;
 import java.util.ArrayList;
 import java.util.concurrent.locks.ReentrantLock;
 
-import Control.ControlBus;
+import Control.ControlBusInterface;
 import Control.Types.BaseType;
 
 public class EventPointsSequence<EventType extends BaseType> implements EventSequenceInterface<EventType> {
@@ -30,7 +30,7 @@ public class EventPointsSequence<EventType extends BaseType> implements EventSeq
 	}
 	
 	ArrayList<EventContainer<EventType>> events;
-	ArrayList<ControlBus<EventType>> controlBuses;
+	ArrayList<ControlBusInterface<EventType>> controlBuses;
 	long startOffset = 0;
 	long endPoint = 0;
 	
@@ -42,7 +42,7 @@ public class EventPointsSequence<EventType extends BaseType> implements EventSeq
 	EventType nextEvent = null;
 	boolean isRunning = false;
 	
-	private EventPointsSequence(ArrayList<EventContainer<EventType>> events, ArrayList<ControlBus<EventType>> controlBuses, long startOffset, long endPoint) {
+	private EventPointsSequence(ArrayList<EventContainer<EventType>> events, ArrayList<ControlBusInterface<EventType>> controlBuses, long startOffset, long endPoint) {
 		this.events = events;
 		this.controlBuses = controlBuses;
 		this.startOffset = startOffset;
@@ -51,7 +51,7 @@ public class EventPointsSequence<EventType extends BaseType> implements EventSeq
 	
 	public EventPointsSequence() {
 		this.events = new ArrayList<EventContainer<EventType>>(); 
-		this.controlBuses = new ArrayList<ControlBus<EventType>>();
+		this.controlBuses = new ArrayList<ControlBusInterface<EventType>>();
 	} 
 	
 	
@@ -129,12 +129,12 @@ public class EventPointsSequence<EventType extends BaseType> implements EventSeq
 	}
 
 	@Override
-	public void addControlBus(ControlBus<EventType> cb) {
+	public void addControlBus(ControlBusInterface<EventType> cb) {
 		this.controlBuses.add(cb);
 		
 	}
 
-	public void removeControlBus(ControlBus<EventType> cb) {
+	public void removeControlBus(ControlBusInterface<EventType> cb) {
 		this.controlBuses.remove(cb);
 	}
 	
@@ -152,8 +152,8 @@ public class EventPointsSequence<EventType extends BaseType> implements EventSeq
 			eventList.add(container);
 		}
 		
-		ArrayList<ControlBus<EventType>> controlBusList = new ArrayList<ControlBus<EventType>>();
-		for(ControlBus<EventType> bus: controlBuses) {
+		ArrayList<ControlBusInterface<EventType>> controlBusList = new ArrayList<ControlBusInterface<EventType>>();
+		for(ControlBusInterface<EventType> bus: controlBuses) {
 			controlBusList.add(bus);
 		}
 		
@@ -166,7 +166,7 @@ public class EventPointsSequence<EventType extends BaseType> implements EventSeq
 	private void queueAndProcessNextEvents(long tick) {
 		if(nextEventTickSchedule == 0) {
 			
-			for(ControlBus<EventType> bus: this.controlBuses) {
+			for(ControlBusInterface<EventType> bus: this.controlBuses) {
 				bus.setValue(nextEvent);
 			}
 			
@@ -243,7 +243,7 @@ public class EventPointsSequence<EventType extends BaseType> implements EventSeq
 		EventContainer<EventType> eventContainer = null;
 		
 		if((eventContainer = events.get(0)) != null) {
-			for(ControlBus<EventType> bus: this.controlBuses) {
+			for(ControlBusInterface<EventType> bus: this.controlBuses) {
 				bus.setValue(eventContainer.event.defaultValue());
 			}
 		}

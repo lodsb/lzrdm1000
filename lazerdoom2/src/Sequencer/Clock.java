@@ -3,8 +3,9 @@ package Sequencer;
 import java.util.concurrent.ScheduledThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 
-public class Clock implements Runnable {
+public class Clock implements ClockInterface, Runnable {
 	private Sequencer sequencer;
+	private ScheduledThreadPoolExecutor stpe;
 	
 	Clock(long interval, Sequencer sequencer) {
 		this.sequencer = sequencer;
@@ -12,8 +13,7 @@ public class Clock implements Runnable {
 		this.interval = interval;
 		tmpInt = this.interval;
 		
-		ScheduledThreadPoolExecutor stpe = new ScheduledThreadPoolExecutor(1);
-		stpe.scheduleAtFixedRate(this, 1000000000, 100000, TimeUnit.NANOSECONDS);
+		this.stpe = new ScheduledThreadPoolExecutor(1);
 	}
 	
 	private static long nanoInMs = 1000000;
@@ -71,6 +71,23 @@ public class Clock implements Runnable {
 				latencyAcc = 0;
 			}
 			sequencer.eval(runs);
+	}
+
+	@Override
+	public void setInterval(long interval) {
+		this.interval = interval;
+		this.stpe.remove(this);
+		this.stpe.scheduleAtFixedRate(this, interval, interval, TimeUnit.NANOSECONDS);
+	}
+
+	@Override
+	public void setSequencer(Sequencer sequencer) {
+		this.sequencer = sequencer;
+	}
+	
+	@Override
+	public void start() {
+		stpe.scheduleAtFixedRate(this, 1000000000, interval, TimeUnit.NANOSECONDS);
 	}
 
 }

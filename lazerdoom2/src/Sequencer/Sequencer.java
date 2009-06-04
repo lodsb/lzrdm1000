@@ -11,7 +11,7 @@ public class Sequencer implements SequenceInterface {
 	private ControlServer controlServer;
 	private boolean isRunning  = false;
 	
-	Sequencer(SequenceInterface mainSequence, ControlServer controlServer) {
+	public Sequencer(SequenceInterface mainSequence, ControlServer controlServer) {
 		this.mainSequence = mainSequence;
 		this.controlServer= controlServer;
 	}

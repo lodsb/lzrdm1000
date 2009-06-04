@@ -3,11 +3,11 @@ package Sequencer;
 import java.util.concurrent.ScheduledThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 
-public class Clock implements ClockInterface, Runnable {
+public class HighResolutionPollingClock implements ClockInterface, Runnable {
 	private Sequencer sequencer;
 	private ScheduledThreadPoolExecutor stpe;
 	
-	Clock(long interval, Sequencer sequencer) {
+	public HighResolutionPollingClock(long interval, Sequencer sequencer) {
 		this.sequencer = sequencer;
 		
 		this.interval = interval;
@@ -77,7 +77,7 @@ public class Clock implements ClockInterface, Runnable {
 	public void setInterval(long interval) {
 		this.interval = interval;
 		this.stpe.remove(this);
-		this.stpe.scheduleAtFixedRate(this, interval, interval, TimeUnit.NANOSECONDS);
+		this.stpe.scheduleAtFixedRate(this, interval, interval-(2/9*interval), TimeUnit.NANOSECONDS);
 	}
 
 	@Override
@@ -87,7 +87,7 @@ public class Clock implements ClockInterface, Runnable {
 	
 	@Override
 	public void start() {
-		stpe.scheduleAtFixedRate(this, 1000000000, interval, TimeUnit.NANOSECONDS);
+		stpe.scheduleAtFixedRate(this, 1000000000, interval-(2/9*interval), TimeUnit.NANOSECONDS);
 	}
 
 }

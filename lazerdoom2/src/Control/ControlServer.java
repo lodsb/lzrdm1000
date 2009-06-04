@@ -11,11 +11,11 @@ public class ControlServer {
 	
 	private OSCBundle currentBundle = new OSCBundle();
 	
-	private long serverLatency = 50;
+	private long serverLatency;
 	private SocketAddress clientAddress;
 	private OSCServer server;
 	
-	ControlServer(int port, long latencyMs) {
+	public ControlServer(int port, long latencyMs) {
 		this.serverLatency = latencyMs;
 		
 		try {

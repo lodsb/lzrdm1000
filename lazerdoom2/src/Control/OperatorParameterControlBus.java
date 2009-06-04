@@ -1,5 +1,6 @@
 package Control;
 
+import de.sciss.jcollider.Synth;
 import de.sciss.net.OSCMessage;
 import Control.Types.BaseType;
 
@@ -7,17 +8,15 @@ public class OperatorParameterControlBus<T extends BaseType> extends ParameterCo
 
 	private ControlOperatorInterface<T> operator;
 	
-	OperatorParameterControlBus(ControlServer server, String url, String parameter, int nodeID, ControlOperatorInterface<T> operator) {
-		super(server, url, parameter, nodeID);	
+	OperatorParameterControlBus(ControlServer server, Synth synth, String parameter, ControlOperatorInterface<T> operator) {
+		super(server,synth, parameter);	
 		this.operator = operator;
 	}
 	
 	@Override
 	public void setValue(T value) {
 		if(operator.consume(value)) {
-			server.appendMessage(new OSCMessage(url, 
-				new Object[] {new Integer(nodeID), new String(parameter), operator.getResult().getValue()}                             
-			));
+			server.appendMessage(synth.setMsg(parameter, operator.getResult().getFloatValue()));
 		}
 		
 	}

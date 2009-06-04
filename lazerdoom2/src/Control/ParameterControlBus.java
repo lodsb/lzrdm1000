@@ -1,28 +1,31 @@
 package Control;
 
+import de.sciss.jcollider.Synth;
 import de.sciss.net.OSCMessage;
 import Control.Types.BaseType;
 
 public class ParameterControlBus<T extends BaseType> implements ControlBusInterface<T> {
 
 	protected ControlServer server;
-	protected String url;
+	protected Synth synth;
 	protected String parameter;
-	protected int nodeID;
 	
-	ParameterControlBus(ControlServer server, String url, String parameter, int nodeID) {
+	ParameterControlBus(ControlServer server, Synth synth, String parameter) {
 		this.server = server;
-		this.url = url;
+		this.synth = synth;
 		this.parameter = parameter;
-		this.nodeID = nodeID;
 	}
 	
 	@Override
 	public void setValue(T baseType) {
-		server.appendMessage(new OSCMessage(url, 
-				new Object[] {new Integer(nodeID), new String(parameter), baseType.getValue()}                             
-		));
+		server.appendMessage(synth.setMsg(this.parameter, baseType.getFloatValue()));
 		
+	}
+
+	@Override
+	public void setSynthAndParameter(Synth synth, String parameter) {
+		this.synth = synth;
+		this.parameter = parameter;
 	}
 
 }

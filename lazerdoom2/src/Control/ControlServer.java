@@ -2,7 +2,7 @@ package Control;
 
 import java.io.IOException;
 import java.net.SocketAddress;
-
+import de.sciss.jcollider.*;
 import de.sciss.net.*;
 
 public class ControlServer {
@@ -12,18 +12,11 @@ public class ControlServer {
 	private OSCBundle currentBundle = new OSCBundle();
 	
 	private long serverLatency;
-	private SocketAddress clientAddress;
-	private OSCServer server;
+	private Server server;
 	
-	public ControlServer(int port, long latencyMs) {
+	public ControlServer(Server server, long latencyMs) {
 		this.serverLatency = latencyMs;
-		
-		try {
-			this.server = OSCServer.newUsing(OSCServer.UDP, port);
-		} catch (IOException e) {
-			System.out.println("ERROR creating OSCServer:\n"+e.getMessage());
-			e.printStackTrace();
-		}
+		this.server = server;
 	}
 	
 	public void flushMessages() {
@@ -32,9 +25,9 @@ public class ControlServer {
 			currentBundle.setTimeTagAbsMillis(OSCBundle.NOW+serverLatency);
 			
 			try {
-				server.send(currentBundle, clientAddress);
+				server.sendBundle(currentBundle);
 			} catch (IOException e) {
-				System.out.println("Error sending OSCMessage:\n"+e.getMessage());
+				System.out.println("Error sending OSCBundle to SC3Server:\n"+e.getMessage());
 				e.printStackTrace();
 			}
 			

@@ -1,5 +1,6 @@
 package Control;
 
+import de.sciss.jcollider.ControlDesc;
 import de.sciss.jcollider.Synth;
 import de.sciss.net.OSCMessage;
 import Control.Types.BaseType;
@@ -8,24 +9,33 @@ public class ParameterControlBus<T extends BaseType> implements ControlBusInterf
 
 	protected ControlServer server;
 	protected Synth synth;
-	protected String parameter;
+	protected ControlDesc controlDescription;
 	
-	ParameterControlBus(ControlServer server, Synth synth, String parameter) {
+	ParameterControlBus(ControlServer server, ControlDesc desc, Synth synth) {
 		this.server = server;
 		this.synth = synth;
-		this.parameter = parameter;
+		this.controlDescription = desc;
 	}
 	
 	@Override
 	public void setValue(T baseType) {
-		server.appendMessage(synth.setMsg(this.parameter, baseType.getFloatValue()));
+		server.appendMessage(synth.setMsg(this.controlDescription.getName(), baseType.getFloatValue()));
 		
 	}
 
 	@Override
-	public void setSynthAndParameter(Synth synth, String parameter) {
+	public void setSynthAndControlDesc(Synth synth, ControlDesc desc) {
 		this.synth = synth;
-		this.parameter = parameter;
+		this.controlDescription = desc;
 	}
 
+	@Override
+	public void setDefaultValue() {
+		server.appendMessage(synth.setMsg(this.controlDescription.getName(), this.controlDescription.getDefaultValue()));
+	}
+
+	@Override
+	public ControlDesc getControlDesc() {
+		return this.controlDescription;
+	}
 }

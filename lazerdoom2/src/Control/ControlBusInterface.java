@@ -5,6 +5,8 @@ import de.sciss.net.*;
 import de.sciss.jcollider.*;
 
 public interface ControlBusInterface<T extends BaseType> {
-	public void setSynthAndParameter(Synth synth, String parameter);
+	void setSynthAndControlDesc(Synth synth, ControlDesc desc);
 	public void setValue(T baseType);
+	public void setDefaultValue();
+	public ControlDesc getControlDesc();
 }

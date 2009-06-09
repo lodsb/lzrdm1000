@@ -242,12 +242,9 @@ public class EventPointsSequence<EventType extends BaseType> implements EventSeq
 		
 		EventContainer<EventType> eventContainer = null;
 		
-		if((eventContainer = events.get(0)) != null) {
-			for(ControlBusInterface<EventType> bus: this.controlBuses) {
-				bus.setValue(eventContainer.event.defaultValue());
-			}
+		for(ControlBusInterface<EventType> bus: this.controlBuses) {
+				bus.setDefaultValue();
 		}
-		
 		eventQueueLock.unlock();
 	}
 

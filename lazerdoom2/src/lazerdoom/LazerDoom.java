@@ -49,6 +49,7 @@ public class LazerDoom {
 		try {
 			superColliderServer.start();
 			superColliderServer.startAliveThread();
+			superColliderServer.boot();
 		} catch (IOException e) {
 			System.err.println("Error starting SC3-Server:\n"+e.getMessage());
 			e.printStackTrace();

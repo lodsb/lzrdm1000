@@ -11,7 +11,7 @@ import de.sciss.jcollider.SynthDef;
 public class StaticSynthLoader implements SynthLoaderInterface {
 	private Server server;
 	
-	private HashMap<SynthInfo, SynthDef> synthInfoList = new HashMap<SynthInfo, SynthDef>();
+	private HashMap<SynthInfo, SynthDef> synthInfoMap = new HashMap<SynthInfo, SynthDef>();
 	
 	public StaticSynthLoader(Server server) {
 		this.server = server;
@@ -30,7 +30,7 @@ public class StaticSynthLoader implements SynthLoaderInterface {
 	public List<SynthInfo> getAvailableSynths() {
 		LinkedList<SynthInfo> synthList = new LinkedList<SynthInfo>();
 		
-		for(SynthInfo si: synthInfoList.keySet()) {
+		for(SynthInfo si: synthInfoMap.keySet()) {
 			synthList.add(si);
 		}
 		
@@ -39,7 +39,13 @@ public class StaticSynthLoader implements SynthLoaderInterface {
 	
 	@Override
 	public Synth instantiateSynth(SynthInfo synthInfo) {
-		// TODO Auto-generated method stub
-		return null;
+		SynthDef synthDef = synthInfoMap.get(synthInfo);
+		Synth synth = null;
+		
+		if(synthDef != null) {
+			
+		}
+ 		
+		return synth; 
 	}
 }

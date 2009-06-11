@@ -14,8 +14,13 @@ public class SynthManager {
 	private HashMap<SynthInfo, SynthLoaderInterface> synthLoaderMap = new HashMap<SynthInfo, SynthLoaderInterface>();
 	private HashMap<Synth, SynthInfo> synthInfoMap = new HashMap<Synth, SynthInfo>();
 	
+	private StaticSynthLoader staticSynthLoader;
+	
 	public SynthManager(Server server) {
 		this.server = server;
+		staticSynthLoader = new StaticSynthLoader(this.server);
+		
+		this.addSynthLoader(staticSynthLoader);
 	}
 	
 	public List<SynthInfo> getAvailableSynths() {
@@ -33,8 +38,10 @@ public class SynthManager {
 		
 		if(info != null) {
 			synth = sli.instantiateSynth(info);
-			loadedSynths.add(synth);
-			synthInfoMap.put(synth, info);
+			if(synth != null) {
+				loadedSynths.add(synth);
+				synthInfoMap.put(synth, info);
+			}
 		}
 		
 		return synth;

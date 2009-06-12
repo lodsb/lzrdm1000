@@ -59,7 +59,7 @@ public class HighResolutionPollingClock implements ClockInterface, Runnable {
 			runs++;
 			
 			if((runs%msRuns)== 0) {
-				System.out.println(System.currentTimeMillis()-oldTime);
+				//System.out.println(System.currentTimeMillis()-oldTime);
 				oldTime = System.currentTimeMillis();
 				
 				latencyAvg = latencyAcc/msRuns;

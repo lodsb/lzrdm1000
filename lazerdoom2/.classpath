@@ -19,5 +19,7 @@
 	</classpathentry>
 	<classpathentry kind="lib" path="libs/jcollider/build/JCollider.jar"/>
 	<classpathentry kind="lib" path="libs/jcollider/libraries/NetUtil.jar"/>
+	<classpathentry kind="lib" path="libs/jjack-0.3/lib/jjack-clients.jar"/>
+	<classpathentry kind="lib" path="libs/jjack-0.3/lib/jjack.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

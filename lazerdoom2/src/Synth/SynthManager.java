@@ -1,4 +1,5 @@
 package Synth;
+import java.io.IOException;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
@@ -19,7 +20,16 @@ public class SynthManager {
 	public SynthManager(Server server) {
 		this.server = server;
 		staticSynthLoader = new StaticSynthLoader(this.server);
+	}
+	
+	public void init() {
+		try {
+			this.server.sync(1f);
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
 		
+		staticSynthLoader.init();
 		this.addSynthLoader(staticSynthLoader);
 	}
 	

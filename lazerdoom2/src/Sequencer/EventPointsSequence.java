@@ -3,13 +3,22 @@ package Sequencer;
 import java.util.ArrayList;
 import java.util.concurrent.locks.ReentrantLock;
 
+import com.trolltech.qt.QSignalEmitter.Signal1;
+import com.trolltech.qt.core.QObject;
+
 import Control.ControlBusInterface;
 import Control.Types.BaseType;
 
-public class EventPointsSequence<EventType extends BaseType> implements EventSequenceInterface<EventType> {
+public class EventPointsSequence<EventType extends BaseType> extends QObject implements EventSequenceInterface<EventType> {
 	
 	// TODO: 1) locking event-Array & processing // reentrant-lock implemented, better option available? evaluate!
 	// 		 2) implement startoffset&endpoint
+	
+	private Signal1<Long> evalSignal = new Signal1<Long>();
+	@Override
+	public Signal1<Long> getSequenceEvalUpdateSignal() {
+		return evalSignal;
+	}
 	
 	private ReentrantLock eventQueueLock = new ReentrantLock();
 	
@@ -167,7 +176,7 @@ public class EventPointsSequence<EventType extends BaseType> implements EventSeq
 		if(nextEventTickSchedule == 0) {
 			
 			for(ControlBusInterface<EventType> bus: this.controlBuses) {
-				bus.setValue(nextEvent);
+				bus.setValue(this, tick, nextEvent);
 			}
 			
 			eventQueueLock.lock();
@@ -243,7 +252,7 @@ public class EventPointsSequence<EventType extends BaseType> implements EventSeq
 		EventContainer<EventType> eventContainer = null;
 		
 		for(ControlBusInterface<EventType> bus: this.controlBuses) {
-				bus.setDefaultValue();
+				bus.setDefaultValue(this, 0);
 		}
 		eventQueueLock.unlock();
 	}

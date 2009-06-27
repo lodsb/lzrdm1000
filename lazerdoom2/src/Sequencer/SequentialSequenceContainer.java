@@ -2,8 +2,16 @@ package Sequencer;
 
 import java.util.ArrayList;
 
-public class SequentialSequenceContainer implements SequenceContainerInterface {
+import com.trolltech.qt.core.QObject;
 
+public class SequentialSequenceContainer extends QObject implements SequenceContainerInterface {
+
+	private Signal1<Long> evalSignal = new Signal1<Long>();
+	@Override
+	public Signal1<Long> getSequenceEvalUpdateSignal() {
+		return evalSignal;
+	}
+	
 	ArrayList<SequenceInterface> sequences = new ArrayList<SequenceInterface>();
 	
 	SequenceInterface currentSequence;

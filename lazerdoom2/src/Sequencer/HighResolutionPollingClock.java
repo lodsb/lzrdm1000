@@ -3,6 +3,8 @@ package Sequencer;
 import java.util.concurrent.ScheduledThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 
+import com.trolltech.qt.core.QObject;
+
 public class HighResolutionPollingClock implements ClockInterface, Runnable {
 	private Sequencer sequencer;
 	private ScheduledThreadPoolExecutor stpe;

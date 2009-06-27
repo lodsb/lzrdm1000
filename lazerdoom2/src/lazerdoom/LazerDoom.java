@@ -4,6 +4,15 @@ import java.io.IOException;
 
 import javax.swing.JFrame;
 
+import sparshui.client.ServerConnection;
+import sparshui.server.GestureServer;
+
+import com.trolltech.qt.core.Qt;
+import com.trolltech.qt.gui.QApplication;
+import com.trolltech.qt.gui.QHBoxLayout;
+import com.trolltech.qt.gui.QWidget;
+import com.trolltech.qt.gui.QGraphicsView.ViewportUpdateMode;
+
 import Control.ControlServer;
 import Sequencer.ParallelSequenceContainer;
 import Sequencer.Sequencer;
@@ -12,7 +21,7 @@ import Synth.SynthManager;
 import de.sciss.jcollider.*;
 import de.sciss.jcollider.gui.ServerPanel;
 
-public class LazerDoom {
+public class LazerDoom extends QWidget {
 	private HighResolutionPollingClock clock;
 	private Sequencer sequencer;
 	private ParallelSequenceContainer mainSequenceContainer;
@@ -23,50 +32,23 @@ public class LazerDoom {
 	
 	private Process jackProcess;
 	
+	private Scene scene = new Scene();
+	private View view = new View();
+	private QHBoxLayout layout = new QHBoxLayout();
+    TUIOTouchHandler handler = new TUIOTouchHandler(view);
+
 	
 	public static void main(String[] args) {
-		/*{
-			System.out.println("Started LazerDoom");
-	          try {
-	                UGenInfo.readBinaryDefinitions();
-	                Server s = new Server( "default" );
-	                s.start();
-	               
-	                Control ck = Control.kr( new String[] { "freq", "out" }, new float
-	[] { 440f, 0f });
-	                new SynthDef( "tutorial-args", UGen.ar( "Out", ck.getChannel
-	( "out" ), UGen.ar( "*", UGen.ar( "SinOsc", ck.getChannel( "freq" )),  
-	UGen.ir( 0.2f )))).send( s );
-	                s.sync( 4f );
-
-	                Group g = s.asTarget();
-	                Synth x, y, z;
-	                x = Synth.head( g, "tutorial-args" ); // no args, so default values
-	                Thread.sleep( 1000 );
-	                x.free();
-	                
-	                System.out.println("wah");
-	                y = new Synth( "tutorial-args", new String[] { "freq" }, new float
-	[] { 660 }, g ); // change freq
-	                Thread.sleep( 1000 );
-	                y.free();
-	                z = new Synth( "tutorial-args", new String[] { "freq", "out" }, new  
-	float[] { 880, 1 }, g );
-	                Thread.sleep( 1000 );
-	                z.free();
-	                System.exit( 0 );
-	          } catch( Exception e1 ) {
-	        	  System.out.println("mehhhh");
-	                e1.printStackTrace();
-	                System.exit( 1 );
-	          }
-	        } 
-		*/
+		QApplication.initialize(args);
 		
 		LazerDoom lazerdoom = new LazerDoom();
 		System.out.println("Started LazerDoom");
 		lazerdoom.createAndShowServerPanel();
 			
+	}
+	
+	public void quit() {
+		jackProcess.destroy();
 	}
 	
 	public void createAndShowServerPanel() {
@@ -103,6 +85,14 @@ public class LazerDoom {
 		synthManager = new SynthManager(this.superColliderServer);
 		synthManager.init();
 		clock.start();
+		
+		
+		// GUI
+		this.setLayout(layout);
+		layout.addWidget(view);
+		view.setScene(scene);
+		view.setViewportUpdateMode(ViewportUpdateMode.MinimalViewportUpdate);
+		this.setWindowFlags(Qt.WindowType.Window);
 		
 	}
 	

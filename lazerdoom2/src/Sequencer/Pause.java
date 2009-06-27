@@ -1,7 +1,16 @@
 package Sequencer;
 
-public class Pause implements SequenceInterface {
+import com.trolltech.qt.QSignalEmitter.Signal1;
+import com.trolltech.qt.core.QObject;
 
+public class Pause extends QObject implements SequenceInterface {
+
+	private Signal1<Long> evalSignal = new Signal1<Long>();
+	@Override
+	public Signal1<Long> getSequenceEvalUpdateSignal() {
+		return evalSignal;
+	}
+	
 	private long pauseTicks;
 	private long runTicks = 0;
 	
@@ -32,6 +41,12 @@ public class Pause implements SequenceInterface {
 	@Override
 	public long size() {
 		return pauseTicks;
+	}
+
+	@Override
+	public SequenceInterface deepCopy() {
+		// TODO Auto-generated method stub
+		return null;
 	}
 
 }

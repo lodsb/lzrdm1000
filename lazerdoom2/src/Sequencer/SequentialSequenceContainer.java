@@ -81,7 +81,7 @@ public class SequentialSequenceContainer extends QObject implements SequenceCont
 	@Override
 	public boolean isRunning() {
 		// TODO Auto-generated method stub
-		return false;
+		return isRunning;
 	}
 
 	@Override

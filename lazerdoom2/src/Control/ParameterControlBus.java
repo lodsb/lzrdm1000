@@ -1,5 +1,6 @@
 package Control;
 
+import Sequencer.BaseSequence;
 import Sequencer.SequenceInterface;
 import de.sciss.jcollider.ControlDesc;
 import de.sciss.jcollider.Synth;
@@ -19,7 +20,7 @@ public class ParameterControlBus<T extends BaseType> implements ControlBusInterf
 	}
 	
 	@Override
-	public void setValue(SequenceInterface si, long tick, T baseType) {
+	public void setValue(BaseSequence si, long tick, T baseType) {
 		server.appendMessage(si, tick, synth.setMsg(this.controlDescription.getName(), baseType.getFloatValue()));		
 	}
 
@@ -30,7 +31,7 @@ public class ParameterControlBus<T extends BaseType> implements ControlBusInterf
 	}
 
 	@Override
-	public void setDefaultValue(SequenceInterface si, long tick) {
+	public void setDefaultValue(BaseSequence si, long tick) {
 		server.appendMessage(si, tick, synth.setMsg(this.controlDescription.getName(), this.controlDescription.getDefaultValue()));
 	}
 

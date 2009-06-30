@@ -9,16 +9,10 @@ import com.trolltech.qt.core.QObject;
 import Control.ControlBusInterface;
 import Control.Types.BaseType;
 
-public class EventPointsSequence<EventType extends BaseType> extends QObject implements EventSequenceInterface<EventType> {
+public class EventPointsSequence<EventType extends BaseType> extends BaseSequence implements EventSequenceInterface<EventType> {
 	
 	// TODO: 1) locking event-Array & processing // reentrant-lock implemented, better option available? evaluate!
 	// 		 2) implement startoffset&endpoint
-	
-	private Signal1<Long> evalSignal = new Signal1<Long>();
-	@Override
-	public Signal1<Long> getSequenceEvalUpdateSignal() {
-		return evalSignal;
-	}
 	
 	private ReentrantLock eventQueueLock = new ReentrantLock();
 	
@@ -51,14 +45,16 @@ public class EventPointsSequence<EventType extends BaseType> extends QObject imp
 	EventType nextEvent = null;
 	boolean isRunning = false;
 	
-	private EventPointsSequence(ArrayList<EventContainer<EventType>> events, ArrayList<ControlBusInterface<EventType>> controlBuses, long startOffset, long endPoint) {
+	private EventPointsSequence(Sequencer seq, ArrayList<EventContainer<EventType>> events, ArrayList<ControlBusInterface<EventType>> controlBuses, long startOffset, long endPoint) {
+		super(seq);
 		this.events = events;
 		this.controlBuses = controlBuses;
 		this.startOffset = startOffset;
 		this.endPoint = endPoint;
 	}
 	
-	public EventPointsSequence() {
+	public EventPointsSequence(Sequencer seq) {
+		super(seq);
 		this.events = new ArrayList<EventContainer<EventType>>(); 
 		this.controlBuses = new ArrayList<ControlBusInterface<EventType>>();
 	} 
@@ -168,7 +164,7 @@ public class EventPointsSequence<EventType extends BaseType> extends QObject imp
 		
 		eventQueueLock.unlock();
 
-		return new EventPointsSequence<EventType>(eventList, controlBusList, this.startOffset, this.endPoint);
+		return new EventPointsSequence<EventType>(this.sequencer, eventList, controlBusList, this.startOffset, this.endPoint);
 	}
 
 	

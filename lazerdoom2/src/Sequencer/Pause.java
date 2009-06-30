@@ -1,21 +1,28 @@
 package Sequencer;
 
+import Sequencer.SequenceEvent.SequenceEventSubtype;
+import Sequencer.SequenceEvent.SequenceEventType;
+
 import com.trolltech.qt.QSignalEmitter.Signal1;
 import com.trolltech.qt.core.QObject;
 
-public class Pause extends QObject implements SequenceInterface {
+public class Pause extends BaseSequence implements SequenceInterface {
 
-	private Signal1<Long> evalSignal = new Signal1<Long>();
-	@Override
-	public Signal1<Long> getSequenceEvalUpdateSignal() {
-		return evalSignal;
-	}
-	
 	private long pauseTicks;
 	private long runTicks = 0;
+	private Sequencer sequencer;
 	
-	public Pause(long pauseTicks) {
+	public Pause(Sequencer sequencer, long pauseTicks) {
+		super(sequencer);
 		this.pauseTicks = pauseTicks;
+		this.sequencer = sequencer;
+	}
+	
+	void setPauseTicks(long pauseTicks) {
+		if(this.pauseTicks != pauseTicks) {
+			this.postSequenceEvent(SequenceEventType.SEQUENCE_SIZE_CHANGED, SequenceEventSubtype.SIZE_IN_TICKS, pauseTicks);
+			this.pauseTicks = pauseTicks;
+		}
 	}
 	
 	@Override
@@ -35,6 +42,7 @@ public class Pause extends QObject implements SequenceInterface {
 
 	@Override
 	public void reset() {
+		super.reset();
 		runTicks = 0;
 	}
 
@@ -46,7 +54,9 @@ public class Pause extends QObject implements SequenceInterface {
 	@Override
 	public SequenceInterface deepCopy() {
 		// TODO Auto-generated method stub
-		return null;
+		Pause copy = new Pause(this.sequencer, this.pauseTicks);
+		this.postSequenceEvent(SequenceEventType.CLONED_SEQUENCE, SequenceEventSubtype.NONE, copy);
+		return copy;
 	}
 
 }

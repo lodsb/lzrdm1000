@@ -11,24 +11,22 @@ import com.trolltech.qt.core.QObject;
 import Control.ControlServer;
 
 public class Sequencer extends QObject implements SequenceInterface, Runnable {
-
-	private Signal1<Long> evalSignal = new Signal1<Long>();
-	@Override
-	public Signal1<Long> getSequenceEvalUpdateSignal() {
-		return evalSignal;
-	}
 	
 	private SequenceInterface mainSequence;
 	private ControlServer controlServer;
 	private boolean isRunning  = false;
 	private long currentTick = 0;
 	
+	
 	// for thread synchronization & signals
+	public Signal1<Long> globalTickSignal = new Signal1();
 	private Semaphore globalTickSyncSemaphore = new Semaphore(0);
 	private ConcurrentLinkedQueue<Long> passedTickList = new ConcurrentLinkedQueue<Long>();
+	private ConcurrentLinkedQueue<SequenceEvent> passedSequenceEventList = new ConcurrentLinkedQueue<SequenceEvent>();
 	
-	
-	public Signal1<Long> globalTick = new Signal1<Long>();
+	void postSequenceEvent(SequenceEvent sequenceEvent) {
+		passedSequenceEventList.offer(sequenceEvent);
+	}
 	
 	public Sequencer(SequenceInterface mainSequence, ControlServer controlServer) {
 		this.mainSequence = mainSequence;
@@ -66,7 +64,7 @@ public class Sequencer extends QObject implements SequenceInterface, Runnable {
 					
 					Long passedTick;
 					while((passedTick = passedTickList.poll()) != null) {
-						evalSignal.emit(passedTick);
+						globalTickSignal.emit(passedTick);
 					}
 						
 					// send update signals of the respective sequences to the i.e. GUI thread
@@ -75,7 +73,13 @@ public class Sequencer extends QObject implements SequenceInterface, Runnable {
 					ControlServer.SentMessage sentMessage;
 					
 					while((sentMessage = queue.poll()) != null) {
-						sentMessage.sequenceInterface.getSequenceEvalUpdateSignal().emit(sentMessage.localTick);
+						sentMessage.sequence.getSequenceEvalUpdateSignal().emit(sentMessage.localTick);
+					}
+					
+					SequenceEvent se;
+					
+					while((se = passedSequenceEventList.poll()) != null) {
+						se.getSource().getSequenceEventSignal().emit(se);
 					}
 					
 					

@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.net.SocketAddress;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
+import Sequencer.BaseSequence;
 import Sequencer.SequenceInterface;
 import de.sciss.jcollider.*;
 import de.sciss.net.*;
@@ -25,7 +26,7 @@ public class ControlServer {
 	}
 	
 	public class SentMessage {
-		public SequenceInterface sequenceInterface;
+		public BaseSequence sequence;
 		public long localTick;
 	}
 	
@@ -53,10 +54,10 @@ public class ControlServer {
 		this.serverLatency = latency;
 	}
 	
-	public void appendMessage(SequenceInterface si, long localTick, OSCMessage message) {
+	public void appendMessage(BaseSequence si, long localTick, OSCMessage message) {
 		SentMessage sm = new SentMessage();
 		sm.localTick = localTick;
-		sm.sequenceInterface = si;
+		sm.sequence = si;
 		
 		currentBundle.addPacket(message);
 		recentMessages.offer(sm);

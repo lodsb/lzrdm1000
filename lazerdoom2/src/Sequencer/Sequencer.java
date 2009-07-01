@@ -15,6 +15,12 @@ public class Sequencer extends QObject implements SequenceInterface, Runnable {
 	private SequenceInterface mainSequence;
 	private ControlServer controlServer;
 	private boolean isRunning  = false;
+	
+	
+	
+	// RELATIVE!!"!"!"!"!"!"
+	
+	
 	private long currentTick = 0;
 	
 	
@@ -28,8 +34,7 @@ public class Sequencer extends QObject implements SequenceInterface, Runnable {
 		passedSequenceEventList.offer(sequenceEvent);
 	}
 	
-	public Sequencer(SequenceInterface mainSequence, ControlServer controlServer) {
-		this.mainSequence = mainSequence;
+	public Sequencer(ControlServer controlServer) {
 		this.controlServer= controlServer;
 		
 		Thread thread = new Thread(this);
@@ -37,23 +42,36 @@ public class Sequencer extends QObject implements SequenceInterface, Runnable {
 		thread.start();
 	}
 	
+	public void setMainSequence(SequenceInterface mainSequence) {
+		this.mainSequence = mainSequence;
+	}
+	
 	@Override
 	public SequenceInterface deepCopy() {
-		return new Sequencer(this.mainSequence.deepCopy(), this.controlServer);
+		if(mainSequence !=  null) {
+			Sequencer seq = new Sequencer(this.controlServer);
+			seq.setMainSequence(this.mainSequence.deepCopy());
+			
+			return seq;
+			
+		} else {
+			return new Sequencer(this.controlServer);
+		}
 	}
 
 	@Override
 	public synchronized boolean eval(long tick) {
-		isRunning = mainSequence.eval(tick);
-		
-		controlServer.flushMessages();
-		passedTickList.offer(tick);
+		if(mainSequence != null) {
+			isRunning = mainSequence.eval(tick);
 
-		
-		currentTick = tick;
-		
-		globalTickSyncSemaphore.release();
-		
+			controlServer.flushMessages();
+			passedTickList.offer(tick);
+
+
+			currentTick = tick;
+
+			globalTickSyncSemaphore.release();
+		}
 		return isRunning;
 	}
 	
@@ -97,12 +115,20 @@ public class Sequencer extends QObject implements SequenceInterface, Runnable {
 
 	@Override
 	public void reset() {
-		this.mainSequence.reset();
+		this.reset();
+		
+		if(mainSequence != null) {
+			this.mainSequence.reset();
+		}
 	}
 
 	@Override
 	public long size() {
-		return mainSequence.size();
+		if(mainSequence != null) {
+			return mainSequence.size();
+		} else {
+			return 0;
+		}
 	}
 
 }

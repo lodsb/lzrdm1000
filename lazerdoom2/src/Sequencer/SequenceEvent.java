@@ -29,6 +29,9 @@ public class SequenceEvent {
 	
 	enum SequenceEventSubtype {
 		NONE,
+		SEQUENCE,
+		TICK,
+		EVENT,
 		SIZE_IN_TICKS
 	};
 	

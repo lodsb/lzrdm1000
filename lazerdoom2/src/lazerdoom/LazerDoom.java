@@ -76,9 +76,11 @@ public class LazerDoom extends QWidget {
 			e.printStackTrace();
 		}
 		
-		mainSequenceContainer = new ParallelSequenceContainer();
 		controlServer = new ControlServer(superColliderServer, 50);
-		sequencer = new Sequencer(mainSequenceContainer, controlServer);
+		sequencer = new Sequencer(controlServer);
+		mainSequenceContainer = new ParallelSequenceContainer(sequencer);
+		sequencer.setMainSequence(mainSequenceContainer);
+		
 		clock = new HighResolutionPollingClock(100000, sequencer);
 		
 		this.startSupercolliderServer();

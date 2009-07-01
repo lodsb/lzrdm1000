@@ -1,6 +1,7 @@
 package Sequencer;
 
 import java.util.ArrayList;
+import java.util.concurrent.CopyOnWriteArrayList;
 
 import Sequencer.SequenceEvent.SequenceEventSubtype;
 import Sequencer.SequenceEvent.SequenceEventType;
@@ -9,7 +10,7 @@ import com.trolltech.qt.core.QObject;
 
 public class ParallelSequenceContainer extends BaseSequence implements SequenceContainerInterface {
 
-	ArrayList<SequenceInterface> sequences;
+	CopyOnWriteArrayList<SequenceInterface> sequences;
 	
 	boolean isRunning = false;
 	
@@ -20,48 +21,48 @@ public class ParallelSequenceContainer extends BaseSequence implements SequenceC
 		sequences.add(sequence);
 		this.updateSize();
 		
-		this.postSequenceEvent(SequenceEventType.APPEND_SEQUENCE, SequenceEventSubtype.NONE, sequence);
+		this.postSequenceEvent(SequenceEventType.APPEND_SEQUENCE, SequenceEventSubtype.SEQUENCE, sequence);
 		this.postSequenceEvent(SequenceEventType.SEQUENCE_SIZE_CHANGED, SequenceEventSubtype.SIZE_IN_TICKS, this.size());
 	}
 	
-	private ParallelSequenceContainer(Sequencer sequencer, ArrayList<SequenceInterface> sequences) {
+	private ParallelSequenceContainer(Sequencer sequencer, CopyOnWriteArrayList<SequenceInterface> sequences) {
 		super(sequencer);
 		this.sequences = sequences;
 	}
 	
 	public ParallelSequenceContainer(Sequencer sequencer) {
 		super(sequencer);
-		this.sequences = new ArrayList<SequenceInterface>();
+		this.sequences = new CopyOnWriteArrayList<SequenceInterface>();
 	}
 
 	@Override
 	public void prependSequence(SequenceInterface sequence) {
 		sequences.add(sequence);
-		
 		this.updateSize();
-		this.postSequenceEvent(SequenceEventType.PREPEND_SEQUENCE, SequenceEventSubtype.NONE, sequence);
+		
+		this.postSequenceEvent(SequenceEventType.PREPEND_SEQUENCE, SequenceEventSubtype.SEQUENCE, sequence);
 		this.postSequenceEvent(SequenceEventType.SEQUENCE_SIZE_CHANGED, SequenceEventSubtype.SIZE_IN_TICKS, this.size());
 	}
 
 	@Override
 	public boolean eval(long tick) {
+		if(tick == 0) {
+			this.postSequenceEvent(SequenceEventType.STARTED, SequenceEventSubtype.NONE, null);
+		}
 		
 		boolean currentlyRunning = false;
 		
 		for(SequenceInterface sequence: sequences) {
-			if(tick < sequence.size()) {
-				boolean sequenceWasRunning = sequence.isRunning();
-				boolean sequenceRunning = sequence.eval(tick);
-				
-				if(sequenceRunning && !sequenceWasRunning) {
-					this.postSequenceEvent(SequenceEventType.STARTED, SequenceEventSubtype.NONE, sequence);
-				} else if(!sequenceRunning && sequenceWasRunning) {
-					this.postSequenceEvent(SequenceEventType.STOPPED, SequenceEventSubtype.NONE, sequence);
+				if(tick < sequence.size()) {
+					currentlyRunning = currentlyRunning | sequence.eval(tick);
 				}
-				currentlyRunning = currentlyRunning | sequence.eval(tick);
-			}
 		}
 		
+		
+		if(!currentlyRunning) {
+			this.postSequenceEvent(SequenceEventType.STOPPED, SequenceEventSubtype.NONE, null);
+		}
+
 		this.isRunning = currentlyRunning;
 		return this.isRunning;
 	}
@@ -73,7 +74,13 @@ public class ParallelSequenceContainer extends BaseSequence implements SequenceC
 
 	@Override
 	public void reset() {
+		this.reset();
 		isRunning = false;
+		
+		//reset all children
+		for(SequenceInterface sequence: sequences) {
+			sequence.reset();
+		}
 	}
 
 	private void updateSize() {
@@ -97,19 +104,21 @@ public class ParallelSequenceContainer extends BaseSequence implements SequenceC
 	public SequenceInterface deepCopy() {
 		ParallelSequenceContainer copy;
 		
-		ArrayList<SequenceInterface> sequenceList = new ArrayList<SequenceInterface>();
+		CopyOnWriteArrayList<SequenceInterface> sequenceList = new CopyOnWriteArrayList<SequenceInterface>();
 		
 		for(SequenceInterface sequence: sequences) {
-			sequenceList.add(sequence.deepCopy());
+				sequenceList.add(sequence.deepCopy());
 		}
 		
+		
 		copy = new ParallelSequenceContainer(this.sequencer, sequenceList);
-		this.postSequenceEvent(SequenceEventType.CLONED_SEQUENCE, SequenceEventSubtype.NONE, copy);
+		this.postSequenceEvent(SequenceEventType.CLONED_SEQUENCE, SequenceEventSubtype.SEQUENCE, copy);
 		return copy;  
 	}
 
 	@Override
 	public void removeSequence(SequenceInterface sequence) {
+		this.postSequenceEvent(SequenceEventType.REMOVE, SequenceEventSubtype.SEQUENCE, sequence);
 		this.sequences.remove(sequence);
 	}
 

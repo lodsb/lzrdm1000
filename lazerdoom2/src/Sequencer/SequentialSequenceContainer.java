@@ -1,6 +1,7 @@
 package Sequencer;
 
 import java.util.ArrayList;
+import java.util.concurrent.locks.ReentrantLock;
 
 import Sequencer.SequenceEvent.SequenceEventSubtype;
 import Sequencer.SequenceEvent.SequenceEventType;
@@ -9,7 +10,9 @@ import com.trolltech.qt.core.QObject;
 
 public class SequentialSequenceContainer extends BaseSequence implements SequenceContainerInterface {
 	
-	ArrayList<SequenceInterface> sequences = new ArrayList<SequenceInterface>();
+	ArrayList<SequenceInterface> sequences;
+	
+	private ReentrantLock eventQueueLock = new ReentrantLock();
 	
 	SequenceInterface currentSequence;
 	
@@ -23,6 +26,7 @@ public class SequentialSequenceContainer extends BaseSequence implements Sequenc
 	
 	public SequentialSequenceContainer(Sequencer sequencer) {
 		super(sequencer);
+		this.sequences = new ArrayList<SequenceInterface>();
 	}
 	
 	private SequentialSequenceContainer(Sequencer sequencer, ArrayList<SequenceInterface> sequenceList) {
@@ -36,18 +40,9 @@ public class SequentialSequenceContainer extends BaseSequence implements Sequenc
 		} else {
 			sequenceTickCntr = 0;
 			if(currentSequenceIndex < sequences.size()) {
-				// stop current sequence event
-				this.postSequenceEvent(SequenceEventType.STOPPED, SequenceEventSubtype.NONE, currentSequence);
-				
-				// start next sequence event				
 				currentSequenceIndex++;
 				currentSequence = sequences.get(currentSequenceIndex);
-				this.postSequenceEvent(SequenceEventType.STARTED, SequenceEventSubtype.NONE, currentSequence);
-				
-			} else {
-				// stop last sequence event
-				this.postSequenceEvent(SequenceEventType.STOPPED, SequenceEventSubtype.NONE, currentSequence);
-				
+			} else {				
 				currentSequenceIndex = 0;
 				if(sequences.size() >= 1) {
 					currentSequence = sequences.get(0);
@@ -62,35 +57,49 @@ public class SequentialSequenceContainer extends BaseSequence implements Sequenc
 	
 	@Override
 	public boolean eval(long tick) {
-		synchronized(sequences) {
-				// subsequent tick, no random access
-			if(sequences.size() > 0) {
-				if(oldTickCntr == (tick-1)) {
-					isRunning = evaluateCurrentSequence();
-				} else {
-					long currentTicks = 0;
-					int sequenceIndex = 0;
-					
-					for(SequenceInterface sequence: sequences) {
-						if(tick > sequence.size()+currentTicks) {
-							currentTicks += sequence.size();
-							sequenceIndex++;
-						} else {
-							break;
-						}
-					}
-					
-					currentSequenceIndex = sequenceIndex;
-					sequenceTickCntr = tick-currentTicks;
-					
-					isRunning = evaluateCurrentSequence();
-				}
-				
-				oldTickCntr = tick;
-			}
-			
-			return isRunning;
+		if(tick == 0) {
+			this.postSequenceEvent(SequenceEventType.STARTED, SequenceEventSubtype.NONE, null);
 		}
+
+		eventQueueLock.lock();
+		
+		if(sequences.size() > 0) {
+			// subsequent tick, no random access
+			if(oldTickCntr == (tick-1)) {
+				isRunning = evaluateCurrentSequence();
+			} 
+			// random access
+			else {
+				long currentTicks = 0;
+				int sequenceIndex = 0;
+
+				for(SequenceInterface sequence: sequences) {
+					if(tick > sequence.size()+currentTicks) {
+						currentTicks += sequence.size();
+						sequenceIndex++;
+					} else {
+						break;
+					}
+				}
+
+				currentSequenceIndex = sequenceIndex;
+				sequenceTickCntr = tick-currentTicks;
+
+				isRunning = evaluateCurrentSequence();
+			}
+
+			oldTickCntr = tick;
+
+
+			if(!isRunning) {
+				this.postSequenceEvent(SequenceEventType.STOPPED, SequenceEventSubtype.NONE, null);
+			}
+		}
+
+		eventQueueLock.unlock();
+
+
+		return isRunning;
 	}
 
 	@Override
@@ -101,18 +110,19 @@ public class SequentialSequenceContainer extends BaseSequence implements Sequenc
 	@Override
 	public void reset() {
 		super.reset();
-		oldTickCntr = -1;
-		sequenceTickCntr = 0;
-		currentSequenceIndex = 0;
-		
-		isRunning = false;
-		
-		for(SequenceInterface sequence: sequences) {
-			sequence.reset();
-			if(sequence.isRunning()) {
-				this.postSequenceEvent(SequenceEventType.STOPPED, SequenceEventSubtype.NONE, sequence);
+		eventQueueLock.lock();
+			
+			oldTickCntr = -1;
+			sequenceTickCntr = 0;
+			currentSequenceIndex = 0;
+			
+			isRunning = false;
+			
+			for(SequenceInterface sequence: sequences) {
+				sequence.reset();
 			}
-		}
+			
+		eventQueueLock.unlock();
 	}
 
 	private void updateSize() {
@@ -132,9 +142,11 @@ public class SequentialSequenceContainer extends BaseSequence implements Sequenc
 
 	@Override
 	public void appendSequence(SequenceInterface sequence) {
-		synchronized(sequences) {
+		eventQueueLock.lock();
+			
 			pappendSequence(sequence);
-		}
+			
+		eventQueueLock.lock();
 	}
 	
 	private void pappendSequence(SequenceInterface sequence) {
@@ -146,7 +158,8 @@ public class SequentialSequenceContainer extends BaseSequence implements Sequenc
 	}
 
 	public void appendSequence(SequenceInterface successor, SequenceInterface sequence) {
-		synchronized(sequences) {
+		eventQueueLock.lock();
+		
 			int index = 0;
 			for(SequenceInterface currentSequence: sequences) {
 				if(currentSequence == successor) {
@@ -160,25 +173,22 @@ public class SequentialSequenceContainer extends BaseSequence implements Sequenc
 				}
 				index++;
 			}
-		}
+			
+		eventQueueLock.unlock();
 	}
 	
 	@Override
 	public void prependSequence(SequenceInterface sequence) {
-		synchronized(sequences) {
-			this.pprependSequence(sequence);
-		}
-	}
-	
-	private void pprependSequence(SequenceInterface sequence) {
-		this.prependSequence(0, sequence);
-		this.updateSize();
-		this.postSequenceEvent(SequenceEventType.PREPEND_SEQUENCE, SequenceEventSubtype.NONE, sequence);
-		this.postSequenceEvent(SequenceEventType.SEQUENCE_SIZE_CHANGED, SequenceEventSubtype.SIZE_IN_TICKS, this.size());
+		eventQueueLock.lock();
+		
+			this.prependSequence(0, sequence);
+		
+		eventQueueLock.unlock();
 	}
 	
 	public void prependSequence(SequenceInterface predecessor, SequenceInterface sequence) {
-		synchronized(sequences) {
+		eventQueueLock.lock();
+			
 			int index = 0;
 			for(SequenceInterface currentSequence: sequences) {
 				if(currentSequence == predecessor) {
@@ -188,7 +198,8 @@ public class SequentialSequenceContainer extends BaseSequence implements Sequenc
 
 				index++;
 			}
-		}
+			
+		eventQueueLock.unlock();
 	}
 	
 	private void prependSequence(int index, SequenceInterface sequence) {
@@ -211,7 +222,10 @@ public class SequentialSequenceContainer extends BaseSequence implements Sequenc
 		sequenceTickCntr = oldTickCntr-currentTicks;
 		
 		isRunning = evaluateCurrentSequence();
-	
+		
+		this.updateSize();
+		this.postSequenceEvent(SequenceEventType.PREPEND_SEQUENCE, SequenceEventSubtype.NONE, sequence);
+		this.postSequenceEvent(SequenceEventType.SEQUENCE_SIZE_CHANGED, SequenceEventSubtype.SIZE_IN_TICKS, this.size());
 	}
 
 	@Override
@@ -219,11 +233,13 @@ public class SequentialSequenceContainer extends BaseSequence implements Sequenc
 		SequentialSequenceContainer copy;
 		ArrayList<SequenceInterface> sequenceList = new ArrayList<SequenceInterface>();
 		
-		synchronized(sequences) {
+		eventQueueLock.lock();
+			
 			for(SequenceInterface sequence: sequences) {
 				sequenceList.add(sequence.deepCopy());
 			}
-		}
+			
+		eventQueueLock.unlock();
 		
 		copy = new SequentialSequenceContainer(this.sequencer, sequenceList);
 		this.postSequenceEvent(SequenceEventType.CLONED_SEQUENCE, SequenceEventSubtype.NONE, copy);
@@ -233,10 +249,12 @@ public class SequentialSequenceContainer extends BaseSequence implements Sequenc
 
 	@Override
 	public void removeSequence(SequenceInterface sequence) {
-		synchronized(sequences) {
+		eventQueueLock.lock();
+		
 			sequences.remove(sequence);
 			this.oldTickCntr = -1;
-		}
+			
+		eventQueueLock.unlock();
 	}
 
 }

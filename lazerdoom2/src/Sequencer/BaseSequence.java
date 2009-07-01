@@ -40,6 +40,7 @@ public abstract class BaseSequence extends QObject implements SequenceInterface 
 	@Override
 	public void reset() {
 		this.postSequenceEvent(SequenceEventType.RESET, SequenceEventSubtype.NONE, null);
+		this.postSequenceEvent(SequenceEventType.STOPPED, SequenceEventSubtype.NONE, null);
 	}
 
 	@Override

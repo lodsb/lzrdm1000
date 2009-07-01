@@ -3,6 +3,9 @@ package Sequencer;
 import java.util.ArrayList;
 import java.util.concurrent.locks.ReentrantLock;
 
+import Sequencer.SequenceEvent.SequenceEventSubtype;
+import Sequencer.SequenceEvent.SequenceEventType;
+
 import com.trolltech.qt.QSignalEmitter.Signal1;
 import com.trolltech.qt.core.QObject;
 
@@ -202,6 +205,10 @@ public class EventPointsSequence<EventType extends BaseType> extends BaseSequenc
 	
 	@Override
 	public boolean eval(long tick) {
+		if(tick == 0) {
+			this.postSequenceEvent(SequenceEventType.STARTED, SequenceEventSubtype.NONE, null);
+		}
+		
 		if(oldTick == tick-1) {
 			//subsequent ticks
 			queueAndProcessNextEvents(tick);
@@ -229,6 +236,10 @@ public class EventPointsSequence<EventType extends BaseType> extends BaseSequenc
 			}
 			
 			eventQueueLock.unlock();
+			
+			if(!isRunning) {
+				this.postSequenceEvent(SequenceEventType.STOPPED, SequenceEventSubtype.NONE, null);
+			}
 		}
 		
 		oldTick = tick;

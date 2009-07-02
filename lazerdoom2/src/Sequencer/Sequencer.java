@@ -5,6 +5,9 @@ import java.util.concurrent.*;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicLong;
 
+import Sequencer.SequenceEvent.SequenceEventSubtype;
+import Sequencer.SequenceEvent.SequenceEventType;
+
 import com.trolltech.qt.QSignalEmitter.Signal1;
 import com.trolltech.qt.core.QObject;
 
@@ -12,20 +15,13 @@ import Control.ControlServer;
 
 public class Sequencer extends QObject implements SequenceInterface, Runnable {
 	
-	private SequenceInterface mainSequence;
+	private SequenceContainerInterface mainSequence;
 	private ControlServer controlServer;
 	private boolean isRunning  = false;
 	
 	
-	
-	// RELATIVE!!"!"!"!"!"!"
-	
-	
-	private long currentTick = 0;
-	
-	
 	// for thread synchronization & signals
-	public Signal1<Long> globalTickSignal = new Signal1();
+	public Signal1<Long> globalTickSignal = new Signal1<Long>();
 	private Semaphore globalTickSyncSemaphore = new Semaphore(0);
 	private ConcurrentLinkedQueue<Long> passedTickList = new ConcurrentLinkedQueue<Long>();
 	private ConcurrentLinkedQueue<SequenceEvent> passedSequenceEventList = new ConcurrentLinkedQueue<SequenceEvent>();
@@ -37,21 +33,26 @@ public class Sequencer extends QObject implements SequenceInterface, Runnable {
 	public Sequencer(ControlServer controlServer) {
 		this.controlServer= controlServer;
 		
+		this.mainSequence = new ParallelSequenceContainer(this);
+		
 		Thread thread = new Thread(this);
 		this.moveToThread(thread);
 		thread.start();
 	}
 	
-	public void setMainSequence(SequenceInterface mainSequence) {
+	private Sequencer(SequenceContainerInterface mainSequence, ControlServer controlServer) {
+		this.controlServer= controlServer;
 		this.mainSequence = mainSequence;
+		
+		Thread thread = new Thread(this);
+		this.moveToThread(thread);
+		thread.start();
 	}
 	
 	@Override
 	public SequenceInterface deepCopy() {
 		if(mainSequence !=  null) {
-			Sequencer seq = new Sequencer(this.controlServer);
-			seq.setMainSequence(this.mainSequence.deepCopy());
-			
+			Sequencer seq = new Sequencer((SequenceContainerInterface)mainSequence.deepCopy(), this.controlServer);
 			return seq;
 			
 		} else {
@@ -61,17 +62,12 @@ public class Sequencer extends QObject implements SequenceInterface, Runnable {
 
 	@Override
 	public synchronized boolean eval(long tick) {
-		if(mainSequence != null) {
 			isRunning = mainSequence.eval(tick);
 
 			controlServer.flushMessages();
 			passedTickList.offer(tick);
 
-
-			currentTick = tick;
-
 			globalTickSyncSemaphore.release();
-		}
 		return isRunning;
 	}
 	

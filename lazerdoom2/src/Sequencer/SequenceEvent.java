@@ -31,8 +31,9 @@ public class SequenceEvent {
 		NONE,
 		SEQUENCE,
 		TICK,
+		SIZE_IN_TICKS,
 		EVENT,
-		SIZE_IN_TICKS
+		CTRL_BUS
 	};
 	
 	private BaseSequence sequenceInterface;

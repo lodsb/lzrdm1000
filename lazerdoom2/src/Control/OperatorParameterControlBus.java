@@ -1,5 +1,6 @@
 package Control;
 
+import Sequencer.BaseSequence;
 import de.sciss.jcollider.ControlDesc;
 import de.sciss.jcollider.Synth;
 import de.sciss.net.OSCMessage;
@@ -15,9 +16,9 @@ public class OperatorParameterControlBus<T extends BaseType> extends ParameterCo
 	}
 	
 	@Override
-	public void setValue(T value) {
+	public void setValue(BaseSequence si, long tick, T value) {
 		if(operator.consume(value)) {
-			server.appendMessage(synth.setMsg(this.controlDescription.getName(), operator.getResult().getFloatValue()));
+			server.appendMessage(si, tick,synth.setMsg(this.controlDescription.getName(), operator.getResult().getFloatValue()));
 		}
 		
 	}

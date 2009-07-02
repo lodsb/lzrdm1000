@@ -1,6 +1,7 @@
 package Sequencer;
 
 import java.util.ArrayList;
+import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.locks.ReentrantLock;
 
 import Sequencer.SequenceEvent.SequenceEventSubtype;
@@ -36,7 +37,9 @@ public class EventPointsSequence<EventType extends BaseType> extends BaseSequenc
 	}
 	
 	ArrayList<EventContainer<EventType>> events;
-	ArrayList<ControlBusInterface<EventType>> controlBuses;
+	
+	CopyOnWriteArrayList<ControlBusInterface<EventType>> controlBuses;
+	
 	long startOffset = 0;
 	long endPoint = 0;
 	
@@ -48,7 +51,7 @@ public class EventPointsSequence<EventType extends BaseType> extends BaseSequenc
 	EventType nextEvent = null;
 	boolean isRunning = false;
 	
-	private EventPointsSequence(Sequencer seq, ArrayList<EventContainer<EventType>> events, ArrayList<ControlBusInterface<EventType>> controlBuses, long startOffset, long endPoint) {
+	private EventPointsSequence(Sequencer seq, ArrayList<EventContainer<EventType>> events, CopyOnWriteArrayList<ControlBusInterface<EventType>> controlBuses, long startOffset, long endPoint) {
 		super(seq);
 		this.events = events;
 		this.controlBuses = controlBuses;
@@ -59,7 +62,7 @@ public class EventPointsSequence<EventType extends BaseType> extends BaseSequenc
 	public EventPointsSequence(Sequencer seq) {
 		super(seq);
 		this.events = new ArrayList<EventContainer<EventType>>(); 
-		this.controlBuses = new ArrayList<ControlBusInterface<EventType>>();
+		this.controlBuses = new CopyOnWriteArrayList<ControlBusInterface<EventType>>();
 	} 
 	
 	
@@ -86,6 +89,9 @@ public class EventPointsSequence<EventType extends BaseType> extends BaseSequenc
 		updateSizeOfAllEvents();
 		
 		eventQueueLock.unlock();
+		
+		this.postSequenceEvent(SequenceEventType.INSERT, SequenceEventSubtype.TICK, tick);
+		this.postSequenceEvent(SequenceEventType.SEQUENCE_SIZE_CHANGED, SequenceEventSubtype.SIZE_IN_TICKS, this.size());
 	}
 
 	@Override
@@ -110,6 +116,9 @@ public class EventPointsSequence<EventType extends BaseType> extends BaseSequenc
 		updateSizeOfAllEvents();
 		
 		eventQueueLock.unlock();
+		
+		this.postSequenceEvent(SequenceEventType.REMOVE, SequenceEventSubtype.TICK, tick);
+		this.postSequenceEvent(SequenceEventType.SEQUENCE_SIZE_CHANGED, SequenceEventSubtype.SIZE_IN_TICKS, this.size());
 	}
 
 	@Override
@@ -118,38 +127,36 @@ public class EventPointsSequence<EventType extends BaseType> extends BaseSequenc
 		
 		eventQueueLock.lock();
 		
-		for(EventContainer<EventType> eventContainer: events) {
-			if(eventContainer.event == t) {
-				break;
-			}
-			index++;
-		}
-		
-		if(index > -1) {
-			events.remove(index+1);
-		}
+		events.remove(t);
 		
 		currentEventListSize = events.size();
 		
 		updateSizeOfAllEvents();
 		
 		eventQueueLock.unlock();
+		
+		this.postSequenceEvent(SequenceEventType.REMOVE, SequenceEventSubtype.EVENT, t);
+		this.postSequenceEvent(SequenceEventType.SEQUENCE_SIZE_CHANGED, SequenceEventSubtype.SIZE_IN_TICKS, this.size());
 	}
 
 	@Override
 	public void addControlBus(ControlBusInterface<EventType> cb) {
 		this.controlBuses.add(cb);
 		
+		this.postSequenceEvent(SequenceEventType.ADD_CTRL_BUS, SequenceEventSubtype.CTRL_BUS, cb);
 	}
 
 	public void removeControlBus(ControlBusInterface<EventType> cb) {
 		this.controlBuses.remove(cb);
+		
+		this.postSequenceEvent(SequenceEventType.REMOVE_CTRL_BUS, SequenceEventSubtype.CTRL_BUS, cb);
 	}
 	
 	@Override
 	public SequenceInterface deepCopy() {
 		EventContainer<EventType> container;
 		ArrayList<EventContainer<EventType>> eventList = new ArrayList<EventContainer<EventType>>();
+		EventPointsSequence<EventType> copy;
 		
 		eventQueueLock.lock();
 		
@@ -160,14 +167,18 @@ public class EventPointsSequence<EventType extends BaseType> extends BaseSequenc
 			eventList.add(container);
 		}
 		
-		ArrayList<ControlBusInterface<EventType>> controlBusList = new ArrayList<ControlBusInterface<EventType>>();
+		CopyOnWriteArrayList<ControlBusInterface<EventType>> controlBusList = new CopyOnWriteArrayList<ControlBusInterface<EventType>>();
 		for(ControlBusInterface<EventType> bus: controlBuses) {
 			controlBusList.add(bus);
 		}
 		
 		eventQueueLock.unlock();
 
-		return new EventPointsSequence<EventType>(this.sequencer, eventList, controlBusList, this.startOffset, this.endPoint);
+		copy = new EventPointsSequence<EventType>(this.sequencer, eventList, controlBusList, this.startOffset, this.endPoint);
+		
+		this.postSequenceEvent(SequenceEventType.CLONED_SEQUENCE, SequenceEventSubtype.SEQUENCE, copy);
+		
+		return copy;
 	}
 
 	
@@ -253,6 +264,7 @@ public class EventPointsSequence<EventType extends BaseType> extends BaseSequenc
 
 	@Override
 	public void reset() {
+		super.reset();
 		
 		eventQueueLock.lock();
 		
@@ -321,6 +333,10 @@ public class EventPointsSequence<EventType extends BaseType> extends BaseSequenc
 
 	@Override
 	public void removeAllControlBusses() {
+		for(ControlBusInterface<EventType> cb: controlBuses) {
+			this.postSequenceEvent(SequenceEventType.REMOVE_CTRL_BUS, SequenceEventSubtype.CTRL_BUS, cb);
+		}
+		
 		controlBuses.clear();
 	}
 

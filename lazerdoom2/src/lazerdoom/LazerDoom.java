@@ -15,6 +15,7 @@ import com.trolltech.qt.gui.QGraphicsView.ViewportUpdateMode;
 
 import Control.ControlServer;
 import Sequencer.ParallelSequenceContainer;
+import Sequencer.SequenceContainerInterface;
 import Sequencer.Sequencer;
 import Sequencer.HighResolutionPollingClock;
 import Synth.SynthManager;
@@ -24,7 +25,7 @@ import de.sciss.jcollider.gui.ServerPanel;
 public class LazerDoom extends QWidget {
 	private HighResolutionPollingClock clock;
 	private Sequencer sequencer;
-	private ParallelSequenceContainer mainSequenceContainer;
+	private SequenceContainerInterface mainSequenceContainer;
 	private ControlServer controlServer;
 	private SynthManager synthManager; 
 	private Server superColliderServer;
@@ -78,8 +79,6 @@ public class LazerDoom extends QWidget {
 		
 		controlServer = new ControlServer(superColliderServer, 50);
 		sequencer = new Sequencer(controlServer);
-		mainSequenceContainer = new ParallelSequenceContainer(sequencer);
-		sequencer.setMainSequence(mainSequenceContainer);
 		
 		clock = new HighResolutionPollingClock(100000, sequencer);
 		

@@ -24,7 +24,13 @@ public class SequenceEvent {
 		
 		//CONTROL
 		ADD_CTRL_BUS,
-		REMOVE_CTRL_BUS
+		REMOVE_CTRL_BUS,
+		
+		//SEQUENCE PLAYER
+		SEQUENCE_PLAYER_STARTED,
+		SEQUENCE_PLAYER_STOPPED,
+		SEQUENCE_PLAYER_STOPPING,
+		SEQUENCE_PLAYER_STARTING
 	};
 	
 	enum SequenceEventSubtype {
@@ -33,7 +39,8 @@ public class SequenceEvent {
 		TICK,
 		SIZE_IN_TICKS,
 		EVENT,
-		CTRL_BUS
+		CTRL_BUS,
+		SEQUENCE_PLAYER,
 	};
 	
 	private BaseSequence sequenceInterface;

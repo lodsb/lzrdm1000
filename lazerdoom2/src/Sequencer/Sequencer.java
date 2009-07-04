@@ -1,5 +1,6 @@
 package Sequencer;
 
+import java.util.List;
 import java.util.LinkedList;
 import java.util.concurrent.*;
 import java.util.concurrent.atomic.AtomicBoolean;
@@ -7,6 +8,8 @@ import java.util.concurrent.atomic.AtomicLong;
 
 import Sequencer.SequenceEvent.SequenceEventSubtype;
 import Sequencer.SequenceEvent.SequenceEventType;
+import Sequencer.SequencerEvent.SequencerEventSubtype;
+import Sequencer.SequencerEvent.SequencerEventType;
 
 import com.trolltech.qt.QSignalEmitter.Signal1;
 import com.trolltech.qt.core.QObject;
@@ -22,12 +25,21 @@ public class Sequencer extends QObject implements SequenceInterface, Runnable {
 	
 	// for thread synchronization & signals
 	public Signal1<Long> globalTickSignal = new Signal1<Long>();
+	public Signal1<SequencerEvent> sequencerEventSignal = new Signal1<SequencerEvent>();
+	
 	private Semaphore globalTickSyncSemaphore = new Semaphore(0);
 	private ConcurrentLinkedQueue<Long> passedTickList = new ConcurrentLinkedQueue<Long>();
 	private ConcurrentLinkedQueue<SequenceEvent> passedSequenceEventList = new ConcurrentLinkedQueue<SequenceEvent>();
+	private ConcurrentLinkedQueue<SequencerEvent> passedSequencerEventList = new ConcurrentLinkedQueue<SequencerEvent>();
+	
+	private CopyOnWriteArrayList<SequencePlayer> sequencePlayers = new CopyOnWriteArrayList<SequencePlayer>();
 	
 	void postSequenceEvent(SequenceEvent sequenceEvent) {
 		passedSequenceEventList.offer(sequenceEvent);
+	}
+	
+	private void postSequencerEvent(SequencerEvent sequencerEvent) {
+		passedSequencerEventList.offer(sequencerEvent);
 	}
 	
 	public Sequencer(ControlServer controlServer) {
@@ -60,6 +72,26 @@ public class Sequencer extends QObject implements SequenceInterface, Runnable {
 		}
 	}
 
+	public SequencePlayer createAndAddSequencePlayer() {
+		SequencePlayer sp = new SequencePlayer(this);
+		sequencePlayers.add(sp);
+		mainSequence.appendSequence(sp);
+		
+		return sp;
+	}
+	
+	public void removeSequencePlayer(SequencePlayer sp) {
+		sp.reset();
+		mainSequence.removeSequence(sp);
+		sequencePlayers.remove(sp);
+		
+		this.postSequencerEvent(new SequencerEvent(SequencerEventType.SEQUENCE_PLAYER_REMOVED, SequencerEventSubtype.SEQUENCE_PLAYER, sp));
+	}
+	
+	public List<SequencePlayer> getSequencePlayers() {
+		return (List<SequencePlayer>)sequencePlayers.clone();
+	}
+	
 	@Override
 	public synchronized boolean eval(long tick) {
 			isRunning = mainSequence.eval(tick);
@@ -96,6 +128,12 @@ public class Sequencer extends QObject implements SequenceInterface, Runnable {
 						se.getSource().getSequenceEventSignal().emit(se);
 					}
 					
+					SequencerEvent sre;
+					
+					while((sre = passedSequencerEventList.poll()) != null) {
+						this.sequencerEventSignal.emit(sre);
+					}
+					
 					
 				} catch (InterruptedException e) {
 					// TODO Auto-generated catch block
@@ -111,8 +149,6 @@ public class Sequencer extends QObject implements SequenceInterface, Runnable {
 
 	@Override
 	public void reset() {
-		this.reset();
-		
 		if(mainSequence != null) {
 			this.mainSequence.reset();
 		}

@@ -3,7 +3,15 @@ package Sequencer;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.locks.ReentrantLock;
 
-public class GeneralSequencePlayer implements SequencePlayerInterface {
+import Sequencer.SequenceEvent.SequenceEventSubtype;
+import Sequencer.SequenceEvent.SequenceEventType;
+
+public class SequencePlayer extends BaseSequence implements SequencePlayerInterface {
+	SequencePlayer(Sequencer sequencer) {
+		super(sequencer);
+		// TODO Auto-generated constructor stub
+	}
+
 	private SequenceInterface sequence = null;
 	
 	private AtomicBoolean startSequence;
@@ -26,6 +34,8 @@ public class GeneralSequencePlayer implements SequencePlayerInterface {
 		isRunning.set(false);
 		startSequence.set(true);
 		scheduledStartTicks = ticks;
+		
+		this.postSequenceEvent(SequenceEventType.SEQUENCE_PLAYER_STARTING, SequenceEventSubtype.TICK, ticks);
 	}
 
 	@Override
@@ -33,6 +43,8 @@ public class GeneralSequencePlayer implements SequencePlayerInterface {
 		isRunning.set(false);
 		stopSequence.set(true);
 		scheduledStopTicks = ticks;
+		
+		this.postSequenceEvent(SequenceEventType.SEQUENCE_PLAYER_STOPPING, SequenceEventSubtype.TICK, ticks);
 	}
 
 	@Override
@@ -74,6 +86,9 @@ public class GeneralSequencePlayer implements SequencePlayerInterface {
 						isRunning.set(true);
 						
 						startSequence.set(false);
+						
+						this.postSequenceEvent(SequenceEventType.SEQUENCE_PLAYER_STARTED, SequenceEventSubtype.NONE, null);
+						
 					} else {
 						scheduledStartTicks--;
 					}
@@ -83,6 +98,9 @@ public class GeneralSequencePlayer implements SequencePlayerInterface {
 					if(scheduledStopTicks >= 0) {
 						scheduledStopTicks--;
 						sequence.eval(relativeTicks);
+						
+						this.postSequenceEvent(SequenceEventType.SEQUENCE_PLAYER_STOPPED, SequenceEventSubtype.NONE, null);
+						
 					} else {
 						stopSequence.set(false);
 					}
@@ -106,11 +124,11 @@ public class GeneralSequencePlayer implements SequencePlayerInterface {
 
 	@Override
 	public void reset() {
-		isRunning.set(false);
-		
 		if(sequence != null) {
 			sequence.reset();
 		}
+		
+		this.stopSequenceImmidiately();
 	}
 
 	@Override

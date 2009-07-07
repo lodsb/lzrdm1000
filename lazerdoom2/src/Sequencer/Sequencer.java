@@ -16,7 +16,7 @@ import com.trolltech.qt.core.QObject;
 
 import Control.ControlServer;
 
-public class Sequencer extends QObject implements SequenceInterface, Runnable {
+public class Sequencer extends QObject implements Runnable {
 	
 	private SequenceContainerInterface mainSequence;
 	private ControlServer controlServer;
@@ -60,22 +60,13 @@ public class Sequencer extends QObject implements SequenceInterface, Runnable {
 		this.moveToThread(thread);
 		thread.start();
 	}
-	
-	@Override
-	public SequenceInterface deepCopy() {
-		if(mainSequence !=  null) {
-			Sequencer seq = new Sequencer((SequenceContainerInterface)mainSequence.deepCopy(), this.controlServer);
-			return seq;
-			
-		} else {
-			return new Sequencer(this.controlServer);
-		}
-	}
 
 	public SequencePlayer createAndAddSequencePlayer() {
 		SequencePlayer sp = new SequencePlayer(this);
 		sequencePlayers.add(sp);
 		mainSequence.appendSequence(sp);
+		
+		this.postSequencerEvent(new SequencerEvent(SequencerEventType.SEQUENCE_PLAYER_ADDED, SequencerEventSubtype.SEQUENCE_PLAYER, sp));
 		
 		return sp;
 	}
@@ -92,8 +83,7 @@ public class Sequencer extends QObject implements SequenceInterface, Runnable {
 		return (List<SequencePlayer>)sequencePlayers.clone();
 	}
 	
-	@Override
-	public synchronized boolean eval(long tick) {
+	public boolean processTick(long tick) {
 			isRunning = mainSequence.eval(tick);
 
 			controlServer.flushMessages();
@@ -142,20 +132,17 @@ public class Sequencer extends QObject implements SequenceInterface, Runnable {
 		}
 	}
 
-	@Override
 	public boolean isRunning() {
 		return isRunning;
 	}
 
-	@Override
 	public void reset() {
 		if(mainSequence != null) {
 			this.mainSequence.reset();
 		}
 	}
 
-	@Override
-	public long size() {
+	public long sizeOfAllSequences() {
 		if(mainSequence != null) {
 			return mainSequence.size();
 		} else {

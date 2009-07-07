@@ -11,7 +11,10 @@ import com.trolltech.qt.QSignalEmitter.Signal1;
 import com.trolltech.qt.core.QObject;
 
 import Control.ControlBusInterface;
+import Control.TestingControlBus;
 import Control.Types.BaseType;
+import Control.Types.DoubleType;
+
 
 public class EventPointsSequence<EventType extends BaseType> extends BaseSequence implements EventSequenceInterface<EventType> {
 	
@@ -51,7 +54,7 @@ public class EventPointsSequence<EventType extends BaseType> extends BaseSequenc
 	EventType nextEvent = null;
 	boolean isRunning = false;
 	
-	private EventPointsSequence(Sequencer seq, ArrayList<EventContainer<EventType>> events, CopyOnWriteArrayList<ControlBusInterface<EventType>> controlBuses, long startOffset, long endPoint) {
+	private EventPointsSequence(SequencerInterface seq, ArrayList<EventContainer<EventType>> events, CopyOnWriteArrayList<ControlBusInterface<EventType>> controlBuses, long startOffset, long endPoint) {
 		super(seq);
 		this.events = events;
 		this.controlBuses = controlBuses;
@@ -59,7 +62,7 @@ public class EventPointsSequence<EventType extends BaseType> extends BaseSequenc
 		this.endPoint = endPoint;
 	}
 	
-	public EventPointsSequence(Sequencer seq) {
+	public EventPointsSequence(SequencerInterface seq) {
 		super(seq);
 		this.events = new ArrayList<EventContainer<EventType>>(); 
 		this.controlBuses = new CopyOnWriteArrayList<ControlBusInterface<EventType>>();
@@ -174,7 +177,7 @@ public class EventPointsSequence<EventType extends BaseType> extends BaseSequenc
 		
 		eventQueueLock.unlock();
 
-		copy = new EventPointsSequence<EventType>(this.sequencer, eventList, controlBusList, this.startOffset, this.endPoint);
+		copy = new EventPointsSequence<EventType>(this.getSequencer(), eventList, controlBusList, this.startOffset, this.endPoint);
 		
 		this.postSequenceEvent(SequenceEventType.CLONED_SEQUENCE, SequenceEventSubtype.SEQUENCE, copy);
 		
@@ -220,13 +223,13 @@ public class EventPointsSequence<EventType extends BaseType> extends BaseSequenc
 			this.postSequenceEvent(SequenceEventType.STARTED, SequenceEventSubtype.NONE, null);
 		}
 		
+		eventQueueLock.lock();
+		
 		if(oldTick == tick-1) {
 			//subsequent ticks
 			queueAndProcessNextEvents(tick);
 		} else {
 			int index = -1;
-			
-			eventQueueLock.lock();
 			
 			for(EventContainer<EventType> eventContainer: events) {
 				if(eventContainer.tick >= tick) {
@@ -246,14 +249,15 @@ public class EventPointsSequence<EventType extends BaseType> extends BaseSequenc
 				isRunning= false;
 			}
 			
-			eventQueueLock.unlock();
-			
 			if(!isRunning) {
 				this.postSequenceEvent(SequenceEventType.STOPPED, SequenceEventSubtype.NONE, null);
 			}
 		}
 		
 		oldTick = tick;
+		
+		eventQueueLock.unlock();
+		
 		return isRunning;
 	}
 
@@ -359,5 +363,4 @@ public class EventPointsSequence<EventType extends BaseType> extends BaseSequenc
 	public void setStartOffset(long ticks) {
 		this.startOffset = ticks;
 	}
-
 }

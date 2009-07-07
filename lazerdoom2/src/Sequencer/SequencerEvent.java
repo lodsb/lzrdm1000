@@ -13,8 +13,9 @@ public class SequencerEvent {
 	
 	SequencerEventType eventType;
 	SequencerEventSubtype subType;
+	Object arg;
 	
-	SequencerEvent(SequencerEventType type, SequencerEventSubtype subtype) {
+	SequencerEvent(SequencerEventType type, SequencerEventSubtype subtype, Object arg) {
 		eventType = type;
 		subType = subtype;
 	}
@@ -25,5 +26,9 @@ public class SequencerEvent {
 	
 	public SequencerEventSubtype getEventSubtype() {
 		return subType;
+	}
+	
+	public Object getArgument() {
+		return arg;
 	}
 }

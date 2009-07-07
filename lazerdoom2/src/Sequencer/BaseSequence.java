@@ -19,8 +19,20 @@ public abstract class BaseSequence extends QObject implements SequenceInterface 
 		return eventSignal;
 	}
 	
-	protected Sequencer sequencer;
-	BaseSequence(Sequencer sequencer) {
+	private SequencerInterface sequencer;
+	
+	protected SequencerInterface getSequencer() {
+		return sequencer;
+	}
+	
+	protected void setSequencer(SequencerInterface sequencer) {
+		this.sequencer = sequencer;
+	}
+	
+	protected BaseSequence() {
+	}
+	
+	BaseSequence(SequencerInterface sequencer) {
 		this.sequencer = sequencer;
 	}
 	

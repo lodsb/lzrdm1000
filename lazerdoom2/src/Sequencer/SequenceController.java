@@ -24,4 +24,6 @@ public class SequenceController extends QObject {
 	public void registerSequenceInterfaceEventListenerToSequencer(SequencerEventListenerInterface sei) {
 		this.sequencer.sequencerEventSignal.connect(sei, "dispatchSequencerEvent(SequencerEvent)");
 	}
+	
+	
 }

@@ -6,10 +6,10 @@ import java.util.concurrent.TimeUnit;
 import com.trolltech.qt.core.QObject;
 
 public class HighResolutionPollingClock implements ClockInterface, Runnable {
-	private Sequencer sequencer;
+	private SequencerInterface sequencer;
 	private ScheduledThreadPoolExecutor stpe;
 	
-	public HighResolutionPollingClock(long interval, Sequencer sequencer) {
+	public HighResolutionPollingClock(long interval, SequencerInterface sequencer) {
 		this.sequencer = sequencer;
 		
 		this.interval = interval;
@@ -72,7 +72,7 @@ public class HighResolutionPollingClock implements ClockInterface, Runnable {
 				}
 				latencyAcc = 0;
 			}
-			sequencer.eval(runs);
+			sequencer.processTick(runs);
 	}
 
 	@Override
@@ -83,7 +83,7 @@ public class HighResolutionPollingClock implements ClockInterface, Runnable {
 	}
 
 	@Override
-	public void setSequencer(Sequencer sequencer) {
+	public void setSequencer(SequencerInterface sequencer) {
 		this.sequencer = sequencer;
 	}
 	

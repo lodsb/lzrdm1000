@@ -10,10 +10,10 @@ interface EventSequenceInterface<EventType extends BaseType> extends SequenceInt
 	void remove(EventType t);
 	void shift(long tick, long offset);
 	
-	void setStartOffset(long ticks);
+	void setLength(long length);
+	void setStartPoint(long tick);
 	long getStartOffset();
-	void setEndPoint(long ticks);
-	long getEndPoint();
+	long getLength();
 	
 	void addControlBus(ControlBusInterface<EventType> cb);
 	void removeControlBus(ControlBusInterface<EventType> cb);

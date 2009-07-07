@@ -1,7 +1,9 @@
 package Control.Types;
 
-public interface BaseType {
-	public BaseType defaultValue();
-	public Object getValue();
+public interface BaseType<T> {
+	public T defaultValue();
+	public T getValue();
 	public float getFloatValue();
+	
+	public void setValue(T t);
 }

@@ -1,6 +1,8 @@
 package Control;
 
+import java.util.ArrayList;
 import java.util.LinkedList;
+import Testing.*;
 
 import Sequencer.BaseSequence;
 import de.sciss.jcollider.ControlDesc;
@@ -10,11 +12,11 @@ import Control.Types.BaseType;
 public class TestingControlBus<T extends BaseType> implements ControlBusInterface<T> {
 
 	public class ControlBusEntry {
-		public T value;
+		public float value;
 		public long tick;
 		public BaseSequence sequence;
 		
-		public ControlBusEntry(T value, long tick, BaseSequence sequence) {
+		public ControlBusEntry(float value, long tick, BaseSequence sequence) {
 			this.value = value;
 			this.tick = tick;
 			this.sequence = sequence;
@@ -27,6 +29,10 @@ public class TestingControlBus<T extends BaseType> implements ControlBusInterfac
 	public ControlDesc getControlDesc() {
 		// TODO Auto-generated method stub
 		return null;
+	}
+	
+	public void clearEntriesAndReset() {
+		this.entries.clear();
 	}
 
 	public LinkedList<ControlBusEntry> getControlBusEntryList() {
@@ -44,7 +50,7 @@ public class TestingControlBus<T extends BaseType> implements ControlBusInterfac
 
 	@Override
 	public void setValue(BaseSequence si, long tick, T baseType) {
-		this.entries.add(new ControlBusEntry(baseType, tick, si));
+		this.entries.add(new ControlBusEntry(baseType.getFloatValue(), tick, si));
 	}
 
 }

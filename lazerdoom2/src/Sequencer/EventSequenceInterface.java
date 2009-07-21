@@ -11,7 +11,7 @@ interface EventSequenceInterface<EventType extends BaseType> extends SequenceInt
 	void shift(long tick, long offset);
 	
 	void setLength(long length);
-	void setStartPoint(long tick);
+	void setStartOffset(long tick);
 	long getStartOffset();
 	long getLength();
 	

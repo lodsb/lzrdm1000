@@ -1,13 +1,14 @@
 package Testing;
 
 import Sequencer.EventPointsSequenceTest;
+import Sequencer.SequentialSequenceContainerTest;
 import junit.framework.Test;
 import junit.framework.TestCase;
 import junit.framework.TestSuite;
 
 public class SequencerTests {
 
-	static Class[] testClasses = { EventPointsSequenceTest.class};
+	static Class[] testClasses = { EventPointsSequenceTest.class, SequentialSequenceContainerTest.class};
 	
 	public static Test suite() {
 		TestSuite suite = new TestSuite();

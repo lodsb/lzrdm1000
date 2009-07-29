@@ -8,7 +8,7 @@ import Sequencer.SequenceEvent.SequenceEventType;
 
 import com.trolltech.qt.core.QObject;
 
-public class SequentialSequenceContainer extends BaseSequence implements SequenceContainerInterface,  {
+public class SequentialSequenceContainer extends BaseSequence implements SequenceContainerInterface  {
 	
 	ArrayList<SequenceInterface> sequences;
 	

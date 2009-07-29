@@ -1,4 +1,3 @@
-<<<<<<< .mine
 package Sequencer;
 
 import java.util.LinkedList;
@@ -41,9 +40,6 @@ public class SequentialSequenceContainerTest extends TestCase {
 		controlBus = new TestingControlBus<DoubleType>();
 		sequenceContainer = new SequentialSequenceContainer(sequencer);
 		sequences = new LinkedList<EventPointsSequence<DoubleType>>();
-		
-		createNewSequences(numberOfEventSequences);
-		fillSequencesWithRandomEvents(numberOfEventsPerSequence, lengthOfSequencesInTicks);
 	}
 	
 	private void createNewSequences(int numberOfSequences) {
@@ -52,6 +48,7 @@ public class SequentialSequenceContainerTest extends TestCase {
 		for(int i = 0; i < numberOfSequences; i++) {
 			EventPointsSequence<DoubleType> eventSequence = new EventPointsSequence<DoubleType>(sequencer);
 			eventSequence.addControlBus(controlBus);
+			eventSequence.setLength(numberOfEventsPerSequence);
 			sequences.add(eventSequence);
 		}
 	}
@@ -63,6 +60,8 @@ public class SequentialSequenceContainerTest extends TestCase {
 	}
 	
 	public void runTest() {
+		createNewSequences(numberOfEventSequences);
+		
 		// Add the sequences and check whether the appropriate events have been posted
 		for(EventSequenceInterface<DoubleType> eventSequence: sequences) {
 			this.sequenceContainer.appendSequence(eventSequence);
@@ -70,34 +69,22 @@ public class SequentialSequenceContainerTest extends TestCase {
 		
 		LinkedList<SequenceEvent> sequenceEvents = sequencer.getSequenceEventList();
 		
-		// check for overall length of sequence container (ticks)
-		// number of events
+		// number of events (ctrl-bus-add (in create sequences), add, sizechange per added sequence)
+		assertTrue("Number of sequence-events after append sequences incorrect",sequenceEvents.size() == numberOfEventSequences*3);
 		
-		assertTrue("Number of sequence-events after append sequences correct",sequenceEvents.size() == numberOfEventSequences*2);
+		// check for overall length of sequence container (ticks)
+		fillSequencesWithRandomEvents(numberOfEventsPerSequence, lengthOfSequencesInTicks);
 		
 		// last event ought to be the size of the container in ticks
 		SequenceEvent se = sequenceEvents.getLast();
-		
-		assertTrue("Size of container equals sum of all sequence-objects", 
+		System.out.println(se.getSequenceEventSubtype());
+		assertTrue("Last event is not SEQUENCE_SIZE_CHANGED", se.getSequenceEventType() == SequenceEventType.SEQUENCE_SIZE_CHANGED && se.getSequenceEventSubtype() == SequenceEventSubtype.SIZE_IN_TICKS);
+		/*assertTrue("Size of container does not equal sum of all sequence-objects", 
 				se.getSequenceEventType() == SequenceEventType.SEQUENCE_SIZE_CHANGED
 				&& se.getSequenceEventSubtype() == SequenceEventSubtype.SIZE_IN_TICKS
-				&& (((Long)se.getArgument()) == numberOfEventSequences*lengthOfSequencesInTicks));
+				&& (((Long)se.getArgument()) == numberOfEventSequences*lengthOfSequencesInTicks));*/
 		
 		
 	}
 }
-=======
-package Sequencer;
 
-import junit.framework.TestCase;
-
-public class SequentialSequenceContainerTest extends TestCase {
-	public void setUp() {
-		
-	}
-	
-	public void runTest() {
-		
-	}
-}
->>>>>>> .r41

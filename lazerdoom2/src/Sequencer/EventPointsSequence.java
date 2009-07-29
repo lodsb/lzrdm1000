@@ -68,6 +68,15 @@ public class EventPointsSequence<EventType extends BaseType> extends BaseSequenc
 		this.events.put(tick, t);
 		
 		this.postSequenceEvent(SequenceEventType.INSERT, SequenceEventSubtype.TICK, tick);
+
+		
+		sdflksdjflskjdf
+		
+		*/ 
+		fixme! sequence size changed sollte nur bei den entprechenden "loop-ops" gesendet werden
+		sonst event add/remove etc.
+		
+		
 		this.postSequenceEvent(SequenceEventType.SEQUENCE_SIZE_CHANGED, SequenceEventSubtype.SIZE_IN_TICKS, this.size());
 	}
 

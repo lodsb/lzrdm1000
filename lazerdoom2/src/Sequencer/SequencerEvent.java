@@ -16,8 +16,8 @@ public class SequencerEvent {
 	Object arg;
 	
 	SequencerEvent(SequencerEventType type, SequencerEventSubtype subtype, Object arg) {
-		eventType = type;
-		subType = subtype;
+		this.eventType = type;
+		this.subType = subtype;
 	}
 	
 	public SequencerEventType getEventType() {

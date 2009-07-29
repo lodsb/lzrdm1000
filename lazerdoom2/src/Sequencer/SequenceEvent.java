@@ -51,6 +51,7 @@ public class SequenceEvent {
 	SequenceEvent(BaseSequence si, SequenceEventType sequenceEventType, SequenceEventSubtype subtype, Object arg) {
 		this.sequenceInterface = si;
 		this.sequenceEventType = sequenceEventType;
+		this.sequenceEventSubtype = subtype;
 		this.arg = arg;
 	}
 

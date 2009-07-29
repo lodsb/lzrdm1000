@@ -66,27 +66,13 @@ public class EventPointsSequence<EventType extends BaseType> extends BaseSequenc
 	@Override
 	public void insert(EventType t, long tick) {
 		this.events.put(tick, t);
-		
 		this.postSequenceEvent(SequenceEventType.INSERT, SequenceEventSubtype.TICK, tick);
-
-		
-		sdflksdjflskjdf
-		
-		*/ 
-		fixme! sequence size changed sollte nur bei den entprechenden "loop-ops" gesendet werden
-		sonst event add/remove etc.
-		
-		
-		this.postSequenceEvent(SequenceEventType.SEQUENCE_SIZE_CHANGED, SequenceEventSubtype.SIZE_IN_TICKS, this.size());
 	}
 
 	@Override
 	public void remove(long tick) {
-
 		this.events.remove(tick);
-		
 		this.postSequenceEvent(SequenceEventType.REMOVE, SequenceEventSubtype.TICK, tick);
-		this.postSequenceEvent(SequenceEventType.SEQUENCE_SIZE_CHANGED, SequenceEventSubtype.SIZE_IN_TICKS, this.size());
 	}
 
 	@Override
@@ -105,7 +91,6 @@ public class EventPointsSequence<EventType extends BaseType> extends BaseSequenc
 		}
 		
 		this.postSequenceEvent(SequenceEventType.REMOVE, SequenceEventSubtype.EVENT, t);
-		this.postSequenceEvent(SequenceEventType.SEQUENCE_SIZE_CHANGED, SequenceEventSubtype.SIZE_IN_TICKS, this.size());
 	}
 
 	@Override
@@ -211,6 +196,9 @@ public class EventPointsSequence<EventType extends BaseType> extends BaseSequenc
 	@Override
 	public void setStartOffset(long ticks) {
 		this.startOffset = ticks;
+		
+		this.postSequenceEvent(SequenceEventType.SET_START, SequenceEventSubtype.SIZE_IN_TICKS, ticks);
+		this.postSequenceEvent(SequenceEventType.SEQUENCE_SIZE_CHANGED, SequenceEventSubtype.SIZE_IN_TICKS, ticks);
 	}
 
 	@Override
@@ -221,5 +209,7 @@ public class EventPointsSequence<EventType extends BaseType> extends BaseSequenc
 	@Override
 	public void setLength(long length) {
 		this.sequenceLength = length;
+		this.postSequenceEvent(SequenceEventType.SET_LENGTH, SequenceEventSubtype.SIZE_IN_TICKS, length);
+		this.postSequenceEvent(SequenceEventType.SEQUENCE_SIZE_CHANGED, SequenceEventSubtype.SIZE_IN_TICKS, length);
 	}
 }

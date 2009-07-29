@@ -21,18 +21,6 @@ public class SequentialSequenceContainerTest extends TestCase {
 	private final long lengthOfSequencesInTicks = 1000;
 	
 	
-	//TODO: move to Testing.Util
-	public static void fillEventSequenceWithRandomEvents(EventPointsSequence<DoubleType> eventSequence, int numberOfEvents, long maxTick) {
-		Random randomSeed = new Random();
-		
-		for(int i = 0; i < numberOfEvents; i++) {
-			long tick = Math.abs(randomSeed.nextLong()) % maxTick;
-			double value = Math.abs(randomSeed.nextDouble());
-			
-			eventSequence.insert(new DoubleType(value), tick);
-		}
-	}
-	
 	private LinkedList<EventPointsSequence<DoubleType>> sequences;
 	
 	public void setUp() {
@@ -55,7 +43,7 @@ public class SequentialSequenceContainerTest extends TestCase {
 	
 	private void fillSequencesWithRandomEvents(int numberOfEvents, long maxTick) {
 		for(EventPointsSequence<DoubleType> eventSequence: sequences) {
-			fillEventSequenceWithRandomEvents(eventSequence, numberOfEvents, maxTick);
+			Testing.Util.fillEventSequenceWithRandomEvents(eventSequence, numberOfEvents, maxTick);
 		}
 	}
 	
@@ -75,10 +63,20 @@ public class SequentialSequenceContainerTest extends TestCase {
 		// check for overall length of sequence container (ticks)
 		fillSequencesWithRandomEvents(numberOfEventsPerSequence, lengthOfSequencesInTicks);
 		
+		// Wait for event-thread to finish pumping events
+		try {
+			Thread.sleep(100, 0);
+		} catch (InterruptedException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		
 		// last event ought to be the size of the container in ticks
 		SequenceEvent se = sequenceEvents.getLast();
 		System.out.println(se.getSequenceEventSubtype());
 		assertTrue("Last event is not SEQUENCE_SIZE_CHANGED", se.getSequenceEventType() == SequenceEventType.SEQUENCE_SIZE_CHANGED && se.getSequenceEventSubtype() == SequenceEventSubtype.SIZE_IN_TICKS);
+		assertTrue("Last event is not from the sequentialsequencecontainer", se.getSource() == this.sequenceContainer);
+		assertTrue("Size of sequence container does not match entire set of events in its children", ((Long)se.getArgument() == numberOfEventSequences*numberOfEventsPerSequence));
 		/*assertTrue("Size of container does not equal sum of all sequence-objects", 
 				se.getSequenceEventType() == SequenceEventType.SEQUENCE_SIZE_CHANGED
 				&& se.getSequenceEventSubtype() == SequenceEventSubtype.SIZE_IN_TICKS

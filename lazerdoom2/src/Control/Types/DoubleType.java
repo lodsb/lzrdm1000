@@ -6,7 +6,7 @@ public class DoubleType implements BaseType<Double> {
 	private double defaultValue = 0.0;
 	
 	public DoubleType(double value) {
-		this.value = value;
+		this.setValue(value);
 	}
 	
 	@Override

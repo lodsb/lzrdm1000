@@ -1,16 +1,50 @@
 package Sequencer;
 
 import java.util.LinkedList;
+import java.util.concurrent.ConcurrentLinkedQueue;
 
 public class TestingSequencer implements SequencerInterface, Runnable {
 
 	private LinkedList<SequenceEvent> sequenceEvents = new LinkedList<SequenceEvent>();
+	
+	private ConcurrentLinkedQueue<SequenceEvent> queuedSequenceEvents = new ConcurrentLinkedQueue<SequenceEvent>();
+	
+	
+	private class EventThread implements Runnable {
+		
+		private Thread thread;
+		
+		EventThread() {
+			this.thread = new Thread(this);
+		}
+		
+		private void start() {
+			this.thread.start();
+		}
+		
+		@Override
+		public void run() {
+			while(true) {
+				SequenceEvent se = queuedSequenceEvents.poll();
+				
+				if(se != null) {
+					se.getSource().getSequenceEventSignal().emit(se);
+				}
+			}
+		}
+	}
+	
 	
 	private long remainingTicks = 0;
 	private SequenceInterface si = null;
 	private int loops = 0;
 	
 	private Thread sequencerThread = new Thread(this);
+	private EventThread eventThread = new EventThread();
+	
+	public TestingSequencer() {
+		eventThread.start();
+	}
 	
 	public LinkedList<SequenceEvent> getSequenceEventList() {
 		return sequenceEvents;
@@ -19,6 +53,7 @@ public class TestingSequencer implements SequencerInterface, Runnable {
 	@Override
 	public void postSequenceEvent(SequenceEvent sequenceEvent) {
 		sequenceEvents.add(sequenceEvent);
+		queuedSequenceEvents.offer(sequenceEvent);
 	}
 	
 	public void clearEventEntriesAndReset() {

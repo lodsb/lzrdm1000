@@ -5,10 +5,11 @@ import java.util.concurrent.locks.ReentrantLock;
 
 import Sequencer.SequenceEvent.SequenceEventSubtype;
 import Sequencer.SequenceEvent.SequenceEventType;
+import Sequencer.SequenceEvent.SequenceMetaEventType;
 
 import com.trolltech.qt.core.QObject;
 
-public class SequentialSequenceContainer extends BaseSequence implements SequenceContainerInterface  {
+public class SequentialSequenceContainer extends BaseSequence implements SequenceContainerInterface, SequenceEventListenerInterface  {
 	
 	ArrayList<SequenceInterface> sequences;
 	
@@ -131,7 +132,11 @@ public class SequentialSequenceContainer extends BaseSequence implements Sequenc
 		for(SequenceInterface sequence: sequences) {
 			numberOfTicks += sequence.size();
 		}
-			
+		
+		if(this.currentSize != numberOfTicks) {
+			this.postSequenceEvent(SequenceEventType.SEQUENCE_SIZE_CHANGED, SequenceEventSubtype.SIZE_IN_TICKS, numberOfTicks);
+		}
+		
 		this.currentSize = numberOfTicks;
 	}
 	
@@ -152,9 +157,12 @@ public class SequentialSequenceContainer extends BaseSequence implements Sequenc
 	private void pappendSequence(SequenceInterface sequence) {
 			sequences.add(sequence);		
 
+			this.postSequenceEvent(SequenceEventType.APPEND_SEQUENCE, SequenceEventSubtype.SEQUENCE, sequence);
 			this.updateSize();
-			this.postSequenceEvent(SequenceEventType.APPEND_SEQUENCE, SequenceEventSubtype.NONE, sequence);
-			this.postSequenceEvent(SequenceEventType.SEQUENCE_SIZE_CHANGED, SequenceEventSubtype.SIZE_IN_TICKS, this.size());
+			
+			if(sequence instanceof BaseSequence) {
+				((BaseSequence)sequence).getSequenceEvalUpdateSignal().connect(this, "dispatchSequenceEvent(SequenceEvent)");
+			}
 	}
 
 	public void appendSequence(SequenceInterface successor, SequenceInterface sequence) {
@@ -223,9 +231,12 @@ public class SequentialSequenceContainer extends BaseSequence implements Sequenc
 		
 		isRunning = evaluateCurrentSequence();
 		
+		this.postSequenceEvent(SequenceEventType.PREPEND_SEQUENCE, SequenceEventSubtype.SEQUENCE, sequence);
 		this.updateSize();
-		this.postSequenceEvent(SequenceEventType.PREPEND_SEQUENCE, SequenceEventSubtype.NONE, sequence);
-		this.postSequenceEvent(SequenceEventType.SEQUENCE_SIZE_CHANGED, SequenceEventSubtype.SIZE_IN_TICKS, this.size());
+		
+		if(sequence instanceof BaseSequence) {
+			((BaseSequence)sequence).getSequenceEvalUpdateSignal().connect(this, "dispatchSequenceEvent(SequenceEvent)");
+		}
 	}
 
 	@Override
@@ -242,7 +253,7 @@ public class SequentialSequenceContainer extends BaseSequence implements Sequenc
 		eventQueueLock.unlock();
 		
 		copy = new SequentialSequenceContainer(this.getSequencer(), sequenceList);
-		this.postSequenceEvent(SequenceEventType.CLONED_SEQUENCE, SequenceEventSubtype.NONE, copy);
+		this.postSequenceEvent(SequenceEventType.CLONED_SEQUENCE, SequenceEventSubtype.SEQUENCE, copy);
 		
 		return copy;
 	}
@@ -253,8 +264,23 @@ public class SequentialSequenceContainer extends BaseSequence implements Sequenc
 		
 			sequences.remove(sequence);
 			this.oldTickCntr = -1;
+		
+			this.postSequenceEvent(SequenceEventType.REMOVE, SequenceEventSubtype.SEQUENCE, sequence);
+			this.updateSize();
+			
+			if(sequence instanceof BaseSequence) {
+				((BaseSequence)sequence).getSequenceEvalUpdateSignal().disconnect(this, "dispatchSequenceEvent(SequenceEvent)");
+			}
 			
 		eventQueueLock.unlock();
+	}
+
+	@Override
+	public void dispatchSequenceEvent(SequenceEvent se) {
+		if(se.getSequenceMetaEventType() == SequenceMetaEventType.SEQUENCE_DATA_CHANGED_EVENT) {
+			this.updateSize();
+		}
+		
 	}
 
 }

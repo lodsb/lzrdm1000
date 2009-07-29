@@ -3,12 +3,14 @@ package Sequencer;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.CopyOnWriteArrayList;
+import java.util.concurrent.atomic.AtomicLong;
 import java.util.concurrent.locks.ReentrantLock;
 
 import Sequencer.SequenceEvent.SequenceEventSubtype;
@@ -29,6 +31,13 @@ public class EventPointsSequence<EventType extends BaseType> extends BaseSequenc
 	// 		 2) implement startoffset&endpoint
 	
 	private ReentrantLock eventQueueLock = new ReentrantLock();
+	
+	private long nextEventTick = 0; 
+	private long oldTick = 0;
+	private EventType nextEvent;
+	private EventType currentEvent;
+	private Iterator<Long> tickIterator;
+	private Iterator<EventType> eventIterator;
 	
 	CopyOnWriteArrayList<ControlBusInterface<EventType>> controlBuses;
 	
@@ -135,9 +144,8 @@ public class EventPointsSequence<EventType extends BaseType> extends BaseSequenc
 		}
 	
 		tick = tick+this.startOffset;
-		
 		EventType event;
-
+		// random
 		if((event = events.get(tick)) != null) {
 			for(ControlBusInterface<EventType> bus: this.controlBuses) {
 				bus.setValue(this, tick, event);

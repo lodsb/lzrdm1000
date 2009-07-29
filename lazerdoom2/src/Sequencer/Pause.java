@@ -10,12 +10,10 @@ public class Pause extends BaseSequence implements SequenceInterface {
 
 	private long pauseTicks;
 	private long runTicks = 0;
-	private Sequencer sequencer;
 	
-	public Pause(Sequencer sequencer, long pauseTicks) {
+	public Pause(SequencerInterface sequencer, long pauseTicks) {
 		super(sequencer);
 		this.pauseTicks = pauseTicks;
-		this.sequencer = sequencer;
 	}
 	
 	void setPauseTicks(long pauseTicks) {
@@ -54,7 +52,7 @@ public class Pause extends BaseSequence implements SequenceInterface {
 	@Override
 	public SequenceInterface deepCopy() {
 		// TODO Auto-generated method stub
-		Pause copy = new Pause(this.sequencer, this.pauseTicks);
+		Pause copy = new Pause(this.getSequencer(), this.pauseTicks);
 		this.postSequenceEvent(SequenceEventType.CLONED_SEQUENCE, SequenceEventSubtype.NONE, copy);
 		return copy;
 	}

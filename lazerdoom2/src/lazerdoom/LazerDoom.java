@@ -18,6 +18,7 @@ import Sequencer.ParallelSequenceContainer;
 import Sequencer.SequenceContainerInterface;
 import Sequencer.Sequencer;
 import Sequencer.HighResolutionPollingClock;
+import Sequencer.SequencerInterface;
 import Synth.SynthManager;
 import de.sciss.jcollider.*;
 import de.sciss.jcollider.gui.ServerPanel;
@@ -59,7 +60,7 @@ public class LazerDoom extends QWidget {
 	
 	public LazerDoom() {
 		// For the clock working as a jack-client
-		System.setProperty("jjack.ports.input", "0");
+		//System.setProperty("jjack.ports.input", "0");
 		
 		this.startJack();
 		
@@ -80,7 +81,7 @@ public class LazerDoom extends QWidget {
 		controlServer = new ControlServer(superColliderServer, 50);
 		sequencer = new Sequencer(controlServer);
 		
-		clock = new HighResolutionPollingClock(100000, sequencer);
+		clock = new HighResolutionPollingClock(100000, (SequencerInterface) sequencer);
 		
 		this.startSupercolliderServer();
 		synthManager = new SynthManager(this.superColliderServer);

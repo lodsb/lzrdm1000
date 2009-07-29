@@ -25,12 +25,12 @@ public class ParallelSequenceContainer extends BaseSequence implements SequenceC
 		this.postSequenceEvent(SequenceEventType.SEQUENCE_SIZE_CHANGED, SequenceEventSubtype.SIZE_IN_TICKS, this.size());
 	}
 	
-	private ParallelSequenceContainer(Sequencer sequencer, CopyOnWriteArrayList<SequenceInterface> sequences) {
+	private ParallelSequenceContainer(SequencerInterface sequencer, CopyOnWriteArrayList<SequenceInterface> sequences) {
 		super(sequencer);
 		this.sequences = sequences;
 	}
 	
-	public ParallelSequenceContainer(Sequencer sequencer) {
+	public ParallelSequenceContainer(SequencerInterface sequencer) {
 		super(sequencer);
 		this.sequences = new CopyOnWriteArrayList<SequenceInterface>();
 	}
@@ -111,7 +111,7 @@ public class ParallelSequenceContainer extends BaseSequence implements SequenceC
 		}
 		
 		
-		copy = new ParallelSequenceContainer(this.sequencer, sequenceList);
+		copy = new ParallelSequenceContainer(this.getSequencer(), sequenceList);
 		this.postSequenceEvent(SequenceEventType.CLONED_SEQUENCE, SequenceEventSubtype.SEQUENCE, copy);
 		return copy;  
 	}

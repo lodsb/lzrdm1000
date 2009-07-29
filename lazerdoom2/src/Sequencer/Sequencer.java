@@ -16,7 +16,7 @@ import com.trolltech.qt.core.QObject;
 
 import Control.ControlServer;
 
-public class Sequencer extends QObject implements Runnable {
+public class Sequencer extends QObject implements Runnable, SequencerInterface {
 	
 	private SequenceContainerInterface mainSequence;
 	private ControlServer controlServer;
@@ -34,7 +34,7 @@ public class Sequencer extends QObject implements Runnable {
 	
 	private CopyOnWriteArrayList<SequencePlayer> sequencePlayers = new CopyOnWriteArrayList<SequencePlayer>();
 	
-	void postSequenceEvent(SequenceEvent sequenceEvent) {
+	public void postSequenceEvent(SequenceEvent sequenceEvent) {
 		passedSequenceEventList.offer(sequenceEvent);
 	}
 	
@@ -149,5 +149,4 @@ public class Sequencer extends QObject implements Runnable {
 			return 0;
 		}
 	}
-
 }

@@ -1,32 +1,33 @@
 package Sequencer;
 
 import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.concurrent.atomic.AtomicReference;
 import java.util.concurrent.locks.ReentrantLock;
 
 import Sequencer.SequenceEvent.SequenceEventSubtype;
 import Sequencer.SequenceEvent.SequenceEventType;
 
 public class SequencePlayer extends BaseSequence implements SequencePlayerInterface {
-	SequencePlayer(Sequencer sequencer) {
+	SequencePlayer(SequencerInterface sequencer) {
 		super(sequencer);
 		// TODO Auto-generated constructor stub
 	}
-
-	private SequenceInterface sequence = null;
 	
-	private AtomicBoolean startSequence;
+	private AtomicReference<SequenceInterface> sequence = new AtomicReference<SequenceInterface>();
+	
+	private AtomicBoolean startSequence = new AtomicBoolean();
 	private long scheduledStartTicks = 0;
 	
 	private long relativeTicks = 0;
 	
-	private AtomicBoolean stopSequence;
+	private AtomicBoolean stopSequence = new AtomicBoolean();
 	private long scheduledStopTicks = 0;
 	
 	private AtomicBoolean isRunning;
 	
 	@Override
 	public SequenceInterface getSequence() {
-		return sequence;
+		return sequence.get();
 	}
 
 	@Override
@@ -49,7 +50,7 @@ public class SequencePlayer extends BaseSequence implements SequencePlayerInterf
 
 	@Override
 	public void setSequence(SequenceInterface sequence) {
-		this.sequence = sequence;
+		this.sequence.set(sequence);
 	}
 
 	@Override
@@ -68,21 +69,26 @@ public class SequencePlayer extends BaseSequence implements SequencePlayerInterf
 
 	@Override
 	public SequenceInterface deepCopy() {
-		// TODO Auto-generated method stub
-		return null;
+		SequencePlayer sp = new SequencePlayer(this.getSequencer());
+		sp.startSequence.set(this.startSequence.get());
+		sp.stopSequence.set(this.stopSequence.get());
+		sp.relativeTicks = this.relativeTicks;
+		sp.sequence.set(this.sequence.get());
+		
+		return sp;
 	}
 
 	@Override
 	public boolean eval(long tick) {
-		if(sequence != null) {
+		if(sequence.get() != null) {
 			if(isRunning.get()) {
 				relativeTicks = tick-relativeTicks;
-				sequence.eval(relativeTicks);
+				sequence.get().eval(relativeTicks);
 			} else {
 				if(startSequence.get()) {
 					if(scheduledStartTicks == 0) {
 						relativeTicks = tick;
-						sequence.eval(relativeTicks);
+						sequence.get().eval(relativeTicks);
 						isRunning.set(true);
 						
 						startSequence.set(false);
@@ -97,7 +103,7 @@ public class SequencePlayer extends BaseSequence implements SequencePlayerInterf
 					
 					if(scheduledStopTicks >= 0) {
 						scheduledStopTicks--;
-						sequence.eval(relativeTicks);
+						sequence.get().eval(relativeTicks);
 						
 						this.postSequenceEvent(SequenceEventType.SEQUENCE_PLAYER_STOPPED, SequenceEventSubtype.NONE, null);
 						
@@ -106,7 +112,7 @@ public class SequencePlayer extends BaseSequence implements SequencePlayerInterf
 					}
 				}
 			}
-		return this.sequence.isRunning();
+		return this.sequence.get().isRunning();
 		
 		}
 	
@@ -116,7 +122,7 @@ public class SequencePlayer extends BaseSequence implements SequencePlayerInterf
 	@Override
 	public boolean isRunning() {
 		if(this.sequence != null) {
-			return this.sequence.isRunning();
+			return this.sequence.get().isRunning();
 		} else {
 			return false;
 		}
@@ -124,8 +130,8 @@ public class SequencePlayer extends BaseSequence implements SequencePlayerInterf
 
 	@Override
 	public void reset() {
-		if(sequence != null) {
-			sequence.reset();
+		if(sequence.get() != null) {
+			sequence.get().reset();
 		}
 		
 		this.stopSequenceImmidiately();
@@ -134,7 +140,7 @@ public class SequencePlayer extends BaseSequence implements SequencePlayerInterf
 	@Override
 	public long size() {
 		if(sequence != null) {
-			return sequence.size();
+			return sequence.get().size();
 		}
 		
 		return 0;

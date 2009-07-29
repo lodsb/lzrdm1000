@@ -29,7 +29,7 @@ public class SequentialSequenceContainer extends BaseSequence implements Sequenc
 		this.sequences = new ArrayList<SequenceInterface>();
 	}
 	
-	private SequentialSequenceContainer(Sequencer sequencer, ArrayList<SequenceInterface> sequenceList) {
+	private SequentialSequenceContainer(SequencerInterface sequencer, ArrayList<SequenceInterface> sequenceList) {
 		super(sequencer);
 		this.sequences = sequenceList;
 	}
@@ -241,7 +241,7 @@ public class SequentialSequenceContainer extends BaseSequence implements Sequenc
 			
 		eventQueueLock.unlock();
 		
-		copy = new SequentialSequenceContainer(this.sequencer, sequenceList);
+		copy = new SequentialSequenceContainer(this.getSequencer(), sequenceList);
 		this.postSequenceEvent(SequenceEventType.CLONED_SEQUENCE, SequenceEventSubtype.NONE, copy);
 		
 		return copy;

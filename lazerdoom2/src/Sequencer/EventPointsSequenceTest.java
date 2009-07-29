@@ -1,17 +1,17 @@
 package Sequencer;
 
-import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.Random;
 
+import junit.framework.TestCase;
+
 import Control.TestingControlBus;
 import Control.Types.DoubleType;
-import org.junit.*;
-import static org.junit.Assert.*;
+
 
 import Testing.Util;
 
-public class EventPointsSequenceTest {
+public class EventPointsSequenceTest extends TestCase {
 	// TESTING
 	private TestingControlBus<DoubleType> testBus;
 	private TestingSequencer testSequencer;
@@ -21,8 +21,7 @@ public class EventPointsSequenceTest {
 	
 	private float[] events; 
 	
-	public EventPointsSequenceTest() {
-		super();
+	public void setUp() {
 		testBus = new TestingControlBus<DoubleType>();
 		testSequencer = new TestingSequencer();
 		eventPointsSequence = new EventPointsSequence<DoubleType>(testSequencer);
@@ -76,9 +75,12 @@ public class EventPointsSequenceTest {
 		}
 	}
 	
-	@Test
-	public void testSequence() {
-		testSequencer.simulateEvalsThreaded(eventPointsSequence, numberOfEvents, 10000);
+	public void runTest() {
+		testSequence();
+	}
+	
+	public boolean testSequence() {
+		testSequencer.simulateEvalsThreaded(eventPointsSequence, numberOfEvents, 100);
 		
 		System.out.println("Modifying sequence while sequencer is running...");
 		this.insertRandomValues(numberOfEvents/2);
@@ -91,7 +93,7 @@ public class EventPointsSequenceTest {
 		System.out.println("rec entr "+recordedEntries2.size());
 		
 		testBus.clearEntriesAndReset();
-		testSequencer.simulateEvals(eventPointsSequence, numberOfEvents, 10000);
+		testSequencer.simulateEvals(eventPointsSequence, numberOfEvents, 1);
 		
 		System.out.println(eventPointsSequence.events.size());
 		System.out.print("Checking recorded events ...");
@@ -110,5 +112,6 @@ public class EventPointsSequenceTest {
 		
 		System.out.println("done!");
 		
+		return allClear;
 	}	
 }

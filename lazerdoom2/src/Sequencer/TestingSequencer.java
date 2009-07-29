@@ -21,6 +21,9 @@ public class TestingSequencer implements SequencerInterface, Runnable {
 		sequenceEvents.add(sequenceEvent);
 	}
 	
+	public void clearEventEntriesAndReset() {
+		sequenceEvents.clear();
+	}
 	
 	public void simulateEvals(SequenceInterface sequence, long ticks, int loops) {
 		System.out.println("Simulating "+ticks+" ticks and "+loops+ " loops with sequence "+sequence);
@@ -32,7 +35,7 @@ public class TestingSequencer implements SequencerInterface, Runnable {
 			}
 		}
 		long stopTime = System.currentTimeMillis();
-		long runTime = stopTime - startTime;
+		long runTime = stopTime - startTime+1;
 		System.out.println("Run time: " + runTime+ " ticks/ms "+(ticks*loops)/runTime);
 
 	}

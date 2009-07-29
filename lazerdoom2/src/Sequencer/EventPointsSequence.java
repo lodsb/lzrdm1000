@@ -48,7 +48,11 @@ public class EventPointsSequence<EventType extends BaseType> extends BaseSequenc
 	
 	boolean isRunning = false;
 	
+<<<<<<< .mine
+	private EventPointsSequence(SequencerInterface seq, ArrayList<EventContainer<EventType>> events, CopyOnWriteArrayList<ControlBusInterface<EventType>> controlBuses, long startOffset, long sequenceLength) {
+=======
 	private EventPointsSequence(SequencerInterface seq, Map<Long, EventType> events, CopyOnWriteArrayList<ControlBusInterface<EventType>> controlBuses, long startOffset, long sequenceLength) {
+>>>>>>> .r41
 		super(seq);
 		this.events = events;
 		this.controlBuses = controlBuses;
@@ -121,19 +125,98 @@ public class EventPointsSequence<EventType extends BaseType> extends BaseSequenc
 			controlBusList.add(bus);
 		}
 
+<<<<<<< .mine
+		copy = new EventPointsSequence<EventType>(this.getSequencer(), eventList, controlBusList, this.startOffset, this.sequenceLength);
+=======
 		copy = new EventPointsSequence<EventType>(this.getSequencer(),  new ConcurrentHashMap<Long, EventType>(events), controlBusList, this.startOffset, this.sequenceLength);
+>>>>>>> .r41
 		
 		this.postSequenceEvent(SequenceEventType.CLONED_SEQUENCE, SequenceEventSubtype.SEQUENCE, copy);
 		
 		return copy;
 	}
+<<<<<<< .mine
+
+	
+	private void queueAndProcessNextEvents(long tick) {
+		if(nextEventTickSchedule == 0) {
+			
+			for(ControlBusInterface<EventType> bus: this.controlBuses) {
+				bus.setValue(this, tick, nextEvent);
+			}
+			
+			
+			if(nextEventIndex+1 < currentEventListSize) {
+				nextEventIndex++;
+				EventContainer<EventType> container = events.get(nextEventIndex);
+				nextEventTickSchedule = container.tick; 
+				nextEvent = container.event;
+			}
+		} 
+		
+		nextEventTickSchedule--;
+	}
+=======
+>>>>>>> .r41
 	
 	@Override
 	public boolean eval(long tick) {
 		if(tick == 0) {
 			this.postSequenceEvent(SequenceEventType.STARTED, SequenceEventSubtype.NONE, null);
+<<<<<<< .mine
 		} 
 		
+		eventQueueLock.lock();
+=======
+		} 
+>>>>>>> .r41
+		
+<<<<<<< .mine
+		if(tick > this.sequenceLength) {
+			this.isRunning = false;
+			
+			eventQueueLock.unlock();
+			return false;
+		} else if(tick == this.sequenceLength) {
+			this.isRunning = false;
+			this.postSequenceEvent(SequenceEventType.STOPPED, SequenceEventSubtype.NONE, null);
+			
+			eventQueueLock.unlock();
+			return false;
+		}
+		
+		tick = tick+this.startOffset;
+		
+		if(tick > this.sizeOfAllEvents) {
+			
+			eventQueueLock.unlock();
+			return true;
+		}
+		
+		this.isRunning = true;
+		
+		if(oldTick == tick-1) {
+			//subsequent ticks
+			queueAndProcessNextEvents(tick);
+		} else {
+			int index = -1;
+			
+			for(EventContainer<EventType> eventContainer: events) {
+				if(eventContainer.tick >= tick) {
+					break;
+				}
+				index++;
+			}
+			
+			if(index > -1) {
+				EventContainer<EventType> container = events.get(index);
+				nextEventTickSchedule = container.tick; 
+				nextEvent = container.event;
+				nextEventIndex = index;
+				
+				queueAndProcessNextEvents(tick);
+			} 
+=======
 		if(tick > this.sequenceLength) {
 			this.isRunning = false;
 			return false;
@@ -150,9 +233,18 @@ public class EventPointsSequence<EventType extends BaseType> extends BaseSequenc
 			for(ControlBusInterface<EventType> bus: this.controlBuses) {
 				bus.setValue(this, tick, event);
 			}
+>>>>>>> .r41
 		}
 		
+<<<<<<< .mine
+		oldTick = tick;
+		
+		eventQueueLock.unlock();
+		
 		return true;
+=======
+		return true;
+>>>>>>> .r41
 	}
 
 	@Override
@@ -200,8 +292,17 @@ public class EventPointsSequence<EventType extends BaseType> extends BaseSequenc
 	}
 
 	@Override
+<<<<<<< .mine
+	public void setStartOffset(long ticks) {
+		eventQueueLock.lock();
+		
+		this.startOffset = ticks;
+		
+		eventQueueLock.unlock();
+=======
 	public void setStartOffset(long ticks) {
 		this.startOffset = ticks;
+>>>>>>> .r41
 	}
 
 	@Override
@@ -210,7 +311,16 @@ public class EventPointsSequence<EventType extends BaseType> extends BaseSequenc
 	}
 
 	@Override
+<<<<<<< .mine
+	public void setLength(long length) {
+		eventQueueLock.lock();
+		
+		this.sequenceLength = length;
+		
+		eventQueueLock.unlock();
+=======
 	public void setLength(long length) {
 		this.sequenceLength = length;
+>>>>>>> .r41
 	}
 }

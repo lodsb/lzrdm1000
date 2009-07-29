@@ -52,6 +52,14 @@ public class TestingSequencer implements SequencerInterface, Runnable {
 		return !sequencerThread.isAlive();
 	}
 
+	public void simulateOneEval(SequenceInterface sequence, long tick) {
+		sequence.eval(tick);
+	}
+	
+	public void clearSequenceEventList() {
+		sequenceEvents.clear();
+	}
+	
 	@Override
 	public boolean processTick(long tick) {
 		return true;

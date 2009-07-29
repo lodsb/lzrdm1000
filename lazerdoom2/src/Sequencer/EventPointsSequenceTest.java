@@ -51,8 +51,7 @@ public class EventPointsSequenceTest extends TestCase {
 			}
 			
 			double value = Math.abs(generator.nextDouble());
-			DoubleType entry = new DoubleType();
-			entry.setValue(value);
+			DoubleType entry = new DoubleType(value);
 			
 			events[index] = entry.getFloatValue();
 			eventPointsSequence.insert(entry, index);

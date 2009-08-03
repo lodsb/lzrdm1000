@@ -13,12 +13,12 @@ public class SequenceController extends QObject {
 		this.sequencer.globalTickSignal.connect(slotObject, method);
 	} 
 	
-	public void connectToSequenceLocalTickSignal(BaseSequence si, Object slotObject, String method) {
-		si.getSequenceEvalUpdateSignal().connect(slotObject, method);
+	public void connectToSequenceLocalTickSignal(BaseSequence si, SequenceEvalListenerInterface svali) {
+		si.registerSequenceEvalListener(svali);
 	}
 	
-	public void registerSequenceInterfaceEventListener(BaseSequence si, SequenceEventListenerInterface sei) {
-		si.getSequenceEventSignal().connect(sei, "dispatchSequenceEvent(SequenceEvent)");
+	public void registerSequenceInterfaceEventListener(BaseSequence si, SequenceEventListenerInterface seli) {
+		si.registerSequenceEventListener(seli);
 	}
 	
 	public void registerSequenceInterfaceEventListenerToSequencer(SequencerEventListenerInterface sei) {

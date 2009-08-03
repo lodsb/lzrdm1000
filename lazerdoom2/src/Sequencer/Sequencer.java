@@ -109,13 +109,13 @@ public class Sequencer extends QObject implements Runnable, SequencerInterface {
 					ControlServer.SentMessage sentMessage;
 					
 					while((sentMessage = queue.poll()) != null) {
-						sentMessage.sequence.getSequenceEvalUpdateSignal().emit(sentMessage.localTick);
+						sentMessage.sequence._pumpSequenceEval(sentMessage.localTick);
 					}
 					
 					SequenceEvent se;
 					
 					while((se = passedSequenceEventList.poll()) != null) {
-						se.getSource().getSequenceEventSignal().emit(se);
+						se.getSource()._pumpSequenceEvent(se);
 					}
 					
 					SequencerEvent sre;

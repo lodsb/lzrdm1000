@@ -1,36 +1,34 @@
 package Sequencer;
 
 import java.util.LinkedList;
+import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.ConcurrentLinkedQueue;
+import java.util.concurrent.LinkedBlockingQueue;
+import java.util.concurrent.atomic.AtomicInteger;
+import java.util.concurrent.locks.ReentrantLock;
 
-public class TestingSequencer implements SequencerInterface, Runnable {
+import Control.Types.DoubleType;
+import Sequencer.SequenceEvent.SequenceEventType;
+
+import com.trolltech.qt.QThread;
+import com.trolltech.qt.core.QObject;
+
+public class TestingSequencer extends QObject implements SequencerInterface, Runnable {
 
 	private LinkedList<SequenceEvent> sequenceEvents = new LinkedList<SequenceEvent>();
 	
-	private ConcurrentLinkedQueue<SequenceEvent> queuedSequenceEvents = new ConcurrentLinkedQueue<SequenceEvent>();
+	//private ConcurrentLinkedQueue<SequenceEvent> queuedSequenceEvents = new ConcurrentLinkedQueue<SequenceEvent>();
 	
+	private BlockingQueue<SequenceEvent> queuedSequenceEvents = new LinkedBlockingQueue<SequenceEvent>();
+
+	ReentrantLock lock = new ReentrantLock();
 	
-	private class EventThread implements Runnable {
-		
-		private Thread thread;
-		
-		EventThread() {
-			this.thread = new Thread(this);
-		}
-		
-		private void start() {
-			this.thread.start();
-		}
-		
-		@Override
+	AtomicInteger shit = new AtomicInteger();
+	AtomicInteger shit2 = new AtomicInteger();
+	
+	private class ProcessThread implements Runnable {
 		public void run() {
-			while(true) {
-				SequenceEvent se = queuedSequenceEvents.poll();
-				
-				if(se != null) {
-					se.getSource().getSequenceEventSignal().emit(se);
-				}
-			}
+			simulateEvals(si, remainingTicks, loops);
 		}
 	}
 	
@@ -39,21 +37,33 @@ public class TestingSequencer implements SequencerInterface, Runnable {
 	private SequenceInterface si = null;
 	private int loops = 0;
 	
-	private Thread sequencerThread = new Thread(this);
-	private EventThread eventThread = new EventThread();
+	private Thread sequencerThread;
+	public Thread eventThread = new Thread(this);
 	
 	public TestingSequencer() {
 		eventThread.start();
 	}
 	
 	public LinkedList<SequenceEvent> getSequenceEventList() {
-		return sequenceEvents;
+		return (LinkedList<SequenceEvent>) sequenceEvents.clone();
 	}
 	
 	@Override
 	public void postSequenceEvent(SequenceEvent sequenceEvent) {
+		//lock.lock();
 		sequenceEvents.add(sequenceEvent);
-		queuedSequenceEvents.offer(sequenceEvent);
+		try {
+			queuedSequenceEvents.put(sequenceEvent);
+		} catch (InterruptedException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		//lock.unlock();
+		if(sequenceEvent.getSequenceEventType() == SequenceEventType.INSERT) {
+			shit.incrementAndGet();
+			//System.out.println("WQ "+shit.get()+" "+shit2.get());
+		}
+		//System.out.println(sequenceEvents.size()+" "+queuedSequenceEvents.size());
 	}
 	
 	public void clearEventEntriesAndReset() {
@@ -66,7 +76,7 @@ public class TestingSequencer implements SequencerInterface, Runnable {
 		
 		for(int k = 0; k < loops; k++) {
 			for(long i = 0; i < ticks; i++) {
-				sequence.eval(i);
+				this.simulateOneEval(sequence, i);
 			}
 		}
 		long stopTime = System.currentTimeMillis();
@@ -80,6 +90,7 @@ public class TestingSequencer implements SequencerInterface, Runnable {
 		this.si = sequence;
 		this.loops = loops;
 		
+		sequencerThread = new Thread(new ProcessThread());
 		sequencerThread.start();
 	}
 	
@@ -102,7 +113,17 @@ public class TestingSequencer implements SequencerInterface, Runnable {
 
 	@Override
 	public void run() {
-		this.simulateEvals(this.si, this.remainingTicks, loops);
+			while(true) {
+				//System.out.println("?!? "+sequenceEvents.size()+" "+queuedSequenceEvents.size());
+				SequenceEvent se;
+				try {
+					se = queuedSequenceEvents.take();
+					se.getSource()._pumpSequenceEvent(se);
+				} catch (InterruptedException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+			}
 	}
 
 }

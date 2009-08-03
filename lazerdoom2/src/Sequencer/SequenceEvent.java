@@ -102,4 +102,8 @@ public class SequenceEvent {
 		return arg;
 	}
 	
+	public String toString() {
+		return "Metatype: "+this.getSequenceMetaEventType()+"\nType: "+this.getSequenceEventType()+"\nSubtype: "+this.getSequenceEventSubtype()+"\nSource: "+this.getSource()+"\nArg: "+this.arg;
+	}
+	
 }

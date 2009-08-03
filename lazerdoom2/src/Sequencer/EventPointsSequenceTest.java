@@ -109,6 +109,19 @@ public class EventPointsSequenceTest extends TestCase {
 		
 		assertEquals(true, allClear);
 		
+		allClear = true;
+		
+		for(int i = 0; i <10; i++) {
+			testBus.clearEntriesAndReset();
+			testSequencer.simulateEvals(eventPointsSequence, numberOfEvents, 1);
+			
+			for(TestingControlBus<DoubleType>.ControlBusEntry cbEntry: recordedEntries) {
+				if(eventPointsSequence._testingGetValueOfTick(cbEntry.tick) == null || eventPointsSequence._testingGetValueOfTick(cbEntry.tick).getFloatValue() != cbEntry.value) {
+					allClear = false;
+				}
+			}
+		}
+		
 		System.out.println("done!");
 		
 		return allClear;

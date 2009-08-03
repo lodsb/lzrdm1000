@@ -1,22 +1,44 @@
 package Sequencer;
 
+import java.util.concurrent.ConcurrentLinkedQueue;
+
 import Sequencer.SequenceEvent.SequenceEventSubtype;
 import Sequencer.SequenceEvent.SequenceEventType;
 
+import com.trolltech.qt.QSignalEmitter;
 import com.trolltech.qt.core.QObject;
 
 public abstract class BaseSequence extends QObject implements SequenceInterface {
 
-	// for gui synchronization
-	private Signal1<Long> evalSignal = new Signal1<Long>();
-	private Signal1<SequenceEvent> eventSignal = new Signal1<SequenceEvent>();
-	
-	public Signal1<Long> getSequenceEvalUpdateSignal() {
-		return evalSignal;
-	}
+	ConcurrentLinkedQueue<SequenceEventListenerInterface> eventListeners = new ConcurrentLinkedQueue<SequenceEventListenerInterface>();
+	ConcurrentLinkedQueue<SequenceEvalListenerInterface> evalListeners = new ConcurrentLinkedQueue<SequenceEvalListenerInterface>();
 
-	public Signal1<SequenceEvent> getSequenceEventSignal() {
-		return eventSignal;
+	public void registerSequenceEventListener(SequenceEventListenerInterface seli) {
+		eventListeners.offer(seli);
+	}
+	
+	public void registerSequenceEvalListener(SequenceEvalListenerInterface svali) {
+		evalListeners.offer(svali);
+	}
+	
+	public void unregisterSequenceEventListener(SequenceEventListenerInterface seli) {
+		eventListeners.remove(seli);
+	}
+	
+	public void unregisterSequenceEvalListener(SequenceEvalListenerInterface svali) {
+		evalListeners.remove(svali);
+	}
+	
+	void _pumpSequenceEvent(SequenceEvent se) {
+		for(SequenceEventListenerInterface seli: eventListeners) {
+			seli.dispatchSequenceEvent(se);
+		}
+	}
+	
+	void _pumpSequenceEval(long tick) {
+		for(SequenceEvalListenerInterface svali: evalListeners) {
+			svali.dispatchEvalEvent(tick);
+		}
 	}
 	
 	private SequencerInterface sequencer;

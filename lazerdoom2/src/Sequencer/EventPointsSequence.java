@@ -212,4 +212,12 @@ public class EventPointsSequence<EventType extends BaseType> extends BaseSequenc
 		this.postSequenceEvent(SequenceEventType.SET_LENGTH, SequenceEventSubtype.SIZE_IN_TICKS, length);
 		this.postSequenceEvent(SequenceEventType.SEQUENCE_SIZE_CHANGED, SequenceEventSubtype.SIZE_IN_TICKS, length);
 	}
+	
+	EventType _testingGetValueOfTick(long tick) {
+		return this.events.get(tick);
+	}
+	
+	public String toString() {
+		return this.events.toString();
+	}
 }

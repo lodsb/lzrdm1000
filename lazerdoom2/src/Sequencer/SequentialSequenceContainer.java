@@ -1,6 +1,7 @@
 package Sequencer;
 
 import java.util.ArrayList;
+import java.util.LinkedList;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReadWriteLock;
 import java.util.concurrent.locks.ReentrantLock;
@@ -182,7 +183,9 @@ public class SequentialSequenceContainer extends BaseSequence implements Sequenc
 	@Override
 	public void appendSequence(SequenceInterface sequence) {
 		writeLock.lock();
-			
+		// reset eval
+		oldTickCntr = -1;
+		
 			pappendSequence(sequence);
 			
 		writeLock.unlock();
@@ -201,6 +204,9 @@ public class SequentialSequenceContainer extends BaseSequence implements Sequenc
 
 	public void appendSequence(SequenceInterface predesessor, SequenceInterface sequence) {
 		writeLock.lock();
+		
+		//reset eval
+		oldTickCntr = -1;
 		
 			int index = 0;
 			for(SequenceInterface currentSequence: sequences) {
@@ -231,7 +237,8 @@ public class SequentialSequenceContainer extends BaseSequence implements Sequenc
 	
 	public void prependSequence(SequenceInterface successor, SequenceInterface sequence) {
 		writeLock.lock();
-			
+		
+		// reset eval
 		currentSequence = null;
 		
 			int index = 0;
@@ -283,6 +290,9 @@ public class SequentialSequenceContainer extends BaseSequence implements Sequenc
 	public void removeSequence(SequenceInterface sequence) {
 		writeLock.lock();
 		
+			// reset eval
+			oldTickCntr = -1;
+			
 			sequences.remove(sequence);
 			this.oldTickCntr = -1;
 		
@@ -308,6 +318,56 @@ public class SequentialSequenceContainer extends BaseSequence implements Sequenc
 	
 	ArrayList<SequenceInterface> _testingGetSequences() {
 		return this.sequences;
+	}
+
+	@Override
+	public void updateStructure(LinkedList<SequenceInterface> updatedSequences) {
+		writeLock.lock();
+		
+		// check if the sequences have to be changed
+		boolean changeNecessary = false;
+		
+		int i = 0;
+		for(SequenceInterface si: this.sequences) {
+			if(si != updatedSequences.get(i)) {
+				changeNecessary = true;
+			} 
+			i++;
+		}
+		
+		if(changeNecessary) {
+			// sequences that have to be removed
+			for(SequenceInterface sequence: this.sequences) {
+				if(!updatedSequences.contains(sequence)) {
+					this.postSequenceEvent(SequenceEventType.REMOVE, SequenceEventSubtype.SEQUENCE, sequence);
+
+					if(sequence instanceof BaseSequence) {
+						((BaseSequence)sequence).unregisterSequenceEventListener(this);
+					}
+				}
+			}
+
+			// sequences that will be added
+			for(SequenceInterface sequence: updatedSequences) {
+				if(!this.sequences.contains(sequence)) {		
+					this.postSequenceEvent(SequenceEventType.APPEND_SEQUENCE, SequenceEventSubtype.SEQUENCE, sequence);
+
+					if(sequence instanceof BaseSequence) {
+						((BaseSequence)sequence).registerSequenceEventListener(this);
+					}
+				}
+			}
+
+			this.sequences.clear();
+
+			for(SequenceInterface si: updatedSequences) {
+				this.sequences.add(si);
+			}
+
+			this.updateSize();
+		}
+		
+		writeLock.unlock();
 	}
 
 }

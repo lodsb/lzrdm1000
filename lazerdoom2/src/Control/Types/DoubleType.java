@@ -31,5 +31,9 @@ public class DoubleType implements BaseType<Double> {
 	public void setValue(Double t) {
 		this.value = t;
 	}
+	
+	public String toString() {
+		return getFloatValue()+"";
+	}
 
 }

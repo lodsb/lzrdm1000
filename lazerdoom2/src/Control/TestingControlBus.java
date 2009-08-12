@@ -21,6 +21,10 @@ public class TestingControlBus<T extends BaseType> implements ControlBusInterfac
 			this.tick = tick;
 			this.sequence = sequence;
 		}
+		
+		public String toString() {
+			return "value: "+value+"\ntick: "+tick+"\nSequence "+sequence;
+		}
 	}
 	
 	private LinkedList<ControlBusEntry> entries = new LinkedList<ControlBusEntry>();

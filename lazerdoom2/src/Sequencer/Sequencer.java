@@ -18,6 +18,19 @@ import Control.ControlServer;
 
 public class Sequencer extends QObject implements Runnable, SequencerInterface {
 	
+	// default resolution
+	public static final int PPQ = 128;
+	
+	public static double beatMeasureToMs(int beat, int measure, double bpm) {
+		return (240000*((double)beat/(double)measure)/bpm);
+	}
+	
+	public static long bpmToPPQNanos(double bpm) {
+		int PPQPerBar = 4*PPQ;
+		
+		return (long)(beatMeasureToMs(1, PPQPerBar, bpm)*1000000);
+	}
+	
 	private SequenceContainerInterface mainSequence;
 	private ControlServer controlServer;
 	private boolean isRunning  = false;

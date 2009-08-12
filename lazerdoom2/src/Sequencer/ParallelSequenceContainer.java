@@ -1,6 +1,7 @@
 package Sequencer;
 
 import java.util.ArrayList;
+import java.util.LinkedList;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReadWriteLock;
@@ -31,7 +32,6 @@ public class ParallelSequenceContainer extends BaseSequence implements SequenceC
 		writeLock.unlock();
 		
 		this.postSequenceEvent(SequenceEventType.APPEND_SEQUENCE, SequenceEventSubtype.SEQUENCE, sequence);
-		this.postSequenceEvent(SequenceEventType.SEQUENCE_SIZE_CHANGED, SequenceEventSubtype.SIZE_IN_TICKS, this.size());
 	}
 	
 	private ParallelSequenceContainer(SequencerInterface sequencer, ArrayList<SequenceInterface> sequences) {
@@ -52,7 +52,6 @@ public class ParallelSequenceContainer extends BaseSequence implements SequenceC
 		writeLock.unlock();
 		
 		this.postSequenceEvent(SequenceEventType.PREPEND_SEQUENCE, SequenceEventSubtype.SEQUENCE, sequence);
-		this.postSequenceEvent(SequenceEventType.SEQUENCE_SIZE_CHANGED, SequenceEventSubtype.SIZE_IN_TICKS, this.size());
 	}
 
 	@Override
@@ -107,7 +106,10 @@ public class ParallelSequenceContainer extends BaseSequence implements SequenceC
 			}
 		}
 		
-		this.currentSize = size;
+		if(size != currentSize) {
+			size = currentSize;
+			this.postSequenceEvent(SequenceEventType.SEQUENCE_SIZE_CHANGED, SequenceEventSubtype.SIZE_IN_TICKS, size);
+		}
 	}
 	
 	@Override
@@ -152,4 +154,50 @@ public class ParallelSequenceContainer extends BaseSequence implements SequenceC
 		
 	}
 
+	@Override
+	public void updateStructure(LinkedList<SequenceInterface> updatedSequences) {
+		writeLock.lock();
+		
+		// check if the sequences have to be changed
+		boolean changeNecessary = false;
+		
+		int i = 0;
+		for(SequenceInterface si: this.sequences) {
+			updatedSequences.contains(si);
+		}
+		
+		if(changeNecessary) {
+			// sequences that have to be removed
+			for(SequenceInterface sequence: this.sequences) {
+				if(!updatedSequences.contains(sequence)) {
+					this.postSequenceEvent(SequenceEventType.REMOVE, SequenceEventSubtype.SEQUENCE, sequence);
+
+					if(sequence instanceof BaseSequence) {
+						((BaseSequence)sequence).unregisterSequenceEventListener(this);
+					}
+				}
+			}
+
+			// sequences that will be added
+			for(SequenceInterface sequence: updatedSequences) {
+				if(!this.sequences.contains(sequence)) {		
+					this.postSequenceEvent(SequenceEventType.APPEND_SEQUENCE, SequenceEventSubtype.SEQUENCE, sequence);
+
+					if(sequence instanceof BaseSequence) {
+						((BaseSequence)sequence).registerSequenceEventListener(this);
+					}
+				}
+			}
+
+			this.sequences.clear();
+
+			for(SequenceInterface si: updatedSequences) {
+				this.sequences.add(si);
+			}
+
+			this.updateSize();
+		}
+		
+		writeLock.unlock();
+	}
 }

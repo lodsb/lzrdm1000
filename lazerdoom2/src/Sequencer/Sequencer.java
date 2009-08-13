@@ -5,6 +5,9 @@ import java.util.LinkedList;
 import java.util.concurrent.*;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicLong;
+import java.util.concurrent.locks.Lock;
+import java.util.concurrent.locks.ReadWriteLock;
+import java.util.concurrent.locks.ReentrantReadWriteLock;
 
 import Sequencer.SequenceEvent.SequenceEventSubtype;
 import Sequencer.SequenceEvent.SequenceEventType;
@@ -31,78 +34,71 @@ public class Sequencer extends QObject implements Runnable, SequencerInterface {
 		return (long)(beatMeasureToMs(1, PPQPerBar, bpm)*1000000);
 	}
 	
-	private SequenceContainerInterface mainSequence;
+	private ParallelSequenceContainer rootSequence;
 	private ControlServer controlServer;
 	private boolean isRunning  = false;
 	
+    private final ReadWriteLock rwLock = new ReentrantReadWriteLock();
+    private final Lock readLock = rwLock.readLock();
+    private final Lock writeLock = rwLock.writeLock();
 	
 	// for thread synchronization & signals
 	public Signal1<Long> globalTickSignal = new Signal1<Long>();
-	public Signal1<SequencerEvent> sequencerEventSignal = new Signal1<SequencerEvent>();
 	
 	private Semaphore globalTickSyncSemaphore = new Semaphore(0);
 	private ConcurrentLinkedQueue<Long> passedTickList = new ConcurrentLinkedQueue<Long>();
 	private ConcurrentLinkedQueue<SequenceEvent> passedSequenceEventList = new ConcurrentLinkedQueue<SequenceEvent>();
 	private ConcurrentLinkedQueue<SequencerEvent> passedSequencerEventList = new ConcurrentLinkedQueue<SequencerEvent>();
 	
-	private CopyOnWriteArrayList<SequencePlayer> sequencePlayers = new CopyOnWriteArrayList<SequencePlayer>();
+	ConcurrentLinkedQueue<SequencerEventListenerInterface> eventListeners = new ConcurrentLinkedQueue<SequencerEventListenerInterface>();
+
+	public void registerSequencerEventListener(SequencerEventListenerInterface seli) {
+		eventListeners.offer(seli);
+	}
 	
+	public void unregisterSequencerEventListener(SequencerEventListenerInterface seli) {
+		eventListeners.remove(seli);
+	}
+		
 	public void postSequenceEvent(SequenceEvent sequenceEvent) {
 		passedSequenceEventList.offer(sequenceEvent);
 	}
 	
-	private void postSequencerEvent(SequencerEvent sequencerEvent) {
+	void postSequencerEvent(SequencerEvent sequencerEvent) {
 		passedSequencerEventList.offer(sequencerEvent);
 	}
 	
 	public Sequencer(ControlServer controlServer) {
 		this.controlServer= controlServer;
 		
-		this.mainSequence = new ParallelSequenceContainer(this);
-		
 		Thread thread = new Thread(this);
 		this.moveToThread(thread);
 		thread.start();
 	}
 	
-	private Sequencer(SequenceContainerInterface mainSequence, ControlServer controlServer) {
+	/*private Sequencer(SequenceContainerInterface mainSequence, ControlServer controlServer) {
 		this.controlServer= controlServer;
-		this.mainSequence = mainSequence;
 		
 		Thread thread = new Thread(this);
 		this.moveToThread(thread);
 		thread.start();
-	}
-
-	public SequencePlayer createAndAddSequencePlayer() {
-		SequencePlayer sp = new SequencePlayer(this);
-		sequencePlayers.add(sp);
-		mainSequence.appendSequence(sp);
-		
-		this.postSequencerEvent(new SequencerEvent(SequencerEventType.SEQUENCE_PLAYER_ADDED, SequencerEventSubtype.SEQUENCE_PLAYER, sp));
-		
-		return sp;
-	}
-	
-	public void removeSequencePlayer(SequencePlayer sp) {
-		sp.reset();
-		mainSequence.removeSequence(sp);
-		sequencePlayers.remove(sp);
-		
-		this.postSequencerEvent(new SequencerEvent(SequencerEventType.SEQUENCE_PLAYER_REMOVED, SequencerEventSubtype.SEQUENCE_PLAYER, sp));
-	}
-	
-	public List<SequencePlayer> getSequencePlayers() {
-		return (List<SequencePlayer>)sequencePlayers.clone();
-	}
+	}*/
 	
 	public boolean processTick(long tick) {
-			isRunning = mainSequence.eval(tick);
+		readLock.lock();
+		
+		if(rootSequence != null) {
+			isRunning = rootSequence.eval(tick);
 
 			controlServer.flushMessages();
 			passedTickList.offer(tick);
 
 			globalTickSyncSemaphore.release();
+		} else {
+			isRunning = false;
+		}
+		readLock.unlock();
+		
 		return isRunning;
 	}
 	
@@ -134,12 +130,13 @@ public class Sequencer extends QObject implements Runnable, SequencerInterface {
 					SequencerEvent sre;
 					
 					while((sre = passedSequencerEventList.poll()) != null) {
-						this.sequencerEventSignal.emit(sre);
+						for(SequencerEventListenerInterface seli: eventListeners) {
+							seli.dispatchSequencerEvent(sre);
+						}
 					}
 					
 					
 				} catch (InterruptedException e) {
-					// TODO Auto-generated catch block
 					e.printStackTrace();
 				}
 		}
@@ -150,16 +147,36 @@ public class Sequencer extends QObject implements Runnable, SequencerInterface {
 	}
 
 	public void reset() {
-		if(mainSequence != null) {
-			this.mainSequence.reset();
-		}
+		readLock.lock();
+			if(rootSequence != null) {
+				this.rootSequence.reset();
+			}
+		readLock.unlock();
+	}
+	
+	public void setRootSequence(ParallelSequenceContainer seq) {
+		writeLock.lock();
+			this.rootSequence = seq;
+		writeLock.unlock();
+	}
+	
+	public ParallelSequenceContainer getRootSequence() {
+		ParallelSequenceContainer p = null;
+		readLock.lock();
+			p = this.rootSequence;
+		readLock.unlock();
+		
+		return p;
 	}
 
 	public long sizeOfAllSequences() {
-		if(mainSequence != null) {
-			return mainSequence.size();
-		} else {
-			return 0;
-		}
+		long ret = 0;
+		
+		readLock.lock();
+			if(rootSequence != null) {
+				return rootSequence.size();
+			} 
+		readLock.unlock();
+		return ret;
 	}
 }

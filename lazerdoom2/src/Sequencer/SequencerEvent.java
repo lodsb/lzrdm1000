@@ -3,12 +3,18 @@ package Sequencer;
 public class SequencerEvent {
 	enum SequencerEventType {
 		SEQUENCE_PLAYER_ADDED,
-		SEQUENCE_PLAYER_REMOVED
+		SEQUENCE_PLAYER_REMOVED,
+		EVENT_POINTS_SEQUENCE_ADDED,
+		EVENT_POINTS_SEQUENCE_REMOVED,
+		CONNECTION_ADDED,
+		CONNECTION_REMOVED
 	}
 	
 	enum SequencerEventSubtype {
 		NONE,
-		SEQUENCE_PLAYER
+		SEQUENCE_PLAYER,
+		EVENT_POINTS_SEQUENCE,
+		SEQUENCE_PAIR
 	}
 	
 	SequencerEventType eventType;

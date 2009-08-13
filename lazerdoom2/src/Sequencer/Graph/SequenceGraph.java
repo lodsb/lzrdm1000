@@ -14,18 +14,18 @@ import Sequencer.SequencerInterface;
 import Sequencer.SequentialSequenceContainer;
 
 import edu.uci.ics.jung.graph.DirectedSparseGraph;
+import edu.uci.ics.jung.graph.util.Pair;
 import edu.uci.ics.jung.algorithms.shortestpath.*;
 
 public class SequenceGraph {
 
-	DirectedSparseGraph<SequenceNode, Integer> graph = new DirectedSparseGraph<SequenceNode, Integer>();
-	UnweightedShortestPath<SequenceNode, Integer> shortestPathAlg = new UnweightedShortestPath<SequenceNode, Integer>(graph);
+	private DirectedSparseGraph<SequenceNode, Integer> graph = new DirectedSparseGraph<SequenceNode, Integer>();
+	private UnweightedShortestPath<SequenceNode, Integer> shortestPathAlg = new UnweightedShortestPath<SequenceNode, Integer>(graph);
+	private HashMap<SequenceInterface, SequenceNode> sequenceNodes = new HashMap<SequenceInterface, SequenceNode>();
 	
-	HashMap<SequenceInterface, SequenceContainerInterface> currentSequenceStructure = new HashMap<SequenceInterface, SequenceContainerInterface>();
+	private int currentEdge = 0; 
 	
-	int currentEdge = 0; 
-	
-	LinkedList<SequenceStructureNode> currentStructure = null;
+	private LinkedList<SequenceStructureNode> currentStructure = null;
 	
 	private class SequenceStructureNode {
 		SequenceInterface si;
@@ -43,7 +43,68 @@ public class SequenceGraph {
 		}
 	}
 	
-	public boolean connect(SequenceNode source, SequenceNode target) {
+	public void clear() {
+		this.graph = new DirectedSparseGraph<SequenceNode, Integer>();
+		currentStructure = null;
+	}
+	
+	public LinkedList<Pair<SequenceInterface>> remove(SequenceInterface si) {
+		LinkedList<Pair<SequenceInterface>> connections = null;
+		SequenceNode rm;
+		
+		
+		if((rm = sequenceNodes.get(si)) != null) {
+			connections = new LinkedList<Pair<SequenceInterface>>();
+			
+			for(Integer edge :graph.getInEdges(rm)) {
+				SequenceNode sourceNode = graph.getSource(edge);
+				if(sourceNode.getSequence() instanceof SequencePlayerInterface) {
+					((SequencePlayerInterface)sourceNode.getSequence()).setSequence(null);
+				}
+				connections.add(new Pair(sourceNode.getSequence(), rm.getSequence()));
+				graph.removeEdge(edge);
+			}
+			
+			for(Integer edge :graph.getOutEdges(rm)) {
+				connections.add(new Pair(rm.getSequence(), graph.getSource(edge).getSequence()));
+				graph.removeEdge(edge);
+			}
+			
+			graph.removeVertex(rm);
+		}
+		
+		return connections;
+	}
+	
+	public boolean connect(SequenceInterface source, SequenceInterface target) {
+		SequenceNode src;
+		SequenceNode tgt;
+		
+		if((src = sequenceNodes.get(source)) == null) {
+			src = new SequenceNode(source);
+		}
+		
+		if((tgt = sequenceNodes.get(target)) == null) {
+			tgt = new SequenceNode(target);
+		}
+		
+		return this.connect(src, tgt);
+	}
+
+	public boolean disconnect(SequenceInterface source, SequenceInterface target) {
+		SequenceNode src;
+		SequenceNode tgt;
+		
+		boolean ret = false;
+		
+		if((src = sequenceNodes.get(source)) != null && (tgt = sequenceNodes.get(target)) == null) { 
+			ret = this.disconnect(src, tgt);
+		}
+		
+		return ret;
+	}
+	
+	private boolean connect(SequenceNode source, SequenceNode target) {
 		boolean ret;
 		
 		if(shortestPathAlg.getDistance(source, target) != null) {
@@ -74,12 +135,16 @@ public class SequenceGraph {
 		return ret;
 	}
 	
-	public void disconnect(SequenceNode source, SequenceNode target) {
+	private boolean disconnect(SequenceNode source, SequenceNode target) {
+		boolean ret = false;
 		Integer edge = graph.findEdge(source, target);
 		
 		if(edge != null) {
 			graph.removeEdge(edge);
+			ret = true;
 		}
+		
+		return ret;
 	}
 	
 	public void updateStructure(SequenceContainerInterface rootContainer, SequencerInterface sequencer) {

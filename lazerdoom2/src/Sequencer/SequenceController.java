@@ -1,12 +1,94 @@
 package Sequencer;
 
+import java.util.LinkedList;
+import java.util.List;
+import java.util.concurrent.CopyOnWriteArrayList;
+
+import Control.Types.DoubleType;
+import Sequencer.Graph.SequenceGraph;
+import Sequencer.SequencerEvent.SequencerEventSubtype;
+import Sequencer.SequencerEvent.SequencerEventType;
+
 import com.trolltech.qt.core.QObject;
+
+import edu.uci.ics.jung.graph.util.Pair;
 
 public class SequenceController extends QObject {
 	private Sequencer sequencer;
+	private SequenceGraph graph;
+	private ParallelSequenceContainer rootSequence;
 	
-	public SequenceController(Sequencer sequencer) {
+	public SequenceController(Sequencer sequencer, SequenceGraph graph) {
 		this.sequencer = sequencer;
+		this.graph = graph;
+		this.rootSequence = new ParallelSequenceContainer(sequencer);
+		
+		this.sequencer.setRootSequence(this.rootSequence);
+	}
+	
+	public boolean removeBaseSequence(BaseSequence sequence) {
+		LinkedList<Pair<SequenceInterface>> connections = graph.remove(sequence);
+		boolean ret = false;
+		
+		if(connections != null) {
+			graph.updateStructure(rootSequence, sequencer);
+			
+			if(sequence instanceof SequencePlayer) {
+				sequencer.postSequencerEvent(new SequencerEvent(SequencerEventType.SEQUENCE_PLAYER_REMOVED, SequencerEventSubtype.SEQUENCE_PLAYER, sequence));
+			} else {
+				sequencer.postSequencerEvent(new SequencerEvent(SequencerEventType.EVENT_POINTS_SEQUENCE_REMOVED, SequencerEventSubtype.EVENT_POINTS_SEQUENCE, sequence));
+			}
+			
+			for(Pair<SequenceInterface> connection: connections) {
+				sequencer.postSequencerEvent(new SequencerEvent(SequencerEventType.CONNECTION_REMOVED, SequencerEventSubtype.SEQUENCE_PAIR, connection));
+			}
+			
+			ret = true;
+		}
+		
+		return ret;
+	}
+	
+	public EventPointsSequence<DoubleType> createDoubleTypeEventPointsSequence() {
+		EventPointsSequence<DoubleType> e = new EventPointsSequence<DoubleType>(sequencer);
+		
+		sequencer.postSequencerEvent(new SequencerEvent(SequencerEventType.EVENT_POINTS_SEQUENCE_ADDED, SequencerEventSubtype.EVENT_POINTS_SEQUENCE, e));
+		
+		return e;
+	}
+	
+	public SequencePlayer createSequencePlayer() {
+		SequencePlayer sp = new SequencePlayer(sequencer);
+
+		sequencer.postSequencerEvent(new SequencerEvent(SequencerEventType.SEQUENCE_PLAYER_ADDED, SequencerEventSubtype.SEQUENCE_PLAYER, sp));
+		
+		return sp;
+	}
+	
+	public boolean connectSequences(SequenceInterface source, SequenceInterface target) {
+		boolean ret = false;
+		
+		if(!(target instanceof SequencePlayerInterface)) {
+			ret = graph.connect(source, target);
+
+			if(ret) {
+				graph.updateStructure(rootSequence, sequencer);
+				sequencer.postSequencerEvent(new SequencerEvent(SequencerEventType.CONNECTION_ADDED, SequencerEventSubtype.SEQUENCE_PAIR, new Pair<SequenceInterface>(source, target)));
+			}
+		}
+		return ret;
+	}
+	
+	public boolean disconnectSequences(SequenceInterface source, SequenceInterface target) {
+		boolean ret = false;
+		
+		ret = graph.disconnect(source, target);
+		
+		if(ret) {
+			graph.updateStructure(rootSequence, sequencer);
+		}
+		
+		return ret;
 	}
 	
 	public void connectToGlobalTickSignal(Object slotObject , String method) {
@@ -22,7 +104,7 @@ public class SequenceController extends QObject {
 	}
 	
 	public void registerSequenceInterfaceEventListenerToSequencer(SequencerEventListenerInterface sei) {
-		this.sequencer.sequencerEventSignal.connect(sei, "dispatchSequencerEvent(SequencerEvent)");
+		this.sequencer.registerSequencerEventListener(sei);
 	}
 	
 	

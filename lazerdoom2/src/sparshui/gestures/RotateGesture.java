@@ -46,7 +46,7 @@ public class RotateGesture extends StandardDynamicGesture {
 	 */
 	@Override
 	protected TouchData createTouchData(TouchPoint touchPoint) {
-		return new RotateData(touchPoint.getLocation());
+		return new RotateData(touchPoint.getLocation(), touchPoint.getID());
 	}
 
 	@Override
@@ -91,8 +91,8 @@ public class RotateGesture extends StandardDynamicGesture {
 		private float _angle;
 		private float _oldAngle;
 
-		public RotateData(Location location) {
-			super(location);
+		public RotateData(Location location, int id) {
+			super(location, id);
 			_oldAngle = _angle = 0f;
 		}
 

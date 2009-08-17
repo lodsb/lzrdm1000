@@ -51,19 +51,25 @@ public class MultiPointDragGesture extends StandardDynamicGesture {
 		Vector<Event> events = new Vector<Event>();
 		updateOffsetCentroid();
 		//System.out.println("Drag processing move: x: " + _offsetCentroid.getX() + ", y: " + _offsetCentroid.getY());
-		events.add(new DragEvent(_offsetCentroid.getX(), _offsetCentroid.getY()));
+		DragEvent e = new DragEvent(_offsetCentroid.getX(), _offsetCentroid.getY());
+		e.setTouchID(touchData.getUniqueID());
+		events.add(e);
 		return events;
 	}
 
 	@Override
 	protected Vector<Event> processDeath(TouchData touchData) {
+		Vector<Event> events = null;
 		if(_knownPoints.size() == 0) {
 			_offset = null;
 			_offsetCentroid = null;
 		} else {
 			adjustOffset();
 		}
-		return null;
+		/*DragEvent e = new DragEvent(_offsetCentroid.getX(), _offsetCentroid.getY());
+		e.setTouchID(touchData.getUniqueID());
+		events.add(e);*/
+		return events;
 	}
 	
 	/**

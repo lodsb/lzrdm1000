@@ -32,15 +32,30 @@ public class Drag extends StandardDynamicGesture {
 
 	@Override
 	protected Vector<Event> processDeath(TouchData touchData) {
-		return null; // Ignore, no work to be done
+		Vector<Event> events = new Vector<Event>();
+		float x = _newCentroid.getX() - _oldCentroid.getX();
+		float y = _newCentroid.getY() - _oldCentroid.getY();
+		if(x != 0 || y != 0) {
+			DragEvent e = new DragEvent(x, y);
+			e.setTouchID(touchData.getUniqueID());
+			e.setDrop(true);
+			events.add(e);
+		}
+		return events;
 	}
 
 	@Override
 	protected Vector<Event> processMove(TouchData touchData) {
+		System.out.println("NIGGER");
 		Vector<Event> events = new Vector<Event>();
 		float x = _newCentroid.getX() - _oldCentroid.getX();
 		float y = _newCentroid.getY() - _oldCentroid.getY();
-		if(x != 0 || y != 0) events.add(new DragEvent(x, y));
+		if(x != 0 || y != 0) {
+			DragEvent e = new DragEvent(x, y);
+			e.setTouchID(touchData.getUniqueID());
+			
+			events.add(e);
+		}
 		return events;
 	}
 

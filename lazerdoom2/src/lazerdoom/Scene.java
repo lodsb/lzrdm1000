@@ -16,6 +16,7 @@ import sparshui.common.messages.events.RotateEvent;
 import sparshui.common.messages.events.TouchEvent;
 import sparshui.gestures.GestureType;
 
+import GUI.Item.SVGButton;
 import SceneItems.ContextMenu;
 import SceneItems.CurveItem;
 import SceneItems.HorizontalTouchabelGraphicsItemLayout;
@@ -25,8 +26,10 @@ import SceneItems.Slider;
 import SceneItems.TouchItemInterface;
 
 import com.trolltech.qt.core.QPointF;
+import com.trolltech.qt.core.Qt;
 import com.trolltech.qt.gui.QApplication;
 import com.trolltech.qt.gui.QGraphicsItemInterface;
+import com.trolltech.qt.gui.QGraphicsLayoutItem;
 import com.trolltech.qt.gui.QGraphicsLinearLayout;
 import com.trolltech.qt.gui.QGraphicsProxyWidget;
 import com.trolltech.qt.gui.QGraphicsRectItem;
@@ -37,7 +40,7 @@ import com.trolltech.qt.gui.QGraphicsView;
 public class Scene extends QGraphicsScene {
 
 	public Scene() {
-		this.setSceneRect(0,0, 1000, 1000);
+		this.setSceneRect(0,0, 2400, 2400);
 		
 	/*	LinkedList<String> menuItems = new LinkedList<String>();
 		menuItems.add("test");
@@ -64,9 +67,21 @@ public class Scene extends QGraphicsScene {
 		//mci.setPos(500,500);
 		//this.addItem(mci);
 		
-		CurveItem ci = new CurveItem(new QPointF(200,200), new QPointF(400,400));
+		/*CurveItem ci = new CurveItem(new QPointF(200,200), new QPointF(400,400));
 		ci.setPos(100,100);
 		this.addItem(ci);
+		*/
+		
+		/*SVGButton button1 = new SVGButton("addSequence");
+		SVGButton button2 = new SVGButton("addSynth");
+		SVGButton button3 = new SVGButton("delete");
+		button1.setPos(0,100);
+		button2.setPos(0,210);
+		button3.setPos(0,310);
+		this.addItem(button1);
+		this.addItem(button2);
+		this.addItem(button3);*/
+		
 		
 	/*	QGraphicsView view2 = new QGraphicsView();
 		QGraphicsScene scene2 = new QGraphicsScene();

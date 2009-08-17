@@ -16,7 +16,13 @@ public class RotateEvent implements Event {
 	 */
 	private float _rotation;
 	private Location _center;
-	
+	private int id;
+	public void setTouchID(int id) {
+		this.id = id;
+	}
+	public int getTouchID() {
+		return this.id;
+	}
 	public RotateEvent() {
 		_rotation = 0;
 		_center = new Location();

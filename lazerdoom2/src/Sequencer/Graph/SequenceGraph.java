@@ -61,12 +61,12 @@ public class SequenceGraph {
 				if(sourceNode.getSequence() instanceof SequencePlayerInterface) {
 					((SequencePlayerInterface)sourceNode.getSequence()).setSequence(null);
 				}
-				connections.add(new Pair(sourceNode.getSequence(), rm.getSequence()));
+				connections.add(new Pair<SequenceInterface>(sourceNode.getSequence(), rm.getSequence()));
 				graph.removeEdge(edge);
 			}
 			
 			for(Integer edge :graph.getOutEdges(rm)) {
-				connections.add(new Pair(rm.getSequence(), graph.getSource(edge).getSequence()));
+				connections.add(new Pair<SequenceInterface>(rm.getSequence(), graph.getSource(edge).getSequence()));
 				graph.removeEdge(edge);
 			}
 			

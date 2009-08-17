@@ -12,7 +12,13 @@ public class SpinEvent implements Event {
 	private float _rotationX;
 	private float _rotationY;
 	private float _rotationZ;
-	
+	private int id;
+	public void setTouchID(int id) {
+		this.id = id;
+	}
+	public int getTouchID() {
+		return this.id;
+	}
 	private QPointF _pos = null;
 	@Override
 	public void setSceneLocation(QPointF pos) {

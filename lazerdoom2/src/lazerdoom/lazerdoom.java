@@ -5,6 +5,9 @@ import java.net.UnknownHostException;
 import java.util.List;
 import java.util.Vector;
 
+import GUI.Scene.SequencerScene;
+import GUI.View.SequencerView;
+
 import com.trolltech.qt.QThread;
 import com.trolltech.qt.core.Qt;
 import com.trolltech.qt.gui.*;
@@ -28,7 +31,7 @@ public class lazerdoom extends QWidget {
 	private ServerConnection sparshServerConnection;
 	
 	private Scene scene = new Scene();
-	private View view = new View();
+	private SequencerView view = new SequencerView();
 	private QHBoxLayout layout = new QHBoxLayout();
 
     public static void main(String[] args) {
@@ -80,7 +83,7 @@ public class lazerdoom extends QWidget {
 		view.setViewportUpdateMode(ViewportUpdateMode.MinimalViewportUpdate);
 		//view.scale(0.5, 0.5);
 		
-		
+		view.setUp((double)0.5);
 
 		this.setWindowFlags(Qt.WindowType.Window);
     }

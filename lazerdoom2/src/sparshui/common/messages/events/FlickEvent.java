@@ -23,6 +23,13 @@ public class FlickEvent implements Event {
 	private float speedLevel;
 	
 	private QPointF _pos = null;
+	private int id;
+	public void setTouchID(int id) {
+		this.id = id;
+	}
+	public int getTouchID() {
+		return this.id;
+	}
 	@Override
 	public void setSceneLocation(QPointF pos) {
 		_pos = pos;

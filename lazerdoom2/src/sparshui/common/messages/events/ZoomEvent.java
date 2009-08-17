@@ -13,7 +13,13 @@ public class ZoomEvent implements Event {
 	
 	private float _scale;
 	private Location _center;
-
+	private int id;
+	public void setTouchID(int id) {
+		this.id = id;
+	}
+	public int getTouchID() {
+		return this.id;
+	}
 	private QPointF _pos = null;
 	@Override
 	public void setSceneLocation(QPointF pos) {

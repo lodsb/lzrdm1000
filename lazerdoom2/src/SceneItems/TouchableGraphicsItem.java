@@ -28,6 +28,10 @@ public abstract class TouchableGraphicsItem extends QGraphicsItem implements Tou
 		}
 	}
 	
+	public TouchItemInterface getParent() {
+		return parent;
+	}
+	
 	public void enableTouchEvents(boolean enableTouchEvents) {
 		this.enableTouchEvents = enableTouchEvents;
 	}

@@ -28,7 +28,7 @@ public class ZoomGesture extends StandardDynamicGesture {
 	
 	@Override
 	protected TouchData createTouchData(TouchPoint touchPoint) {
-		return new ZoomData(touchPoint.getLocation());
+		return new ZoomData(touchPoint.getLocation(), touchPoint.getID());
 	}
 
 	@Override
@@ -120,8 +120,8 @@ public class ZoomGesture extends StandardDynamicGesture {
 	protected class ZoomData extends TouchData {
 		private float _distance;
 		private float _oldDistance;
-		public ZoomData(Location location) {
-			super(location);
+		public ZoomData(Location location, int id) {
+			super(location, id);
 			_oldDistance = _distance = (float)Math.hypot(location.getX() - _newCentroid.getX(), location.getY() - _newCentroid.getY());
 			//System.out.println("[ZoomGesture] Zoom Event Constructed, Distance = " + _distance);
 		}

@@ -55,9 +55,9 @@ public abstract class StandardDynamicGesture implements Gesture {
 				events = handleMove(changedPoint);
 				break;
 			case DEATH:
-				System.out.println("calling handledeath");
+				//System.out.println("calling handledeath");
 				events = handleDeath(changedPoint);
-				System.out.println(events);
+				//System.out.println(events);
 				break;
 		}
 		
@@ -70,7 +70,7 @@ public abstract class StandardDynamicGesture implements Gesture {
 	 * @return
 	 */
 	protected TouchData createTouchData(TouchPoint touchPoint) {
-		return new TouchData(touchPoint.getLocation());
+		return new TouchData(touchPoint.getLocation(), touchPoint.getID());
 	}
 	
 	/**
@@ -113,12 +113,16 @@ public abstract class StandardDynamicGesture implements Gesture {
 	 */
 	private Vector<Event> handleMove(TouchPoint touchPoint) {
 		TouchData touchData = _knownPoints.get(touchPoint.getID());
-		touchData.setLocation(touchPoint.getLocation());
-		moveCentroid(
-				touchData.getLocation().getX() - touchData.getOldLocation().getX(),
-				touchData.getLocation().getY() - touchData.getOldLocation().getY()
-		);
-		return processMove(touchData);
+		if(touchData != null) {
+			touchData.setLocation(touchPoint.getLocation());
+			moveCentroid(
+					touchData.getLocation().getX() - touchData.getOldLocation().getX(),
+					touchData.getLocation().getY() - touchData.getOldLocation().getY()
+			);
+			return processMove(touchData);
+		}
+		
+		return null;
 	}
 	
 	/**
@@ -128,10 +132,13 @@ public abstract class StandardDynamicGesture implements Gesture {
 	 */
 	private Vector<Event> handleDeath(TouchPoint touchPoint) {
 		TouchData touchData = _knownPoints.get(touchPoint.getID());
-		touchData.setLocation(touchPoint.getLocation());
-		_knownPoints.remove(touchPoint.getID());
-		moveCentroid(-touchData.getOldLocation().getX(), -touchData.getOldLocation().getY());
-		return processDeath(touchData);
+		if(touchData != null) {
+			touchData.setLocation(touchPoint.getLocation());
+			_knownPoints.remove(touchPoint.getID());
+			moveCentroid(-touchData.getOldLocation().getX(), -touchData.getOldLocation().getY());
+			return processDeath(touchData);
+		} 
+		return null;
 	}
 	
 	/**
@@ -152,8 +159,15 @@ public abstract class StandardDynamicGesture implements Gesture {
 	protected class TouchData {
 		private Location _location;
 		private Location _oldLocation;
-		public TouchData(Location location) {
+		private int uniqueID;
+		
+		public int getUniqueID () {
+			return uniqueID;
+		}
+		
+		public TouchData(Location location, int id) {
 			_oldLocation = _location = location;
+			this.uniqueID = id;
 		}
 		public Location getLocation() {
 			return _location;

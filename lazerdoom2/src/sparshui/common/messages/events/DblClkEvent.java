@@ -13,6 +13,7 @@ public class DblClkEvent implements Event {
 	private int _id;
 	private float _x;
 	private float _y;
+	
 
 	//default constructor
 	public DblClkEvent() {

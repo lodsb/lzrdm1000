@@ -27,7 +27,7 @@ import com.trolltech.qt.opengl.QGLWidget;
 
 public class View extends QGraphicsView implements Client{
 	private HashMap<Integer, TouchItemInterface> touchItemGroupIDMap = new HashMap<Integer, TouchItemInterface>();
-	private Object[] runtimeArray = new Object[512];
+	
 	
 	/**
 	 * 

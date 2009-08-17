@@ -3,6 +3,8 @@ package sparshui.gestures;
 import java.util.Vector;
 
 import sparshui.common.Event;
+import sparshui.common.messages.events.DragEvent;
+import sparshui.gestures.StandardDynamicGesture.TouchData;
 
 /**
  * 
@@ -22,6 +24,17 @@ public class SinglePointDragGesture extends MultiPointDragGesture {
 			adjustOffset();
 			return null;
 		}
+	}
+	
+	@Override
+	protected Vector<Event> processDeath(TouchData touchData) {
+		Vector<Event> events = new Vector<Event>();
+		DragEvent e = new DragEvent(_offsetCentroid.getX(), _offsetCentroid.getY());
+		super.processDeath(touchData);
+		e.setTouchID(touchData.getUniqueID());
+		e.setDrop(true);
+		events.add(e);
+		return events;
 	}
 
 }

@@ -12,7 +12,24 @@ public class DragEvent implements Event {
 	
 	private float _absx;
 	private float _absy;
-
+	private int id;
+	public void setTouchID(int id) {
+		this.id = id;
+	}
+	public int getTouchID() {
+		return this.id;
+	}
+	
+	private boolean isDrop = false;
+	
+	public void setDrop(boolean isDrop) {
+		this.isDrop = isDrop;
+	} 
+	
+	public boolean isDrop() {
+		return this.isDrop;
+	}
+	
 	public DragEvent() {
 		_absx = 0;
 		_absy = 0;

@@ -33,8 +33,6 @@ import com.trolltech.qt.gui.QStyleOptionGraphicsItem;
 import com.trolltech.qt.gui.QWidget;
 import com.trolltech.qt.gui.QPainter.RenderHint;
 
-import SceneItems.TouchableGraphicsItem;
-
 public class SequenceItem extends TouchableGraphicsItem implements ConnectableSequenceInterface, ConnectableSynthInterface {
 
 	private static QColor normalColor = new QColor(130,130,130); 

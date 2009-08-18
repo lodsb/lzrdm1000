@@ -1,4 +1,4 @@
-package SceneItems;
+package GUI.Item;
 
 import java.util.LinkedList;
 import java.util.List;
@@ -22,6 +22,7 @@ import com.trolltech.qt.gui.QPainter;
 import com.trolltech.qt.gui.QPainterPath;
 import com.trolltech.qt.gui.QStyleOptionGraphicsItem;
 import com.trolltech.qt.gui.QWidget;
+import GUI.Multitouch.*;
 
 public class MulticontrolItem extends TouchableGraphicsItem {
 	

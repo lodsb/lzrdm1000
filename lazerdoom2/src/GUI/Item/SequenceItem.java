@@ -7,6 +7,7 @@ import com.trolltech.qt.gui.QStyleOptionGraphicsItem;
 import com.trolltech.qt.gui.QWidget;
 import java.awt.Color;
 import java.util.LinkedList;
+import java.util.List;
 import java.util.Random;
 
 import com.trolltech.qt.core.QPoint;
@@ -34,11 +35,16 @@ import com.trolltech.qt.gui.QPainter.RenderHint;
 
 import SceneItems.TouchableGraphicsItem;
 
-public class SequenceItem extends TouchableGraphicsItem {
+public class SequenceItem extends TouchableGraphicsItem implements ConnectableSequenceInterface, ConnectableSynthInterface {
 
 	private static QColor normalColor = new QColor(130,130,130); 
 	private static QColor actionColor = new QColor(211,120,0);
+	private static QColor pauseColor = new QColor(0,0,0);
 	private static QRectF boundingRect = new QRectF(0,0,200,200);
+	private QPen pausePen;
+	
+	private LinkedList<SynthInConnector> synthInPorts;
+	private LinkedList<SynthOutConnector> synthOutPorts;
 
 	private QColor customColor = new QColor(38,50,62);
 	private QBrush gradientBrush;
@@ -47,6 +53,22 @@ public class SequenceItem extends TouchableGraphicsItem {
 	
 	private QImage mnemonic = createMnemonic(boundingRect, 10, 8, 40);
 
+	private SequenceConnector outConnector;
+	private SequenceConnector inConnector;
+	private boolean isPause = false;
+	
+	public boolean isPause() {
+		return this.isPause;
+	}
+	
+	public SequenceConnector getSequenceOutConnector() {
+		return this.outConnector;
+	}
+	
+	public SequenceConnector getSequenceInConnector() {
+		return this.inConnector;
+	}
+	
 	public static QImage createMnemonic(QRectF size, int numberOfStrips, int penWidth, int minimumCircumference) {
 		//dirty hack since painting with aliasing didnt work
 		
@@ -76,12 +98,13 @@ public class SequenceItem extends TouchableGraphicsItem {
 		return pixmap.scaledToHeight(rectSizeWidth/upsampling, TransformationMode.SmoothTransformation);
 	}
 	
-	public SequenceItem() {
+	public SequenceItem(boolean isPause) {
 		this.setFlag(GraphicsItemFlag.ItemIsMovable, true);
 		this.setFlag(GraphicsItemFlag.ItemIsSelectable, true);
 
-		this.updateGradientBrush();
-		
+		this.setBrushes();
+
+		this.isPause = isPause;
 
 		addPorts();
 	}
@@ -97,6 +120,9 @@ public class SequenceItem extends TouchableGraphicsItem {
 		connector.setParentItem(this);
 		connector.rotate(90.0);
 		connector.setPos(200,75);
+		
+		this.outConnector = connector;
+		
 		connector = new SequenceConnector();
 		//connector.scale(2.0, 2.0);
 		connector.setParentItem(this);
@@ -106,9 +132,33 @@ public class SequenceItem extends TouchableGraphicsItem {
 		//blah.addToGroup(this);
 		
 		this.setZValue(1.0);
+		
+		this.inConnector = connector;
+		
+		synthInPorts = new LinkedList<SynthInConnector>();
+		synthOutPorts = new LinkedList<SynthOutConnector>();
+	
+		if(!isPause) {
+			SynthInConnector synthConnector = new SynthInConnector("Record");
+			//connector.scale(2.0, 2.0);
+			synthConnector.setZValue(0.23);
+			synthConnector.setParentItem(this);
+			synthConnector.rotate(0.0);
+			synthConnector.setPos(75,-40);
+			synthInPorts.add(synthConnector);
+			
+			SynthOutConnector synthOutConnector = new SynthOutConnector("Sequence");
+			//connector.scale(2.0, 2.0);
+			synthOutConnector.setZValue(0.23);
+			synthOutConnector.setParentItem(this);
+			synthOutConnector.rotate(180.0);
+			synthOutConnector.setPos(125,240);
+			synthOutPorts.add(synthOutConnector);
+		}
+		
 	}
 
-	private void updateGradientBrush() {
+	private void setBrushes() {
 		double rad = contentsRect.width();
 		QRadialGradient gr = new QRadialGradient(rad, rad, rad, 3 * rad / 5, 3 * rad / 5);
 		gr.setColorAt(0.0, new QColor(255, 255, 255, 120));
@@ -118,6 +168,9 @@ public class SequenceItem extends TouchableGraphicsItem {
 		gr.setColorAt(1, new QColor(0, 0, 0, 0));
 
 		gradientBrush = new QBrush(gr);
+		
+		this.pausePen = new QPen(pauseColor);
+		this.pausePen.setWidth(12);
 	}
 
 	@Override
@@ -154,6 +207,14 @@ public class SequenceItem extends TouchableGraphicsItem {
 		painter.setPen(frameColor);
 
 		painter.drawEllipse(contentsRect);
+		
+		if(isPause) {
+			painter.setBrush(QBrush.NoBrush);
+			painter.setPen(this.pausePen);
+			
+			painter.drawLine(90,80, 90, 120);
+			painter.drawLine(110,80, 110, 120);
+		}
 
 	}
 
@@ -167,6 +228,16 @@ public class SequenceItem extends TouchableGraphicsItem {
 	public void setSize(QSizeF size) {
 		// TODO Auto-generated method stub
 
+	}
+
+	@Override
+	public List<SynthInConnector> getSynthInConnectors() {
+		return synthInPorts;
+	}
+
+	@Override
+	public List<SynthOutConnector> getSynthOutConnectors() {
+		return synthOutPorts;
 	}
 
 }

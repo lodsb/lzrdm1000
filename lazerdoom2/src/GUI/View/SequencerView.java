@@ -27,6 +27,8 @@ import com.trolltech.qt.gui.QPainter;
 import com.trolltech.qt.gui.QRadialGradient;
 import GUI.Multitouch.*;
 import GUI.Item.*;
+import GUI.Item.SynthesizerItem;
+
 import java.util.Map.Entry;
 import SceneItems.TouchItemInterface;
 import SceneItems.TouchPointCursor;
@@ -132,7 +134,7 @@ public class SequencerView extends QGraphicsView implements Client, TouchItemInt
 	private LinkedList<Integer> viewGestures = new LinkedList<Integer>();
 	private HashMap<Integer, TouchPointCursor> touchPointCursors = new HashMap<Integer, TouchPointCursor>();
 	
-	private LinkedList<SVGButton> menuItems = new LinkedList<SVGButton>();
+	private LinkedList<SequenceButton> menuItems = new LinkedList<SequenceButton>();
 	
 	private void createMenuItems() {
 		double margin = 10;
@@ -142,9 +144,9 @@ public class SequencerView extends QGraphicsView implements Client, TouchItemInt
 		//basic size
 		QRectF sceneRect = scene.sceneRect();
 		
-		SVGButton button1 = new SVGButton("addSequence");
-		SVGButton button2 = new SVGButton("addSynth");
-		SVGButton button3 = new SVGButton("delete");
+		SequenceButton button1 = new SequenceButton("addSequence");
+		SequenceButton button2 = new SequenceButton("addSynth");
+		SequenceButton button3 = new SequenceButton("delete");
 		
 		QRectF buttonRect = button1.boundingRect();
 		double verticalOffset = (sceneRect.height() - (buttonRect.height()*3))/2;
@@ -161,9 +163,9 @@ public class SequencerView extends QGraphicsView implements Client, TouchItemInt
 		menuItems.add(button2);
 		menuItems.add(button3);
 
-		button3 = new SVGButton("addSequence");
-		button2 = new SVGButton("addSynth");
-		button1 = new SVGButton("delete");
+		button3 = new SequenceButton("addSequence");
+		button2 = new SequenceButton("addSynth");
+		button1 = new SequenceButton("delete");
 		
 		button1.setParent(this);
 		button2.setParent(this);
@@ -222,29 +224,57 @@ public class SequencerView extends QGraphicsView implements Client, TouchItemInt
 		
 		/*****/
 		
-		SequenceItem si = new SequenceItem();
-		si.setPos(500,500);
-		this.scene().addItem(si);
+		SequenceItem si1 = new SequenceItem(true);
+		si1.setPos(500,500);
+		this.scene().addItem(si1);
 		
-		si = new SequenceItem();
-		si.setPos(700,500);
-		this.scene().addItem(si);
+		SequenceItem si2;
+		si2 = new SequenceItem(false);
+		si2.setPos(700,500);
+		this.scene().addItem(si2);
 		
-		si = new SequenceItem();
-		si.setPos(300,500);
-		this.scene().addItem(si);
+		SequenceItem si3;
+		si3 = new SequenceItem(false);
+		si3.setPos(300,500);
+		this.scene().addItem(si3);
 		
-		si = new SequenceItem();
-		si.setPos(300,300);
-		this.scene().addItem(si);
+		SequenceItem si4;
+		si4 = new SequenceItem(false);
+		si4.setPos(300,300);
+		this.scene().addItem(si4);
 		
-		si = new SequenceItem();
-		si.setPos(300,700);
-		this.scene().addItem(si);
+		SequenceItem si5;
+		si5 = new SequenceItem(false);
+		si5.setPos(300,700);
+		this.scene().addItem(si5);
 		
-		si = new SequenceItem();
-		si.setPos(200,200);
-		this.scene().addItem(si);
+		SequenceItem si6;
+		si6 = new SequenceItem(false);
+		si6.setPos(200,200);
+		this.scene().addItem(si6);
+		
+		SequencePlayerItem player;
+		player = new SequencePlayerItem();
+		player.setPos(800,800);
+		this.scene().addItem(player);
+		
+		SynthesizerItem synth;
+		synth = new SynthesizerItem(new String[]{"A", "B", "C", "D"});
+		
+		synth.setPos(500,800);
+		this.scene().addItem(synth);
+		
+		this.scene().addItem(new SequenceConnection( player.getSequenceOutConnector(), si2.getSequenceInConnector()));
+		this.scene().addItem(new SequenceConnection( si1.getSequenceOutConnector(), si6.getSequenceInConnector()));
+		this.scene().addItem(new SequenceConnection( si3.getSequenceOutConnector(), si5.getSequenceInConnector()));
+		this.scene().addItem(new SequenceConnection( si3.getSequenceOutConnector(), si1.getSequenceInConnector()));
+		this.scene().addItem(new SequenceConnection( si2.getSequenceOutConnector(), si3.getSequenceInConnector()));
+		this.scene().addItem(new SequenceConnection( si2.getSequenceOutConnector(), si4.getSequenceInConnector()));
+		this.scene().addItem(new SynthConnection(synth.getSynthInConnectors().get(1), si4.getSynthOutConnectors().get(0)));
+		this.scene().addItem(new SynthConnection(synth.getSynthInConnectors().get(0), si2.getSynthOutConnectors().get(0)));
+		this.scene().addItem(new SynthConnection(synth.getSynthInConnectors().get(2), si3.getSynthOutConnectors().get(0)));
+		this.scene().addItem(new SynthConnection(synth.getSynthInConnectors().get(3), si6.getSynthOutConnectors().get(0)));
+		
 	}
 		
 	public void registerTouchItem(TouchItemInterface it) {

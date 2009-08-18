@@ -14,15 +14,13 @@ import com.trolltech.qt.gui.QWidget;
 import com.trolltech.qt.svg.QGraphicsSvgItem;
 import com.trolltech.qt.svg.QSvgRenderer;
 
-public class SVGButton extends TouchableGraphicsItem {
+public class SequenceButton extends TouchableGraphicsItem {
 	// botton-icons.svg includes:
 	// "delete"
 	// "addSynth"
 	// "addSequence"
 	
 	private static String svgFileName = System.getProperty("user.dir")+"/src/GUI/Item/SVG/button-icons.svg";
-	
-	private LinkedList<Integer> viewGestures = new LinkedList<Integer>();
 
 	private static QSvgRenderer sharedRenderer = new QSvgRenderer(svgFileName);
 	private String elementID;
@@ -34,7 +32,7 @@ public class SVGButton extends TouchableGraphicsItem {
 		return elementID;
 	}
 	
-	public SVGButton(String elementID) {
+	public SequenceButton(String elementID) {
 		super();
 		this.elementID = elementID;
 	}

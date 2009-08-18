@@ -16,7 +16,7 @@ import sparshui.common.messages.events.RotateEvent;
 import sparshui.common.messages.events.TouchEvent;
 import sparshui.gestures.GestureType;
 
-import GUI.Item.SVGButton;
+import GUI.Item.SequenceButton;
 import SceneItems.ContextMenu;
 import SceneItems.CurveItem;
 import SceneItems.HorizontalTouchabelGraphicsItemLayout;

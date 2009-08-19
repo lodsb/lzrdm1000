@@ -2,7 +2,7 @@ package sparshui.common;
 
 import java.io.Serializable;
 
-import SceneItems.TouchItemInterface;
+import GUI.Multitouch.*;
 
 import com.trolltech.qt.core.QPointF;
 

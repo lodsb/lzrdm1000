@@ -13,7 +13,7 @@ import com.trolltech.qt.gui.QPen;
 import com.trolltech.qt.gui.QStyleOptionGraphicsItem;
 import com.trolltech.qt.gui.QWidget;
 
-import SceneItems.TouchableGraphicsItem;
+import GUI.Multitouch.*;
 
 public class SynthConnection extends TouchableGraphicsItem {
 

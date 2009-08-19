@@ -1,4 +1,4 @@
-package SceneItems;
+package GUI.Multitouch;
 
 import com.trolltech.qt.core.QSizeF;
 

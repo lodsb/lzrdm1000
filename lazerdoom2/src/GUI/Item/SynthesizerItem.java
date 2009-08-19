@@ -17,10 +17,9 @@ import com.trolltech.qt.gui.QPen;
 import com.trolltech.qt.gui.QRadialGradient;
 import com.trolltech.qt.gui.QStyleOptionGraphicsItem;
 import com.trolltech.qt.gui.QWidget;
+import GUI.Multitouch.*;
 
-import SceneItems.TouchableGraphicsItem;
-
-public class SynthesizerItem extends TouchableGraphicsItem implements ConnectableSynthInterface {
+public class SynthesizerItem extends BaseSequenceViewItem implements ConnectableSynthInterface {
 	private QRectF contentsRect = new QRectF(39.5,39.5, 121, 121);
 	private static QColor normalColor = new QColor(130,130,130); 
 	private static QColor actionColor = new QColor(211,120,0);

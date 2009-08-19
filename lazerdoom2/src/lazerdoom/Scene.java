@@ -20,7 +20,7 @@ import GUI.Item.SequenceButton;
 import SceneItems.ContextMenu;
 import SceneItems.CurveItem;
 import SceneItems.HorizontalTouchabelGraphicsItemLayout;
-import SceneItems.MulticontrolItem;
+import GUI.Multitouch.*;
 import SceneItems.PushButton;
 import SceneItems.Slider;
 import SceneItems.TouchItemInterface;

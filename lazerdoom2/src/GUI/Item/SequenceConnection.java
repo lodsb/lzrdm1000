@@ -14,8 +14,7 @@ import com.trolltech.qt.gui.QPen;
 import com.trolltech.qt.gui.QStyleOptionGraphicsItem;
 import com.trolltech.qt.gui.QWidget;
 import com.trolltech.qt.gui.QGraphicsItem.GraphicsItemFlag;
-
-import SceneItems.TouchableGraphicsItem;
+import GUI.Multitouch.*;
 
 public class SequenceConnection extends TouchableGraphicsItem {
 

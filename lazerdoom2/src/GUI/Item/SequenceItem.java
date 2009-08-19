@@ -1,5 +1,5 @@
 package GUI.Item;
-
+import GUI.Multitouch.*;
 import com.trolltech.qt.core.QRectF;
 import com.trolltech.qt.core.QSizeF;
 import com.trolltech.qt.gui.QPainter;
@@ -33,7 +33,7 @@ import com.trolltech.qt.gui.QStyleOptionGraphicsItem;
 import com.trolltech.qt.gui.QWidget;
 import com.trolltech.qt.gui.QPainter.RenderHint;
 
-public class SequenceItem extends TouchableGraphicsItem implements ConnectableSequenceInterface, ConnectableSynthInterface {
+public class SequenceItem extends BaseSequenceViewItem implements ConnectableSequenceInterface, ConnectableSynthInterface {
 
 	private static QColor normalColor = new QColor(130,130,130); 
 	private static QColor actionColor = new QColor(211,120,0);
@@ -137,13 +137,13 @@ public class SequenceItem extends TouchableGraphicsItem implements ConnectableSe
 		synthOutPorts = new LinkedList<SynthOutConnector>();
 	
 		if(!isPause) {
-			SynthInConnector synthConnector = new SynthInConnector("Record");
+			/*SynthInConnector synthConnector = new SynthInConnector("Record");
 			//connector.scale(2.0, 2.0);
 			synthConnector.setZValue(0.23);
 			synthConnector.setParentItem(this);
 			synthConnector.rotate(0.0);
 			synthConnector.setPos(75,-40);
-			synthInPorts.add(synthConnector);
+			synthInPorts.add(synthConnector);*/
 			
 			SynthOutConnector synthOutConnector = new SynthOutConnector("Sequence");
 			//connector.scale(2.0, 2.0);

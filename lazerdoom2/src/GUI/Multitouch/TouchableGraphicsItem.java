@@ -1,9 +1,11 @@
-package SceneItems;
+package GUI.Multitouch;
 
 import java.util.LinkedList;
 import java.util.List;
 
 import sparshui.common.Event;
+
+import SceneItems.Util;
 
 import com.trolltech.qt.core.QRectF;
 import com.trolltech.qt.core.QSizeF;
@@ -12,8 +14,9 @@ import com.trolltech.qt.gui.QGraphicsItemInterface;
 import com.trolltech.qt.gui.QPainter;
 import com.trolltech.qt.gui.QStyleOptionGraphicsItem;
 import com.trolltech.qt.gui.QWidget;
+import GUI.Multitouch.*;
 
-public abstract class TouchableGraphicsItem extends QGraphicsItem implements TouchItemInterface, GeometryInterface {
+public abstract class TouchableGraphicsItem extends QGraphicsItem implements TouchItemInterface , GeometryInterface {
 
 	private TouchItemInterface parent = null;
 	private int id = Util.getGroupID();

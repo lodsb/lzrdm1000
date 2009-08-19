@@ -10,8 +10,7 @@ import com.trolltech.qt.gui.QPainterPath;
 import com.trolltech.qt.gui.QStyleOptionGraphicsItem;
 import com.trolltech.qt.gui.QTransform;
 import com.trolltech.qt.gui.QWidget;
-
-import SceneItems.TouchableGraphicsItem;
+import GUI.Multitouch.*;
 
 public class SynthConnector extends TouchableGraphicsItem {
 	private static QColor normalColor = new QColor(255,2,104);

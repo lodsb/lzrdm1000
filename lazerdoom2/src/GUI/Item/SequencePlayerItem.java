@@ -17,10 +17,9 @@ import com.trolltech.qt.gui.QRadialGradient;
 import com.trolltech.qt.gui.QStyleOptionGraphicsItem;
 import com.trolltech.qt.gui.QWidget;
 import com.trolltech.qt.svg.QSvgRenderer;
+import GUI.Multitouch.*;
 
-import SceneItems.TouchableGraphicsItem;
-
-public class SequencePlayerItem extends TouchableGraphicsItem implements ConnectableSequenceInterface {
+public class SequencePlayerItem extends BaseSequenceViewItem implements ConnectableSequenceInterface {
 	
 	private static QRectF boundingRect = new QRectF(0,0,200,200);
 	private QRectF centerRect = new QRectF(39.5,39.5, 121, 121);

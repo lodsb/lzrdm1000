@@ -30,9 +30,8 @@ import GUI.Item.*;
 import GUI.Item.SynthesizerItem;
 
 import java.util.Map.Entry;
-import SceneItems.TouchItemInterface;
 import SceneItems.TouchPointCursor;
-import SceneItems.TouchableGraphicsItem;
+import GUI.Multitouch.*;
 
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.ConcurrentLinkedQueue;
@@ -259,10 +258,14 @@ public class SequencerView extends QGraphicsView implements Client, TouchItemInt
 		this.scene().addItem(player);
 		
 		SynthesizerItem synth;
-		synth = new SynthesizerItem(new String[]{"A", "B", "C", "D"});
+		synth = new SynthesizerItem(new String[]{"A", "B", "C"});
 		
 		synth.setPos(500,800);
 		this.scene().addItem(synth);
+	
+		EditorCursor ec = new EditorCursor();
+		ec.setPos(1000,1000);
+		this.scene().addItem(ec);
 		
 		this.scene().addItem(new SequenceConnection( player.getSequenceOutConnector(), si2.getSequenceInConnector()));
 		this.scene().addItem(new SequenceConnection( si1.getSequenceOutConnector(), si6.getSequenceInConnector()));
@@ -273,7 +276,9 @@ public class SequencerView extends QGraphicsView implements Client, TouchItemInt
 		this.scene().addItem(new SynthConnection(synth.getSynthInConnectors().get(1), si4.getSynthOutConnectors().get(0)));
 		this.scene().addItem(new SynthConnection(synth.getSynthInConnectors().get(0), si2.getSynthOutConnectors().get(0)));
 		this.scene().addItem(new SynthConnection(synth.getSynthInConnectors().get(2), si3.getSynthOutConnectors().get(0)));
-		this.scene().addItem(new SynthConnection(synth.getSynthInConnectors().get(3), si6.getSynthOutConnectors().get(0)));
+		//this.scene().addItem(new SynthConnection(synth.getSynthInConnectors().get(3), si6.getSynthOutConnectors().get(0)));
+		//this.scene().addItem(new MulticontrolItem());
+	
 		
 	}
 		

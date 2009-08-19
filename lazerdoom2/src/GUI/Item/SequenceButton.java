@@ -4,8 +4,7 @@ import java.util.LinkedList;
 
 import sparshui.gestures.TouchGesture;
 
-import SceneItems.TouchableGraphicsItem;
-
+import GUI.Multitouch.*;
 import com.trolltech.qt.core.QRectF;
 import com.trolltech.qt.core.QSizeF;
 import com.trolltech.qt.gui.QPainter;

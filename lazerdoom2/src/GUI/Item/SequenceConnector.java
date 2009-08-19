@@ -1,7 +1,6 @@
 package GUI.Item;
 
-import SceneItems.TouchableGraphicsItem;
-
+import GUI.Multitouch.*;
 import com.trolltech.qt.core.QPointF;
 import com.trolltech.qt.core.QRectF;
 import com.trolltech.qt.core.QSizeF;

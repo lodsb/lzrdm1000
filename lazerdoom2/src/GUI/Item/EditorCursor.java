@@ -40,9 +40,6 @@ public class EditorCursor extends TouchableGraphicsItem {
 	public EditorCursor() {
 		this.setFlag(GraphicsItemFlag.ItemIsMovable, true);
 		this.setFlag(GraphicsItemFlag.ItemIsSelectable, true);
-		
-		//"M 8.930379,113.71752 L 43.930379,13.717523 L 78.930379,113.71752 L 43.930379,88.299483 L 8.930379,113.71752 z"
-		
 		cursorPath = new QPainterPath();
 		cursorPath.moveTo(-35, 50);
 		cursorPath.lineTo(0,-50);
@@ -58,7 +55,6 @@ public class EditorCursor extends TouchableGraphicsItem {
 	}
 	
 	public boolean setPosition(QPointF nextPos) {
-		//this.rotate(-currentAngle);
 		boolean ret = true;
 		
 		QPointF pos = this.mapToScene(new QPointF(0,0));
@@ -91,7 +87,6 @@ public class EditorCursor extends TouchableGraphicsItem {
 			
 			
 			if(xDist != 0 && yDist != 0) {
-				//System.out.println(xDist+" "+yDist+" "+(yDist/xDist)+" distance "+distance+" "+angle);
 				if(angle > 180 && xDist > 0) {
 					angle = -angle;
 				}

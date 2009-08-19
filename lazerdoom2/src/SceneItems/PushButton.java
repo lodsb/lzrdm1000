@@ -8,6 +8,8 @@ import sparshui.common.TouchState;
 import sparshui.common.messages.events.TouchEvent;
 import sparshui.gestures.GestureType;
 
+import GUI.Multitouch.TouchableGraphicsItem;
+
 import com.trolltech.qt.core.QPointF;
 import com.trolltech.qt.core.QRect;
 import com.trolltech.qt.core.QRectF;

@@ -7,6 +7,7 @@ import java.util.Vector;
 
 import GUI.Scene.SequencerScene;
 import GUI.View.SequencerView;
+import GUI.View.SynthesizerView;
 
 import com.trolltech.qt.QThread;
 import com.trolltech.qt.core.Qt;
@@ -76,6 +77,8 @@ public class lazerdoom extends QWidget {
         
 		this.setLayout(layout);
 		layout.addWidget(view);
+		SynthesizerView v = new SynthesizerView();
+		v.setParent(this);
 		//QGLWidget w = new QGLWidget();
 		//view.setViewport(w);
 		view.setScene(scene);

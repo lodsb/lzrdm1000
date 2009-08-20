@@ -23,6 +23,8 @@ import com.trolltech.qt.gui.QWidget;
 import com.trolltech.qt.gui.QGraphicsItem.GraphicsItemFlag;
 import com.trolltech.qt.svg.QSvgRenderer;
 
+import edu.uci.ics.jung.graph.util.Pair;
+
 import GUI.Multitouch.TouchableGraphicsItem;
 import SceneItems.*;
 
@@ -205,7 +207,7 @@ public class TouchableEditor extends TouchableGraphicsWidget {
 	}
 	
 	private	int id = Util.getGroupID();
-	private QSizeF containerSize = new QSizeF(600,600);
+	private QSizeF containerSize = new QSizeF(800,600);
 	private double zValue = 100.0;
 	private EditorHeader header;
 	
@@ -216,8 +218,8 @@ public class TouchableEditor extends TouchableGraphicsWidget {
 	public TouchableEditor() {
 		baseLayout = new QGraphicsLinearLayout();
 		baseLayout.setOrientation(Orientation.Vertical);
-		graphicsView = new TouchableGraphicsView();
-		graphicsViewContainer = new TouchableGraphicsViewContainer(graphicsView, new QSizeF(600,600));
+		graphicsView = new TouchableGraphicsView(this);
+		graphicsViewContainer = new TouchableGraphicsViewContainer(graphicsView, containerSize);
 		baseLayout.addItem(graphicsViewContainer);
 		this.setLayout(baseLayout);
 		this.setZValue(zValue);
@@ -225,12 +227,13 @@ public class TouchableEditor extends TouchableGraphicsWidget {
 		header = new EditorHeader(new QRectF(0,0,400,75));
 		header.rotate(90.0);
 		header.setParentItem(this);
-		header.setPos(685, 100);
+		header.setPos(885, 100);
 		
 		EditorButton closeButton = new EditorButton("delete");
 		closeButton.pressed.connect(this, "closeEditor()");
 		closeButton.setParentItem(this);
-		closeButton.setPos(647,450);
+		closeButton.setPos(847,450);
+		closeButton.setZValue(10);
 		
 		this.setFlag(GraphicsItemFlag.ItemIsMovable, true);
 		this.setFlag(GraphicsItemFlag.ItemIsSelectable, true);
@@ -245,12 +248,14 @@ public class TouchableEditor extends TouchableGraphicsWidget {
 		header.setColor(color);
 	}
 	
-	public int getGroupIDViewCoordinates(QPointF pos) {
+	public Pair<Object> getGroupIDViewCoordinates(QPointF pos) {
+		
 		return this.graphicsView.getGroupIDViewCoordinates(pos);
 	}
 	
 	@Override
 	public List<Integer> getAllowedGestures() {
+		System.out.println("GAG");
 		return this.graphicsView.getAllowedGestures();
 	}
 
@@ -269,7 +274,7 @@ public class TouchableEditor extends TouchableGraphicsWidget {
 			DragEvent e = (DragEvent) event;
 			e.setSceneLocation(this.mapFromScene(e.getSceneLocation()));					
 		}
-		
+		System.out.println("MEGA");
 		return this.graphicsView.processEvent(event);
 	}
 	

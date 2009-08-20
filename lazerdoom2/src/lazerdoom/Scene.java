@@ -17,13 +17,12 @@ import sparshui.common.messages.events.TouchEvent;
 import sparshui.gestures.GestureType;
 
 import GUI.Item.SequenceButton;
+import GUI.Item.Editor.PushButton;
+import GUI.Item.Editor.Slider;
 import SceneItems.ContextMenu;
 import SceneItems.CurveItem;
 import SceneItems.HorizontalTouchabelGraphicsItemLayout;
 import GUI.Multitouch.*;
-import SceneItems.PushButton;
-import SceneItems.Slider;
-import SceneItems.TouchItemInterface;
 
 import com.trolltech.qt.core.QPointF;
 import com.trolltech.qt.core.Qt;

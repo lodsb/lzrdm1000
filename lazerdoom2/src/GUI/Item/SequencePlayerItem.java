@@ -111,7 +111,7 @@ public class SequencePlayerItem extends BaseSequenceViewItem implements Connecta
 		}
 
 		@Override
-		public void setSize(QSizeF size) {
+		public void setGeometry(QRectF size) {
 		}
 		
 		@Override
@@ -129,6 +129,12 @@ public class SequencePlayerItem extends BaseSequenceViewItem implements Connecta
 			}
 			
 			return true;
+		}
+
+		@Override
+		public QSizeF getMaximumSize() {
+			// TODO Auto-generated method stub
+			return null;
 		}
 	}
 	
@@ -213,7 +219,7 @@ public class SequencePlayerItem extends BaseSequenceViewItem implements Connecta
 	}
 
 	@Override
-	public void setSize(QSizeF size) {
+	public void setGeometry(QRectF size) {
 		// TODO Auto-generated method stub
 
 	}
@@ -226,6 +232,12 @@ public class SequencePlayerItem extends BaseSequenceViewItem implements Connecta
 	@Override
 	public SequenceConnector getSequenceOutConnector() {
 		return this.outConnector;
+	}
+
+	@Override
+	public QSizeF getMaximumSize() {
+		// TODO Auto-generated method stub
+		return null;
 	}
 
 }

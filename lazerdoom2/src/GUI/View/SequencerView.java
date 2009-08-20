@@ -17,17 +17,28 @@ import com.trolltech.qt.core.QObject;
 import com.trolltech.qt.core.QPoint;
 import com.trolltech.qt.core.QPointF;
 import com.trolltech.qt.core.QRectF;
+import com.trolltech.qt.core.QTimer;
+import com.trolltech.qt.core.Qt.Orientation;
 import com.trolltech.qt.gui.QApplication;
 import com.trolltech.qt.gui.QBrush;
 import com.trolltech.qt.gui.QColor;
 import com.trolltech.qt.gui.QGraphicsItemInterface;
+import com.trolltech.qt.gui.QGraphicsLinearLayout;
+import com.trolltech.qt.gui.QGraphicsProxyWidget;
 import com.trolltech.qt.gui.QGraphicsScene;
 import com.trolltech.qt.gui.QGraphicsView;
+import com.trolltech.qt.gui.QGraphicsWidget;
 import com.trolltech.qt.gui.QPainter;
 import com.trolltech.qt.gui.QRadialGradient;
+import com.trolltech.qt.gui.QSizePolicy;
+import com.trolltech.qt.gui.QGraphicsScene.ItemIndexMethod;
+import com.trolltech.qt.gui.QSizePolicy.ControlType;
+import com.trolltech.qt.gui.QSizePolicy.Policy;
+import com.trolltech.qt.opengl.QGLWidget;
+
 import GUI.Multitouch.*;
 import GUI.Item.*;
-import GUI.Item.SynthesizerItem;
+import GUI.Item.Editor.TouchableEditor;
 
 import java.util.Map.Entry;
 import SceneItems.TouchPointCursor;
@@ -35,9 +46,24 @@ import GUI.Multitouch.*;
 
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.ConcurrentLinkedQueue;
+import java.util.concurrent.Semaphore;
+import java.util.concurrent.SynchronousQueue;
 import java.util.concurrent.atomic.AtomicLong;
 
 public class SequencerView extends QGraphicsView implements Client, TouchItemInterface {	
+
+	private LinkedList<TouchableEditor> editors = new LinkedList<TouchableEditor>();
+	
+	public void registerEditor(TouchableEditor editor) {
+		editors.add(editor);
+	}
+	
+	public void unregisterEditor(TouchableEditor editor) {
+		editors.remove(editor);
+	}
+	
+	Semaphore sema = new Semaphore(10);
+	
 	private class TeCommThread extends QObject implements Runnable {
 		Signal2<TouchEventCommunicationContainer, Location> groupIDSignal = new Signal2<TouchEventCommunicationContainer, Location>();
 		Signal2<TouchEventCommunicationContainer, Integer> gesturesSignal = new Signal2<TouchEventCommunicationContainer,Integer>();
@@ -66,8 +92,15 @@ public class SequencerView extends QGraphicsView implements Client, TouchItemInt
 		public void run() {
 			ProcessEvent pe;
 			TouchEventCommunicationContainer tc;
-			
 			while(true) { 
+				
+				try {
+					sema.acquire();
+				} catch (InterruptedException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+				
 				if((pe = processEventQueue.poll()) != null) {
 					processEventSignal.emit(pe.id, pe.event);
 				}
@@ -87,7 +120,8 @@ public class SequencerView extends QGraphicsView implements Client, TouchItemInt
 	QThread thread;
 	TeCommThread tect;
 	ConcurrentLinkedQueue<TouchEventCommunicationContainer> teCommContainerSendQueue = new ConcurrentLinkedQueue<TouchEventCommunicationContainer>();
-	ConcurrentLinkedQueue<TouchEventCommunicationContainer> teCommContainerRecvQueue = new ConcurrentLinkedQueue<TouchEventCommunicationContainer>(); 
+	ConcurrentLinkedQueue<TouchEventCommunicationContainer> teCommContainerRecvQueue = new ConcurrentLinkedQueue<TouchEventCommunicationContainer>();
+	
 	private class TouchEventCommunicationContainer {
 		TouchEventCommunicationContainer(Location l, int id, boolean isGetGroup) {
 			this.loc = l;
@@ -203,6 +237,10 @@ public class SequencerView extends QGraphicsView implements Client, TouchItemInt
 		viewGestures.add(sparshui.gestures.GestureType.DRAG_GESTURE.ordinal());
 		
 		this.setCacheMode(QGraphicsView.CacheModeFlag.CacheBackground);
+		//this.setViewportUpdateMode(ViewportUpdateMode.NoViewportUpdate);
+		QGLWidget w = new QGLWidget();
+		this.setViewport(w);
+		System.out.println("fdsdf "+this.viewportUpdateMode());
 		
 		SequencerView.instance = this;
 		
@@ -211,7 +249,10 @@ public class SequencerView extends QGraphicsView implements Client, TouchItemInt
 		tect.moveToThread(thread);
 		thread.start();
 		
-		this.setRenderHint(QPainter.RenderHint.Antialiasing);
+		this.setRenderHint(QPainter.RenderHint.HighQualityAntialiasing);
+	
+		//updateTimer.timeout.connect(this, "update()");
+		//updateTimer.start(1000/60);
 	}
 	
 	public void setUp(double scale) {
@@ -220,8 +261,9 @@ public class SequencerView extends QGraphicsView implements Client, TouchItemInt
 		this.centerOn(new QPointF(sceneRect.height()/2, sceneRect.width()/2));
 		this.scale(scale, scale);
 		
+		//this.scene().setItemIndexMethod(ItemIndexMethod.NoIndex);
 		
-		/*****/
+		
 		
 		SequenceItem si1 = new SequenceItem(true);
 		si1.setPos(500,500);
@@ -280,6 +322,75 @@ public class SequencerView extends QGraphicsView implements Client, TouchItemInt
 		//this.scene().addItem(new MulticontrolItem());
 	
 		
+		
+		/*QGraphicsLinearLayout baseLayout = new QGraphicsLinearLayout() {
+			public String toString() { return "BNGGGFFGGF"; }
+		};
+		baseLayout.setOrientation(Orientation.Vertical);
+		QGraphicsLinearLayout layout = new QGraphicsLinearLayout();
+		layout.setOrientation(com.trolltech.qt.core.Qt.Orientation.Horizontal);
+		PushButton button = new PushButton("<");
+		TextLabel button1 = new TextLabel("SynthesizerOne");
+		PushButton button2 = new PushButton(">");
+		TouchableGraphicsItemContainer container = new TouchableGraphicsItemContainer();
+		container.setItem(button);
+		layout.addItem(container);
+		container = new TouchableGraphicsItemContainer();
+		container.setItem(button1);
+		layout.addItem(container);
+		container = new TouchableGraphicsItemContainer();
+		container.setItem(button2);
+		layout.addItem(container);
+		baseLayout.addItem(layout);
+		
+		layout = new QGraphicsLinearLayout();
+		
+		Slider slider1 = new Slider();
+		Slider slider2 = new Slider();
+		Slider slider3 = new Slider();
+		Slider slider4 = new Slider();
+		Slider slider5 = new Slider();
+		Slider slider6 = new Slider();
+		Slider slider7 = new Slider();
+		Slider slider8 = new Slider();
+		
+		container = new TouchableGraphicsItemContainer();
+		container.setItem(slider1);
+		layout.addItem(container);
+		container = new TouchableGraphicsItemContainer();
+		container.setItem(slider2);
+		layout.addItem(container);
+		container = new TouchableGraphicsItemContainer();
+		container.setItem(slider3);
+		layout.addItem(container);
+		container = new TouchableGraphicsItemContainer();
+		container.setItem(slider4);
+		layout.addItem(container);
+		container = new TouchableGraphicsItemContainer();
+		container.setItem(slider5);
+		layout.addItem(container);
+		container = new TouchableGraphicsItemContainer();
+		container.setItem(slider6);
+		layout.addItem(container);
+		container = new TouchableGraphicsItemContainer();
+		container.setItem(slider7);
+		layout.addItem(container);
+		container = new TouchableGraphicsItemContainer();
+		container.setItem(slider8);
+		layout.addItem(container);
+
+		baseLayout.addItem(layout);*/
+		//QGraphicsProxyWidget x = new QGraphicsProxyWidget();
+		//QGraphicsScene sc = new QGraphicsScene();
+		//TouchableGraphicsView gv = new TouchableGraphicsView();
+		//gv.setScene(sc);
+		//gv.setSizeIncrement(500, 800);
+		//x.setWidget(new QGraphicsView());
+
+		TouchableEditor editor = new TouchableEditor();
+		this.scene().addItem(editor);
+		editor.setPos(800, 800);
+		this.registerEditor(editor);
 	}
 		
 	public void registerTouchItem(TouchItemInterface it) {
@@ -292,6 +403,7 @@ public class SequencerView extends QGraphicsView implements Client, TouchItemInt
 	
 	@Override
 	public List<Integer> getAllowedGestures(int id) {
+		System.out.println("gestures");
 		TouchEventCommunicationContainer tc = new TouchEventCommunicationContainer(null, id, false);
 		return postAndwaitUntilProcessed(tc).returnAllowedGestures;
 	}
@@ -305,6 +417,7 @@ public class SequencerView extends QGraphicsView implements Client, TouchItemInt
 		if(id == viewGroupID) {
 			ret = viewGestures;
 		} else if((it = touchItemGroupIDMap.get(id)) != null) {
+			System.out.println(it);
 			ret = it.getAllowedGestures();
 		}
 		
@@ -314,6 +427,8 @@ public class SequencerView extends QGraphicsView implements Client, TouchItemInt
 	private TouchEventCommunicationContainer postAndwaitUntilProcessed(TouchEventCommunicationContainer tc) {
 		teCommContainerSendQueue.add(tc);
 		
+		sema.release();
+		
 		TouchEventCommunicationContainer currentTe;
 		while(true) {
 			Iterator<TouchEventCommunicationContainer> it = teCommContainerRecvQueue.iterator();
@@ -321,7 +436,7 @@ public class SequencerView extends QGraphicsView implements Client, TouchItemInt
 				currentTe = it.next();
 				if(currentTe == tc) {
 					teCommContainerRecvQueue.remove(tc);
-					
+					sema.release();
 					return tc;
 				}
 			}
@@ -340,8 +455,9 @@ public class SequencerView extends QGraphicsView implements Client, TouchItemInt
 		double y = pos.getY();
 		int getGroupIDReturnValue = 0;
 		
-		QGraphicsItemInterface it = this.scene().itemAt(convertScreenPos(x,y));
 		
+		QGraphicsItemInterface it = this.scene().itemAt(convertScreenPos(x,y));
+
 		if(it != null && it instanceof TouchItemInterface) {
 			getGroupIDReturnValue = ((TouchItemInterface)it).getGroupID();
 			
@@ -350,21 +466,34 @@ public class SequencerView extends QGraphicsView implements Client, TouchItemInt
 			}
 			
 		} else {
-			getGroupIDReturnValue = this.viewGroupID;
+			int retVal = -1;
+			
+			for(TouchableEditor editor: editors) {
+				QPointF point = editor.mapFromScene(convertScreenPos(x,y));
+				if(editor.boundingRect().contains(point)) {
+					retVal = editor.getGroupIDViewCoordinates(point);
+				}
+			} 
+			
+			if(retVal == -1) {
+				getGroupIDReturnValue = this.viewGroupID;
+			} else {
+				getGroupIDReturnValue = retVal;
+			}
 		}
-		
 		tect.setGroupID(tc, getGroupIDReturnValue);
 	}
 
 	@Override
 	public synchronized void processEvent(final int id, final Event event) {
+		sema.release();
 		processEventQueue.add(new ProcessEvent(id, event));
 	}
 	
 	public QPointF convertScreenPos(double x, double y) {
 		x = x*this.viewport().width();
 		y = y*this.viewport().height();
-		return this.mapToScene(new QPoint((int)x, (int)y));
+		return this.mapToScene((int)x, (int)y);
 	}
 	
 	private void processEventLocalThread(Integer id, Event event) {
@@ -374,21 +503,14 @@ public class SequencerView extends QGraphicsView implements Client, TouchItemInt
 				TouchPointCursor tc = null;
 				TouchEvent e = (TouchEvent) event;
 				
-				if(e.getState() == TouchState.BIRTH) {
-					for(Entry<Integer, TouchPointCursor> tc2: touchPointCursors.entrySet()) {
-						if(!(tc2.getValue()).isVisible()) {
-							tc = tc2.getValue();
-							break;
-						}
-					}
+				if(e.getState() == TouchState.BIRTH) {					
+					tc = new TouchPointCursor();
+					this.scene().addItem(tc);	
 					
-					if(tc == null) { 
-						tc = new TouchPointCursor();
-						this.scene().addItem(tc);	
-					}
 						
 					touchPointCursors.put(e.getTouchID(), tc);
 					tc.setPos(convertScreenPos(e.getX(), e.getY()));
+					tc.setZValue(-100.0);
 					
 					tc.setVisible(true);
 					
@@ -400,6 +522,8 @@ public class SequencerView extends QGraphicsView implements Client, TouchItemInt
 					tc.setHTMLText("<b>ID: </b>"+e.getTouchID()+"<br><b>Pos x/y: <b>"+convertScreenPos(e.getX(), e.getY()).x()+"/"+convertScreenPos(e.getX(), e.getY()).y());
 				} else if(e.getState() == TouchState.DEATH) {
 					tc = touchPointCursors.get(e.getTouchID());
+					touchPointCursors.remove(tc);
+					this.scene().removeItem(tc);
 					tc.setVisible(false);
 				}
 				
@@ -407,6 +531,13 @@ public class SequencerView extends QGraphicsView implements Client, TouchItemInt
 		} else {
 			TouchItemInterface it = null;
 			if((it  = touchItemGroupIDMap.get(id)) != null) {
+				if(event instanceof TouchEvent) {
+					TouchEvent e = (TouchEvent) event;
+					e.setSceneLocation(convertScreenPos(e.getX(), e.getY()));
+				} else if (event instanceof DragEvent) {
+					DragEvent e = (DragEvent) event;
+					e.setSceneLocation(convertScreenPos(e.getAbsX(), e.getAbsY()));					
+				}
 				it.processEvent(event);
 			}
 		}

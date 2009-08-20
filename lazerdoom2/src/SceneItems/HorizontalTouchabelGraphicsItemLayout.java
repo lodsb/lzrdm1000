@@ -33,7 +33,7 @@ public class HorizontalTouchabelGraphicsItemLayout extends
 		for(TouchableGraphicsItem item: items) {
 			QSizeF itemSize = item.getPreferedSize();
 			if(itemSize.height() < maxHeight) {
-				item.setSize(new QSizeF(maxHeight, itemSize.width()));
+				item.setGeometry(new QSizeF(maxHeight, itemSize.width()));
 			}
 		}
 

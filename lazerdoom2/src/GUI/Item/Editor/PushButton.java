@@ -1,4 +1,4 @@
-package SceneItems;
+package GUI.Item.Editor;
 
 import java.util.LinkedList;
 import java.util.List;
@@ -19,6 +19,7 @@ import com.trolltech.qt.gui.QColor;
 import com.trolltech.qt.gui.QFont;
 import com.trolltech.qt.gui.QFontMetrics;
 import com.trolltech.qt.gui.QPainter;
+import com.trolltech.qt.gui.QPen;
 import com.trolltech.qt.gui.QStyleOptionGraphicsItem;
 import com.trolltech.qt.gui.QWidget;
 
@@ -67,20 +68,24 @@ public class PushButton extends TouchableGraphicsItem {
 	@Override
 	public void paint(QPainter painter, QStyleOptionGraphicsItem option,
 			QWidget widget) {
-		
+		painter.setPen(QPen.NoPen);
+		painter.setBrush(normalBrush);
+		painter.drawRect(size);
 		if(pressed) {
 			painter.setBrush(pressedBrush);
 		} else {
 			painter.setBrush(normalBrush);
 		}
 		
-		painter.drawRect(size);
+		painter.setPen(QColor.black);
+		painter.drawRoundedRect(size, 100,100);
 		painter.drawText(size, 0x84, labelText);
 	}
 
 	@Override
-	public void setSize(QSizeF size) {
-		this.size.setSize(size);
+	public void setGeometry(QRectF size) {
+		this.size = size;
+		this.prepareGeometryChange();
 		this.update();
 	}
 
@@ -93,15 +98,13 @@ public class PushButton extends TouchableGraphicsItem {
 		if(event instanceof TouchEvent) {
 			TouchEvent e = (TouchEvent) event;
 			
-			QPointF coordinate = mapFromScene(lazerdoom.View.getInstance().convertScreenPos(e.getX(),e.getY()));
-			if(this.shape().contains(coordinate)) {
+			//QPointF coordinate = mapFromScene(lazerdoom.View.getInstance().convertScreenPos(e.getX(),e.getY()));
+			if(e.getState() == TouchState.BIRTH) {
 				this.pressed = true;
 				this.update();
-				
-				if(e.getState() == TouchState.DEATH) {
-					this.buttonPressed.emit(this);
-				}
-				
+			}	
+			else if(e.getState() == TouchState.DEATH) {
+					this.buttonPressed.emit(this);	
 			} else {
 				this.pressed = false;
 				update();
@@ -113,5 +116,10 @@ public class PushButton extends TouchableGraphicsItem {
 	@Override
 	public QSizeF getPreferedSize() {
 		return size.size(); 
+	}
+
+	@Override
+	public QSizeF getMaximumSize() {
+		return new QSizeF(Integer.MAX_VALUE, Integer.MAX_VALUE);
 	}
 }

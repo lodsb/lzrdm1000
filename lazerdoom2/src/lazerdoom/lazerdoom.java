@@ -5,7 +5,10 @@ import java.net.UnknownHostException;
 import java.util.List;
 import java.util.Vector;
 
+import GUI.Item.Editor.PushButton;
+import GUI.Multitouch.TouchableGraphicsItemContainer;
 import GUI.Scene.SequencerScene;
+import GUI.Scene.Editor.SynthesizerScene;
 import GUI.View.SequencerView;
 import GUI.View.SynthesizerView;
 
@@ -77,13 +80,18 @@ public class lazerdoom extends QWidget {
         
 		this.setLayout(layout);
 		layout.addWidget(view);
-		SynthesizerView v = new SynthesizerView();
-		v.setParent(this);
+		
+		/*SynthesizerScene synthSc = new SynthesizerScene();
+		QGraphicsView v = new QGraphicsView(this);
+		v.setScene(synthSc);
+		
+		layout.addWidget(v);
+		*/
 		//QGLWidget w = new QGLWidget();
 		//view.setViewport(w);
 		view.setScene(scene);
 		//view.setRenderHint(RenderHint.Antialiasing);
-		view.setViewportUpdateMode(ViewportUpdateMode.MinimalViewportUpdate);
+		//view.setViewportUpdateMode(ViewportUpdateMode.MinimalViewportUpdate);
 		//view.scale(0.5, 0.5);
 		
 		view.setUp((double)0.5);

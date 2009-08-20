@@ -1,8 +1,10 @@
 package GUI.Multitouch;
 
+import com.trolltech.qt.core.QRectF;
 import com.trolltech.qt.core.QSizeF;
 
 public interface GeometryInterface {
-	public abstract void setSize(QSizeF size);
+	public abstract void setGeometry(QRectF size);
 	public abstract QSizeF getPreferedSize();
+	public abstract QSizeF getMaximumSize();
 }

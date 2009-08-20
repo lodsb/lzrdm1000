@@ -210,7 +210,7 @@ public class CurveItem  extends TouchableGraphicsItem {
 		}
 
 		@Override
-		public void setSize(QSizeF size) {
+		public void setGeometry(QSizeF size) {
 			// TODO Auto-generated method stub	
 		}
 
@@ -316,7 +316,7 @@ public class CurveItem  extends TouchableGraphicsItem {
 	}
 
 	@Override
-	public void setSize(QSizeF size) {
+	public void setGeometry(QSizeF size) {
 		// TODO Auto-generated method stub
 
 	}

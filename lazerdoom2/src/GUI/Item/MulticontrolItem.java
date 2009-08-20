@@ -105,9 +105,15 @@ public class MulticontrolItem extends TouchableGraphicsItem {
 		}
 
 		@Override
-		public void setSize(QSizeF size) {
+		public void setGeometry(QRectF size) {
 			// TODO Auto-generated method stub
 			
+		}
+
+		@Override
+		public QSizeF getMaximumSize() {
+			// TODO Auto-generated method stub
+			return null;
 		}
 		
 	}
@@ -173,8 +179,14 @@ public class MulticontrolItem extends TouchableGraphicsItem {
 		}
 
 		@Override
-		public void setSize(QSizeF size) {
+		public void setGeometry(QRectF size) {
 			// TODO Auto-generated method stub
+		}
+
+		@Override
+		public QSizeF getMaximumSize() {
+			// TODO Auto-generated method stub
+			return null;
 		}
 		
 	}
@@ -409,7 +421,7 @@ public class MulticontrolItem extends TouchableGraphicsItem {
 	}
 
 	@Override
-	public void setSize(QSizeF size) {
+	public void setGeometry(QRectF size) {
 		// TODO Auto-generated method stub
 		
 	}
@@ -505,6 +517,12 @@ public class MulticontrolItem extends TouchableGraphicsItem {
 			}
 		}
 		return true;
+	}
+
+	@Override
+	public QSizeF getMaximumSize() {
+		// TODO Auto-generated method stub
+		return null;
 	}
 
 }

@@ -1,4 +1,4 @@
-package SceneItems;
+package GUI.Item.Editor;
 
 import java.util.LinkedList;
 import java.util.List;
@@ -64,6 +64,7 @@ public class Slider extends TouchableGraphicsItem {
 		double height = size.height();
 		double y = currentValue*height;
 		currentValueRect = new QRect((int)size.left(),(int)size.bottom(),(int)size.width(),(int)-y);
+		this.prepareGeometryChange();
 		this.update();
 	}
 	
@@ -76,7 +77,7 @@ public class Slider extends TouchableGraphicsItem {
 				editing = false;
 			}
 			
-			QPointF coordinate = mapFromScene(lazerdoom.View.getInstance().convertScreenPos(e.getX(),e.getY()));
+			QPointF coordinate = mapFromScene(e.getSceneLocation());
 			if(this.shape().contains(coordinate)) {
 				if(e.getState() == TouchState.BIRTH) {
 					editing = true;
@@ -84,7 +85,6 @@ public class Slider extends TouchableGraphicsItem {
 				}
 				
 				if(editing) {
-					double lowerY = size.bottom();
 					double height = size.height();
 					double y = height-coordinate.y();
 					currentValue = y/height;
@@ -97,14 +97,19 @@ public class Slider extends TouchableGraphicsItem {
 	}
 
 	@Override
-	public void setSize(QSizeF size) {
-		this.size.setSize(size);
+	public void setGeometry(QRectF size) {
+		this.size = size;
 		this.updateValueRect();
 	}
 
 	@Override
 	public QSizeF getPreferedSize() {
 		return preferedSize.size();
+	}
+
+	@Override
+	public QSizeF getMaximumSize() {
+		return new QSizeF(Integer.MAX_VALUE, Integer.MAX_VALUE);
 	}
 
 

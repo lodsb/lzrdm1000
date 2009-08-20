@@ -53,7 +53,13 @@ public class SequenceButton extends TouchableGraphicsItem {
 	}
 
 	@Override
-	public void setSize(QSizeF size) {
+	public void setGeometry(QRectF size) {
+	}
+
+	@Override
+	public QSizeF getMaximumSize() {
+		// TODO Auto-generated method stub
+		return null;
 	}
 	
 }

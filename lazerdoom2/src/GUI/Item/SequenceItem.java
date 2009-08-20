@@ -223,7 +223,7 @@ public class SequenceItem extends BaseSequenceViewItem implements ConnectableSeq
 	}
 
 	@Override
-	public void setSize(QSizeF size) {
+	public void setGeometry(QRectF size) {
 		// TODO Auto-generated method stub
 
 	}
@@ -236,6 +236,12 @@ public class SequenceItem extends BaseSequenceViewItem implements ConnectableSeq
 	@Override
 	public List<SynthOutConnector> getSynthOutConnectors() {
 		return synthOutPorts;
+	}
+
+	@Override
+	public QSizeF getMaximumSize() {
+		// TODO Auto-generated method stub
+		return null;
 	}
 
 }

@@ -1,6 +1,6 @@
 package sparshui.common.messages.events;
 
-import SceneItems.TouchItemInterface;
+import GUI.Multitouch.*;
 
 import com.trolltech.qt.core.QPointF;
 

@@ -30,7 +30,7 @@ public class SequenceConnector extends TouchableGraphicsItem {
 
 	public SequenceConnector() {
 		this.setFlag(GraphicsItemFlag.ItemIsSelectable,true);
-		//this.setZValue(zValue);
+		this.setZValue(10.0);
 
 		//customColor.setAlpha(stdAlpha);
 		

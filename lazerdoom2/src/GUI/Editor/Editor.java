@@ -1,9 +1,12 @@
 package GUI.Editor;
 
 import java.util.HashMap;
+import java.util.LinkedList;
 import java.util.List;
 
-import SceneItems.TouchPointCursor;
+import GUI.Editor.Commands.GroupCommand;
+import GUI.Item.TouchPointCursor;
+import GUI.Multitouch.TouchItemInterface;
 
 import com.trolltech.qt.core.QObject;
 import com.trolltech.qt.core.QPointF;
@@ -129,13 +132,11 @@ public class Editor extends QObject {
 		} else {
 			if((p = groupEventsMap.get(event.getTouchID())) != null) {
 				this.scene.removeItem(groupEventsMap.get(event.getTouchID()));
-				List<QGraphicsItemInterface> items = this.scene.items(p.path());
-				for(QGraphicsItemInterface item: items) {
-					item.setSelected(true);
-				}
-
-
 				this.groupEventsMap.remove(event.getTouchID());
+				
+				if(event.isSuccessful()) {
+					this.executeCommand(new GroupCommand(p.path(), this.scene));
+				}
 			}
 		}
 	}

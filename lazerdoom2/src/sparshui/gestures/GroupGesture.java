@@ -21,7 +21,9 @@ import sparshui.server.TouchPoint;
 public class GroupGesture implements Gesture {
 
 	private static HashMap<Integer, Location> startPoints = new HashMap<Integer, Location>();
-	double maxDeviance = 0.1;
+	private static HashMap<Integer, Boolean> movedOutOfStartRegion = new HashMap<Integer, Boolean>();
+	
+	double maxDeviance = 0.025;
 	@Override
 	public String getName() {
 		return "GroupGesture";
@@ -38,20 +40,44 @@ public class GroupGesture implements Gesture {
 			break;
 		case MOVE:
 			events.add(new GroupEvent(changedTouchPoint.getLocation(), true, false, changedTouchPoint.getID()));
+			this.updateStartRegion(changedTouchPoint);
 			break;
 		case DEATH:
 			Location startLocation = startPoints.get(changedTouchPoint.getID());
-			double x = changedTouchPoint.getLocation().getX();
-			double y = changedTouchPoint.getLocation().getY();
-			double distance = Math.sqrt(x-startLocation.getX())*(x-startLocation.getX())+(y-startLocation.getY())*(y-startLocation.getY());
-			events.add(new GroupEvent(changedTouchPoint.getLocation(), false,(distance <= maxDeviance) , changedTouchPoint.getID()));
+			if(startLocation == null) {
+				events.add(new GroupEvent(changedTouchPoint.getLocation(), false, false, changedTouchPoint.getID()));
+			} else {
+				double x = changedTouchPoint.getLocation().getX();
+				double y = changedTouchPoint.getLocation().getY();
+				this.updateStartRegion(changedTouchPoint);
+				double distance = Math.sqrt((double)(x-startLocation.getX())*(x-startLocation.getX())+(y-startLocation.getY())*(y-startLocation.getY()));
+				System.out.println("################## "+((distance <= maxDeviance) && (movedOutOfStartRegion.get(changedTouchPoint.getID())))+ " distance "+distance + " startloc "+startLocation+ " "+(x-startLocation.getX())*(x-startLocation.getX())+(y-startLocation.getY())*(y-startLocation.getY())+" region "+movedOutOfStartRegion.get(changedTouchPoint.getID()));
+				events.add(new GroupEvent(changedTouchPoint.getLocation(), false,((distance <= maxDeviance) && movedOutOfStartRegion.get(changedTouchPoint.getID())) , changedTouchPoint.getID()));
+				startPoints.remove(changedTouchPoint.getID());
+				movedOutOfStartRegion.remove(changedTouchPoint.getID());
+			}
 			break;
 			
 		}
-		System.out.println(events);
 		return events;
 	}
 
+	private void updateStartRegion(TouchPoint changedTouchPoint) {
+		if(!movedOutOfStartRegion.containsKey(changedTouchPoint.getID())) {
+			Location startLocation = startPoints.get(changedTouchPoint.getID());
+			if(startLocation == null) return;
+			double x = changedTouchPoint.getLocation().getX();
+			double y = changedTouchPoint.getLocation().getY();
+			double distance = Math.sqrt((double)(x-startLocation.getX())*(x-startLocation.getX())+(y-startLocation.getY())*(y-startLocation.getY()));
+			movedOutOfStartRegion.put(changedTouchPoint.getID(), distance > maxDeviance);
+		} else if(!movedOutOfStartRegion.get(changedTouchPoint.getID())) {
+			Location startLocation = startPoints.get(changedTouchPoint.getID());
+			double x = changedTouchPoint.getLocation().getX();
+			double y = changedTouchPoint.getLocation().getY();
+			double distance = Math.sqrt((double)(x-startLocation.getX())*(x-startLocation.getX())+(y-startLocation.getY())*(y-startLocation.getY()));
+			movedOutOfStartRegion.put(changedTouchPoint.getID(), distance > maxDeviance);
+		}
+	}
 	@Override
 	public GestureType getGestureType() {
 		return GestureType.GROUP_GESTURE;

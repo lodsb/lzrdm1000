@@ -38,11 +38,7 @@ public class SynthConnector extends TouchableGraphicsItem {
 	
 	public SynthConnector() {
 		this.setFlag(GraphicsItemFlag.ItemIsSelectable,true);
-		//this.setZValue(zValue);
-
-		//customColor.setAlpha(stdAlpha);
-		
-		
+		this.setZValue(10);
 	}
 
 	public QLineF baseToTopLineInScene() {

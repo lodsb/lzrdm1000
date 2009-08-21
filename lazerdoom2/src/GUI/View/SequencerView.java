@@ -404,10 +404,10 @@ public class SequencerView extends QGraphicsView implements Client, TouchItemInt
 		//gv.setSizeIncrement(500, 800);
 		//x.setWidget(new QGraphicsView());
 
-		TouchableEditor editor = new TouchableEditor();
+		/*TouchableEditor editor = new TouchableEditor();
 		this.scene().addItem(editor);
 		editor.setPos(800, 800);
-		this.registerEditor(editor);
+		this.registerEditor(editor);*/
 	}
 		
 	public void registerTouchItem(TouchItemInterface it) {

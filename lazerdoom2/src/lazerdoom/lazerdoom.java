@@ -5,6 +5,7 @@ import java.net.UnknownHostException;
 import java.util.List;
 import java.util.Vector;
 
+import GUI.Editor.Editor;
 import GUI.Item.Editor.PushButton;
 import GUI.Multitouch.TouchableGraphicsItemContainer;
 import GUI.Scene.SequencerScene;
@@ -35,7 +36,7 @@ public class lazerdoom extends QWidget {
 	private ServerConnection sparshServerConnection;
 	
 	private Scene scene = new Scene();
-	private SequencerView view = new SequencerView();
+	private SequencerView view = new SequencerView(new Editor(scene,true));
 	private QHBoxLayout layout = new QHBoxLayout();
 
     public static void main(String[] args) {

@@ -3,6 +3,7 @@ package sparshui.server;
 import sparshui.gestures.Flick;
 import sparshui.gestures.Gesture;
 import sparshui.gestures.GestureType;
+import sparshui.gestures.GroupGesture;
 import sparshui.gestures.MultiPointDragGesture;
 import sparshui.gestures.RotateGesture;
 import sparshui.gestures.SinglePointDragGesture;
@@ -57,6 +58,8 @@ public class GestureFactory {
 			return new DblClkGesture();
 		if(gestureID == GestureType.FLICK_GESTURE.ordinal())
 			return new Flick();
+		if(gestureID == GestureType.GROUP_GESTURE.ordinal()) 
+			return new GroupGesture();
 		
 		System.err.println("[GestureFactory] Gesture not recognized: " + gestureID);
 		return null;

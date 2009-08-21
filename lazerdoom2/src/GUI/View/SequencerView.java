@@ -10,6 +10,8 @@ import sparshui.common.Event;
 import sparshui.common.Location;
 import sparshui.common.TouchState;
 import sparshui.common.messages.events.DragEvent;
+import sparshui.common.messages.events.ExtendedGestureEvent;
+import sparshui.common.messages.events.GroupEvent;
 import sparshui.common.messages.events.TouchEvent;
 
 import com.trolltech.qt.QThread;
@@ -24,11 +26,14 @@ import com.trolltech.qt.gui.QBrush;
 import com.trolltech.qt.gui.QColor;
 import com.trolltech.qt.gui.QGraphicsItemInterface;
 import com.trolltech.qt.gui.QGraphicsLinearLayout;
+import com.trolltech.qt.gui.QGraphicsPathItem;
 import com.trolltech.qt.gui.QGraphicsProxyWidget;
 import com.trolltech.qt.gui.QGraphicsScene;
 import com.trolltech.qt.gui.QGraphicsView;
 import com.trolltech.qt.gui.QGraphicsWidget;
 import com.trolltech.qt.gui.QPainter;
+import com.trolltech.qt.gui.QPainterPath;
+import com.trolltech.qt.gui.QPen;
 import com.trolltech.qt.gui.QRadialGradient;
 import com.trolltech.qt.gui.QSizePolicy;
 import com.trolltech.qt.gui.QGraphicsScene.ItemIndexMethod;
@@ -39,6 +44,7 @@ import com.trolltech.qt.opengl.QGLWidget;
 import edu.uci.ics.jung.graph.util.Pair;
 
 import GUI.Multitouch.*;
+import GUI.Editor.Editor;
 import GUI.Item.*;
 import GUI.Item.Editor.TouchableEditor;
 
@@ -230,14 +236,19 @@ public class SequencerView extends QGraphicsView implements Client, TouchItemInt
 		menuItems.add(button3);
 	}
 	
-	public SequencerView() {
+	private Editor sequencerEditor;
+	
+	public SequencerView(Editor editor) {
+	
+		this.sequencerEditor = editor;
 		
 		/*
 		 * Gestures supported by the view
 		 */
 		
 		viewGestures.add(sparshui.gestures.GestureType.TOUCH_GESTURE.ordinal());
-		viewGestures.add(sparshui.gestures.GestureType.DRAG_GESTURE.ordinal());
+		//viewGestures.add(sparshui.gestures.GestureType.DRAG_GESTURE.ordinal());
+		viewGestures.add(sparshui.gestures.GestureType.GROUP_GESTURE.ordinal());
 		
 		this.setCacheMode(QGraphicsView.CacheModeFlag.CacheNone);
 		this.setViewportUpdateMode(ViewportUpdateMode.FullViewportUpdate);
@@ -552,10 +563,7 @@ public class SequencerView extends QGraphicsView implements Client, TouchItemInt
 				if(event instanceof TouchEvent) {
 					TouchEvent e = (TouchEvent) event;
 					e.setSceneLocation(convertScreenPos(e.getX(), e.getY()));
-				} else if (event instanceof DragEvent) {
-					DragEvent e = (DragEvent) event;
-					e.setSceneLocation(convertScreenPos(e.getAbsX(), e.getAbsY()));					
-				}
+				} 
 				it.processEvent(event);
 			}
 		//}
@@ -583,7 +591,7 @@ public class SequencerView extends QGraphicsView implements Client, TouchItemInt
 	@Override
 	public int getGroupID() {
 		return this.viewGroupID;
-	}
+	} 
 
 	@Override
 	public boolean processEvent(Event event) {
@@ -616,8 +624,12 @@ public class SequencerView extends QGraphicsView implements Client, TouchItemInt
 			}
 			
 		} 
-		
-		if(event instanceof DragEvent) {
+		if(event instanceof ExtendedGestureEvent) {
+			ExtendedGestureEvent e = (ExtendedGestureEvent) event;
+			e.setSceneLocation(convertScreenPos(e.getRelX(), e.getRelY()));
+			this.sequencerEditor.handleExtendedGestureEvent(e);
+		}
+		/*if(event instanceof DragEvent) {
 			DragEvent de = (DragEvent) event;
 			
 			TouchableGraphicsItem tii;
@@ -629,8 +641,7 @@ public class SequencerView extends QGraphicsView implements Client, TouchItemInt
 				System.out.println(de.isDrop());
 				System.out.println("***>");
 			}
-		}
+		}*/
 		return false;
 	}
-
 }

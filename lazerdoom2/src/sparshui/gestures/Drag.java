@@ -46,7 +46,7 @@ public class Drag extends StandardDynamicGesture {
 
 	@Override
 	protected Vector<Event> processMove(TouchData touchData) {
-		System.out.println("NIGGER");
+		
 		Vector<Event> events = new Vector<Event>();
 		float x = _newCentroid.getX() - _oldCentroid.getX();
 		float y = _newCentroid.getY() - _oldCentroid.getY();

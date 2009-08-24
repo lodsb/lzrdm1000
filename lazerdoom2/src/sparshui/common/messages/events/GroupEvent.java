@@ -13,17 +13,10 @@ public class GroupEvent extends ExtendedGestureEvent {
 	
 	private float _absx;
 	private float _absy;
-	private int id;
-	public void setTouchID(int id) {
-		this.id = id;
-	}
-	public int getTouchID() {
-		return this.id;
-	}
 			
 	public GroupEvent(Location loc, boolean isOng, boolean isSucc, int id) {
 		super(loc);
-		this.id = id;
+		this.setTouchID(id);
 		this.setFlags(isOng, isSucc);
 	}	
 	
@@ -45,7 +38,7 @@ public class GroupEvent extends ExtendedGestureEvent {
 
 	@Override
 	public String toString() {
-		String ret = "Group Event: absx = " + _absx + ", absy = " + _absy+" ongoing "+this.isOngoing()+" succ "+this.isSuccessful()+" uid "+this.id;
+		String ret = "Group Event: absx = " + _absx + ", absy = " + _absy+" ongoing "+this.isOngoing()+" succ "+this.isSuccessful()+" uid "+this.getTouchID();
 		return ret;
 	}
 	@Override

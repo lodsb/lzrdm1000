@@ -1,5 +1,6 @@
 package sparshui.server;
 
+import sparshui.gestures.DeleteGesture;
 import sparshui.gestures.Flick;
 import sparshui.gestures.Gesture;
 import sparshui.gestures.GestureType;
@@ -60,6 +61,8 @@ public class GestureFactory {
 			return new Flick();
 		if(gestureID == GestureType.GROUP_GESTURE.ordinal()) 
 			return new GroupGesture();
+		if(gestureID == GestureType.DELETE_GESTURE.ordinal()) 
+			return new DeleteGesture();
 		
 		System.err.println("[GestureFactory] Gesture not recognized: " + gestureID);
 		return null;

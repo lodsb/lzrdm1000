@@ -9,21 +9,30 @@ import sparshui.client.Client;
 import sparshui.common.Event;
 import sparshui.common.Location;
 import sparshui.common.TouchState;
+import sparshui.common.messages.events.DeleteEvent;
 import sparshui.common.messages.events.DragEvent;
 import sparshui.common.messages.events.ExtendedGestureEvent;
 import sparshui.common.messages.events.GroupEvent;
 import sparshui.common.messages.events.TouchEvent;
 
 import com.trolltech.qt.QThread;
+import com.trolltech.qt.core.QCoreApplication;
+import com.trolltech.qt.core.QEvent;
 import com.trolltech.qt.core.QObject;
 import com.trolltech.qt.core.QPoint;
 import com.trolltech.qt.core.QPointF;
 import com.trolltech.qt.core.QRectF;
 import com.trolltech.qt.core.QTimer;
+import com.trolltech.qt.core.Qt;
+import com.trolltech.qt.core.QEvent.Type;
+import com.trolltech.qt.core.Qt.KeyboardModifier;
+import com.trolltech.qt.core.Qt.MouseButton;
+import com.trolltech.qt.core.Qt.MouseButtons;
 import com.trolltech.qt.core.Qt.Orientation;
 import com.trolltech.qt.gui.QApplication;
 import com.trolltech.qt.gui.QBrush;
 import com.trolltech.qt.gui.QColor;
+import com.trolltech.qt.gui.QGraphicsEllipseItem;
 import com.trolltech.qt.gui.QGraphicsItemInterface;
 import com.trolltech.qt.gui.QGraphicsLinearLayout;
 import com.trolltech.qt.gui.QGraphicsPathItem;
@@ -31,11 +40,13 @@ import com.trolltech.qt.gui.QGraphicsProxyWidget;
 import com.trolltech.qt.gui.QGraphicsScene;
 import com.trolltech.qt.gui.QGraphicsView;
 import com.trolltech.qt.gui.QGraphicsWidget;
+import com.trolltech.qt.gui.QMouseEvent;
 import com.trolltech.qt.gui.QPainter;
 import com.trolltech.qt.gui.QPainterPath;
 import com.trolltech.qt.gui.QPen;
 import com.trolltech.qt.gui.QRadialGradient;
 import com.trolltech.qt.gui.QSizePolicy;
+import com.trolltech.qt.gui.QWidget;
 import com.trolltech.qt.gui.QGraphicsScene.ItemIndexMethod;
 import com.trolltech.qt.gui.QSizePolicy.ControlType;
 import com.trolltech.qt.gui.QSizePolicy.Policy;
@@ -60,6 +71,8 @@ import java.util.concurrent.atomic.AtomicLong;
 
 public class SequencerView extends QGraphicsView implements Client, TouchItemInterface {	
 
+	private QWidget parentWidget;
+	
 	public static QGLWidget sharedGlWidget;
 	private LinkedList<TouchableEditor> editors = new LinkedList<TouchableEditor>();
 	
@@ -174,7 +187,6 @@ public class SequencerView extends QGraphicsView implements Client, TouchItemInt
 	
 	private int viewGroupID = 1;
 	private LinkedList<Integer> viewGestures = new LinkedList<Integer>();
-	private HashMap<Integer, TouchPointCursor> touchPointCursors = new HashMap<Integer, TouchPointCursor>();
 	
 	private LinkedList<SequenceButton> menuItems = new LinkedList<SequenceButton>();
 	
@@ -240,15 +252,17 @@ public class SequencerView extends QGraphicsView implements Client, TouchItemInt
 	
 	public SequencerView(Editor editor) {
 	
+		this.parentWidget = parentWidget;
 		this.sequencerEditor = editor;
 		
 		/*
 		 * Gestures supported by the view
 		 */
 		
-		viewGestures.add(sparshui.gestures.GestureType.TOUCH_GESTURE.ordinal());
+		//viewGestures.add(sparshui.gestures.GestureType.TOUCH_GESTURE.ordinal());
 		//viewGestures.add(sparshui.gestures.GestureType.DRAG_GESTURE.ordinal());
 		viewGestures.add(sparshui.gestures.GestureType.GROUP_GESTURE.ordinal());
+		viewGestures.add(sparshui.gestures.GestureType.DELETE_GESTURE.ordinal());
 		
 		this.setCacheMode(QGraphicsView.CacheModeFlag.CacheNone);
 		this.setViewportUpdateMode(ViewportUpdateMode.FullViewportUpdate);
@@ -594,40 +608,70 @@ public class SequencerView extends QGraphicsView implements Client, TouchItemInt
 	} 
 
 	@Override
+	public void mousePressEvent(QMouseEvent event) {
+	     System.out.println("??????????CLICK CLICK CLICK CLICK" + event.x() +  " " +event.y());
+	     super.mousePressEvent(event);
+	}
+//	
+//	@Override
+//	public void mouseMoveEvent(QMouseEvent event) {
+//		System.out.println("move move move"+ event.x() +  " " +event.y());
+//		this.scene().addEllipse(event.x(), event.y(), 30,30);
+//		//System.out.println(viewport().visibleRegion());
+//		super.mouseMoveEvent(event);
+//	}
+//	
+//	@Override
+//	public void mouseReleaseEvent(QMouseEvent event) {
+//		super.mouseReleaseEvent(event);
+//	}
+
+	
+	private void sendMouseEventFromTouchEvent(TouchEvent touchEvent) {
+		QPoint mousePoint =  this.mapFromScene(convertScreenPos(touchEvent.getX(), touchEvent.getY()));
+		QEvent event;
+		
+		if(touchEvent.getState() == TouchState.BIRTH) {
+			event = new QMouseEvent(Type.MouseButtonPress, new QPoint((int)mousePoint.x(), (int)mousePoint.y()), MouseButton.LeftButton, new Qt.MouseButtons() , KeyboardModifier.NoModifier);
+		} else if(touchEvent.getState() == TouchState.MOVE) {
+			event = new QMouseEvent(Type.MouseMove, new QPoint((int)mousePoint.x(), (int)mousePoint.y()), MouseButton.LeftButton, new Qt.MouseButtons() , KeyboardModifier.NoModifier);
+		} else {
+			event = new QMouseEvent(Type.MouseButtonRelease, new QPoint((int)mousePoint.x(), (int)mousePoint.y()), MouseButton.LeftButton, new Qt.MouseButtons() , KeyboardModifier.NoModifier);
+		}
+		
+		QApplication.sendEvent(this.parentWidget, event);
+	}
+	
+	QGraphicsEllipseItem ellipse = null;
+	@Override
 	public boolean processEvent(Event event) {
 		if(event instanceof TouchEvent) {
-			TouchPointCursor tc = null;
 			TouchEvent e = (TouchEvent) event;
-			
-			if(e.getState() == TouchState.BIRTH) {					
-				tc = new TouchPointCursor();
-				this.scene().addItem(tc);	
-				
-					
-				touchPointCursors.put(e.getTouchID(), tc);
-				tc.setPos(convertScreenPos(e.getX(), e.getY()));
-				tc.setZValue(-100.0);
-				
-				tc.setVisible(true);
-				
-				tc.setHTMLText("<b>ID: </b>"+e.getTouchID()+"<br><b>Pos x/y: <b>"+convertScreenPos(e.getX(), e.getY()).x()+"/"+convertScreenPos(e.getX(), e.getY()).y());
-				
-			} else if(e.getState() == TouchState.MOVE) {
-				tc = touchPointCursors.get(e.getTouchID());
-				tc.setPos(convertScreenPos(e.getX(), e.getY()));
-				tc.setHTMLText("<b>ID: </b>"+e.getTouchID()+"<br><b>Pos x/y: <b>"+convertScreenPos(e.getX(), e.getY()).x()+"/"+convertScreenPos(e.getX(), e.getY()).y());
-			} else if(e.getState() == TouchState.DEATH) {
-				tc = touchPointCursors.get(e.getTouchID());
-				touchPointCursors.remove(tc);
-				this.scene().removeItem(tc);
-				tc.setVisible(false);
-			}
-			
+			e.setSceneLocation(convertScreenPos(e.getX(), e.getY()));
+			this.sequencerEditor.handleTouchEvent(e);
 		} 
 		if(event instanceof ExtendedGestureEvent) {
 			ExtendedGestureEvent e = (ExtendedGestureEvent) event;
 			e.setSceneLocation(convertScreenPos(e.getRelX(), e.getRelY()));
 			this.sequencerEditor.handleExtendedGestureEvent(e);
+			
+			if(event instanceof DeleteEvent) {
+				if(ellipse == null) {
+					ellipse = new QGraphicsEllipseItem(-30,-30,60,60);
+					ellipse.setPen(new QPen(QColor.white));
+					ellipse.setPos(500,500);
+					this.scene().addItem(ellipse);
+					ellipse = new QGraphicsEllipseItem(-15,-15,30,30);
+					ellipse.setPen(new QPen(QColor.red));
+					this.scene().addItem(ellipse);
+				}
+				if(((DeleteEvent) e).getCrossPoint() != null) {
+					QPointF point = convertScreenPos(((DeleteEvent) e).getCrossPoint().x(),((DeleteEvent) e).getCrossPoint().y());
+					ellipse.setPos(point);
+					System.out.println("WHATxdddd "+point);
+				}
+			}
+
 		}
 		/*if(event instanceof DragEvent) {
 			DragEvent de = (DragEvent) event;

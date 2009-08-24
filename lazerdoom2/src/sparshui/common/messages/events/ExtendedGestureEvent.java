@@ -15,6 +15,14 @@ public abstract class ExtendedGestureEvent implements Event {
 		this.loc = loc;
 	}
 	
+	private int id;
+	protected void setTouchID(int id) {
+		this.id = id;
+	}
+	public int getTouchID() {
+		return this.id;
+	}
+	
 	public double getRelX() {
 		return this.loc.getX();
 	}

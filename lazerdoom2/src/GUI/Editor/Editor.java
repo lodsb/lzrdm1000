@@ -65,36 +65,38 @@ public class Editor extends QObject {
 		}
 	}
 	
-	public void handleTouchEvent(TouchEvent touchEvent) {
-	/*	if(this.showTouchEvents) {
+	private HashMap<Integer, TouchPointCursor> touchPointCursors = new HashMap<Integer, TouchPointCursor>();
+	
+	public void handleTouchEvent(TouchEvent event) {
+		if(this.showTouchEvents) {
 				TouchPointCursor tc = null;
 				TouchEvent e = (TouchEvent) event;
 				
 				if(e.getState() == TouchState.BIRTH) {					
 					tc = new TouchPointCursor();
-					this.scene().addItem(tc);	
+					this.scene.addItem(tc);	
 					
 						
 					touchPointCursors.put(e.getTouchID(), tc);
-					tc.setPos(convertScreenPos(e.getX(), e.getY()));
+					tc.setPos(event.getSceneLocation());
 					tc.setZValue(-100.0);
 					
 					tc.setVisible(true);
 					
-					tc.setHTMLText("<b>ID: </b>"+e.getTouchID()+"<br><b>Pos x/y: <b>"+convertScreenPos(e.getX(), e.getY()).x()+"/"+convertScreenPos(e.getX(), e.getY()).y());
+					tc.setHTMLText("<b>ID: </b>"+e.getTouchID()+"<br><b>Pos x/y: <b>"+event.getSceneLocation().x()+"/"+event.getSceneLocation().y());
 					
 				} else if(e.getState() == TouchState.MOVE) {
 					tc = touchPointCursors.get(e.getTouchID());
-					tc.setPos(convertScreenPos(e.getX(), e.getY()));
-					tc.setHTMLText("<b>ID: </b>"+e.getTouchID()+"<br><b>Pos x/y: <b>"+convertScreenPos(e.getX(), e.getY()).x()+"/"+convertScreenPos(e.getX(), e.getY()).y());
+					tc.setPos(event.getSceneLocation());
+					tc.setHTMLText("<b>ID: </b>"+e.getTouchID()+"<br><b>Pos x/y: <b>"+event.getSceneLocation().x()+"/"+event.getSceneLocation().y());
 				} else if(e.getState() == TouchState.DEATH) {
 					tc = touchPointCursors.get(e.getTouchID());
 					touchPointCursors.remove(tc);
-					this.scene().removeItem(tc);
+					this.scene.removeItem(tc);
 					tc.setVisible(false);
 				}
 				
-		}*/
+		}
 	}
 	
 	public void handleExtendedGestureEvent(ExtendedGestureEvent event) {

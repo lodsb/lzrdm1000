@@ -51,7 +51,7 @@ public class lazerdoom extends QWidget {
     public void stopCommunication() {
     	sparshGestureServerThread.interrupt();
     }
-    
+
     
     public lazerdoom(QWidget parent){
         super(parent);

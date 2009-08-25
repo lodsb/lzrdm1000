@@ -18,12 +18,20 @@ public class SequenceController extends QObject {
 	private SequenceGraph graph;
 	private ParallelSequenceContainer rootSequence;
 	
+	private static SequenceController instance = null;
+	
+	public static SequenceController getInstance() {
+		return instance;
+	}
+	
 	public SequenceController(Sequencer sequencer, SequenceGraph graph) {
 		this.sequencer = sequencer;
 		this.graph = graph;
 		this.rootSequence = new ParallelSequenceContainer(sequencer);
 		
 		this.sequencer.setRootSequence(this.rootSequence);
+		
+		instance = this;
 	}
 	
 	public boolean removeBaseSequence(BaseSequence sequence) {

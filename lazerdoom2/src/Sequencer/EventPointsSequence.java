@@ -48,6 +48,10 @@ public class EventPointsSequence<EventType extends BaseType> extends BaseSequenc
 	
 	boolean isRunning = false;
 	
+	public Iterator<Entry<Long, EventType>> getIterator() {
+		return this.events.entrySet().iterator();
+	}
+	
 	private EventPointsSequence(SequencerInterface seq, Map<Long, EventType> events, CopyOnWriteArrayList<ControlBusInterface<EventType>> controlBuses, long startOffset, long sequenceLength) {
 		super(seq);
 		this.events = events;

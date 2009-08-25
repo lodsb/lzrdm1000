@@ -8,7 +8,6 @@ import java.util.Vector;
 import GUI.Editor.Editor;
 import GUI.Item.Editor.PushButton;
 import GUI.Multitouch.TouchableGraphicsItemContainer;
-import GUI.Scene.SequencerScene;
 import GUI.Scene.Editor.SynthesizerScene;
 import GUI.View.SequencerView;
 import GUI.View.SynthesizerView;

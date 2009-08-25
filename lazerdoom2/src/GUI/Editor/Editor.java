@@ -41,6 +41,7 @@ public class Editor extends QObject {
 	
 	public Editor(QGraphicsScene scene) {
 		this.scene = scene;
+		this.setShowTouchEvents(false);
 	}
 	
 	public Editor(QGraphicsScene scene, boolean showTouchPoints) {
@@ -49,8 +50,8 @@ public class Editor extends QObject {
 	}
 
 	
-	public void setScene(QGraphicsScene scene) {
-		this.scene = scene;
+	public QGraphicsScene getScene() {
+		return this.scene;
 	}
 	
 	public void undo() {
@@ -103,17 +104,26 @@ public class Editor extends QObject {
 		if(event instanceof GroupEvent) {
 			GroupEvent e = (GroupEvent) event;
 			this.handleGroupEvent(e);
+		} else if(event instanceof DeleteEvent) {
+			DeleteEvent e = (DeleteEvent) event;
+			this.handleDeleteEvent(e);
 		}
 	}
 	
-	private HashMap<Integer, QGraphicsPathItem> groupEventsMap = new HashMap<Integer, QGraphicsPathItem>();
+	protected void handleDeleteEvent(DeleteEvent event) {
+		
+	}
 	
-	protected void handleGroupEvent(GroupEvent event) {
+	private HashMap<Integer, QGraphicsPathItem> gestureVisualizationsMap = new HashMap<Integer, QGraphicsPathItem>();
+	
+	protected QPainterPath updateGestureVisualization(ExtendedGestureEvent event) {
+		QPainterPath ppath = null;
 		QGraphicsPathItem p;
+		
 		if(event.isOngoing()) {
 			QPointF point = event.getSceneLocation();
 
-			if((p = groupEventsMap.get(event.getTouchID())) == null) {
+			if((p = gestureVisualizationsMap.get(event.getTouchID())) == null) {
 				p = new QGraphicsPathItem();
 				this.scene.addItem(p);
 				//p.setPos(point);
@@ -125,19 +135,35 @@ public class Editor extends QObject {
 				path.addEllipse(point, 50,50);
 				path.moveTo(point);
 				p.setPath(path);
-				groupEventsMap.put(event.getTouchID(), p);
+				gestureVisualizationsMap.put(event.getTouchID(), p);
 			} 
 
 			QPainterPath path = new QPainterPath(p.path());
 			path.lineTo(point);
 			p.setPath(path);
 		} else {
-			if((p = groupEventsMap.get(event.getTouchID())) != null) {
-				this.scene.removeItem(groupEventsMap.get(event.getTouchID()));
-				this.groupEventsMap.remove(event.getTouchID());
-				
+			if((p = gestureVisualizationsMap.get(event.getTouchID())) != null) {
+				this.scene.removeItem(gestureVisualizationsMap.get(event.getTouchID()));
+				this.gestureVisualizationsMap.remove(event.getTouchID());
+			}
+		}
+		
+		if(p != null) {
+			ppath =  p.path();
+		}
+		
+		return ppath;
+	}
+	
+	protected void handleGroupEvent(GroupEvent event) {
+		if(event.isOngoing()) {
+			this.updateGestureVisualization(event);
+		} else {
+			QPainterPath path = updateGestureVisualization(event);
+			
+			if(path != null) {
 				if(event.isSuccessful()) {
-					this.executeCommand(new GroupCommand(p.path(), this.scene));
+					this.executeCommand(new GroupCommand(path, this.scene));
 				}
 			}
 		}

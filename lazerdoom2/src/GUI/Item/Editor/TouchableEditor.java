@@ -26,6 +26,7 @@ import com.trolltech.qt.svg.QSvgRenderer;
 import edu.uci.ics.jung.graph.util.Pair;
 
 import GUI.Multitouch.TouchableGraphicsItem;
+import GUI.Scene.Editor.EditorScene;
 import SceneItems.*;
 
 public class TouchableEditor extends TouchableGraphicsWidget {
@@ -215,6 +216,10 @@ public class TouchableEditor extends TouchableGraphicsWidget {
 	private TouchableGraphicsViewContainer graphicsViewContainer;
 	private QGraphicsLinearLayout baseLayout;
 	
+	public void setScene(EditorScene scene) {
+		this.graphicsView.setScene(scene);
+	}
+	
 	public TouchableEditor() {
 		baseLayout = new QGraphicsLinearLayout();
 		baseLayout.setOrientation(Orientation.Vertical);
@@ -237,6 +242,7 @@ public class TouchableEditor extends TouchableGraphicsWidget {
 		
 		this.setFlag(GraphicsItemFlag.ItemIsMovable, true);
 		this.setFlag(GraphicsItemFlag.ItemIsSelectable, true);
+		
 
 	}
 	

@@ -32,6 +32,7 @@ import com.trolltech.qt.core.Qt.Orientation;
 import com.trolltech.qt.gui.QApplication;
 import com.trolltech.qt.gui.QBrush;
 import com.trolltech.qt.gui.QColor;
+import com.trolltech.qt.gui.QFrame;
 import com.trolltech.qt.gui.QGraphicsEllipseItem;
 import com.trolltech.qt.gui.QGraphicsItemInterface;
 import com.trolltech.qt.gui.QGraphicsLinearLayout;
@@ -54,14 +55,20 @@ import com.trolltech.qt.opengl.QGLWidget;
 
 import edu.uci.ics.jung.graph.util.Pair;
 
+import Control.Types.DoubleType;
 import GUI.Multitouch.*;
 import GUI.Editor.Editor;
+import GUI.Editor.SequenceDataEditor.SequenceDataEditor;
 import GUI.Item.*;
 import GUI.Item.Editor.TouchableEditor;
 
 import java.util.Map.Entry;
 import SceneItems.TouchPointCursor;
+import Sequencer.EventPointsSequence;
+import Sequencer.SequencerInterface;
+import Sequencer.TestingSequencer;
 import GUI.Multitouch.*;
+import GUI.Scene.Editor.SequenceDataEditorScene;
 
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.ConcurrentLinkedQueue;
@@ -294,7 +301,7 @@ public class SequencerView extends QGraphicsView implements Client, TouchItemInt
 		
 		//this.scene().setItemIndexMethod(ItemIndexMethod.NoIndex);
 		
-		
+		/*
 		
 		SequenceItem si1 = new SequenceItem(true);
 		si1.setPos(500,500);
@@ -348,7 +355,7 @@ public class SequencerView extends QGraphicsView implements Client, TouchItemInt
 		this.scene().addItem(new SequenceConnection( si2.getSequenceOutConnector(), si4.getSequenceInConnector()));
 		this.scene().addItem(new SynthConnection(synth.getSynthInConnectors().get(1), si4.getSynthOutConnectors().get(0)));
 		this.scene().addItem(new SynthConnection(synth.getSynthInConnectors().get(0), si2.getSynthOutConnectors().get(0)));
-		this.scene().addItem(new SynthConnection(synth.getSynthInConnectors().get(2), si3.getSynthOutConnectors().get(0)));
+		this.scene().addItem(new SynthConnection(synth.getSynthInConnectors().get(2), si3.getSynthOutConnectors().get(0)));*/
 		//this.scene().addItem(new SynthConnection(synth.getSynthInConnectors().get(3), si6.getSynthOutConnectors().get(0)));
 		//this.scene().addItem(new MulticontrolItem());
 	
@@ -418,10 +425,26 @@ public class SequencerView extends QGraphicsView implements Client, TouchItemInt
 		//gv.setSizeIncrement(500, 800);
 		//x.setWidget(new QGraphicsView());
 
-		/*TouchableEditor editor = new TouchableEditor();
+		EventPointsSequence<DoubleType> s = new EventPointsSequence<DoubleType>(new TestingSequencer());
+		s.insert(new DoubleType(0.5), 100);
+		s.insert(new DoubleType(-0.5), 200);
+		s.insert(new DoubleType(1.0), 300);
+		s.insert(new DoubleType(-1.0), 400);
+		s.insert(new DoubleType(0.3), 500);
+		s.insert(new DoubleType(0.2), 600);
+		s.insert(new DoubleType(-0.1), 700);
+		s.insert(new DoubleType(0.3), 800);
+		
+		SequenceDataEditorScene<DoubleType> sc = new SequenceDataEditorScene<DoubleType>();
+		SequenceDataEditor<DoubleType> e = new SequenceDataEditor<DoubleType>(sc, s);
+		TouchableEditor editor = new TouchableEditor();
+		editor.setScene(sc);
+		QFrame frame = new QFrame();
+		QGraphicsView fview = new QGraphicsView(frame);
+		fview.setScene(sc);
 		this.scene().addItem(editor);
 		editor.setPos(800, 800);
-		this.registerEditor(editor);*/
+		this.registerEditor(editor);
 	}
 		
 	public void registerTouchItem(TouchItemInterface it) {

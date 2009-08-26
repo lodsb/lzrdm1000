@@ -6,5 +6,5 @@ import GUI.Item.Editor.TouchableEditorItem;
 import com.trolltech.qt.core.QRectF;
 import com.trolltech.qt.gui.QGraphicsScene;
 
-public abstract class EditorScene extends QGraphicsScene {
+public class EditorScene extends QGraphicsScene {
 }

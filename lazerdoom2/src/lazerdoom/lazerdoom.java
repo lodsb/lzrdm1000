@@ -5,12 +5,19 @@ import java.net.UnknownHostException;
 import java.util.List;
 import java.util.Vector;
 
+import Control.Types.DoubleType;
 import GUI.Editor.Editor;
+import GUI.Editor.SequenceDataEditor.SequenceDataEditor;
 import GUI.Item.Editor.PushButton;
+import GUI.Item.Editor.TouchableEditor;
 import GUI.Multitouch.TouchableGraphicsItemContainer;
+import GUI.Scene.Editor.EditorScene;
+import GUI.Scene.Editor.SequenceDataEditorScene;
 import GUI.Scene.Editor.SynthesizerScene;
 import GUI.View.SequencerView;
 import GUI.View.SynthesizerView;
+import Sequencer.EventPointsSequence;
+import Sequencer.TestingSequencer;
 
 import com.trolltech.qt.QThread;
 import com.trolltech.qt.core.Qt;
@@ -34,7 +41,7 @@ public class lazerdoom extends QWidget {
 	private Thread sparshGestureServerThread;
 	private ServerConnection sparshServerConnection;
 	
-	private Scene scene = new Scene();
+	private EditorScene scene = new EditorScene();
 	private SequencerView view = new SequencerView(new Editor(scene,true));
 	private QHBoxLayout layout = new QHBoxLayout();
 
@@ -79,7 +86,8 @@ public class lazerdoom extends QWidget {
         TUIOTouchHandler handler = new TUIOTouchHandler(view);
         
 		this.setLayout(layout);
-		layout.addWidget(view);
+		layout.addWidget(view);	
+		
 		
 		/*SynthesizerScene synthSc = new SynthesizerScene();
 		QGraphicsView v = new QGraphicsView(this);

@@ -44,7 +44,7 @@ public class TouchableGraphicsView extends QGraphicsView implements TouchItemInt
 	
 	public TouchableGraphicsView(TouchableEditor editor) {
 		allowedGestures.add(sparshui.gestures.GestureType.TOUCH_GESTURE.ordinal());
-		this.setScene(new QGraphicsScene());
+		//this.setScene(new QGraphicsScene());
 		this.setupViewport(new QGLWidget((QWidget)null, (QGLWidget)SequencerView.sharedGlWidget));
 		//this.setCacheMode(CacheModeFlag.CacheBackground);
 		this.setRenderHint(RenderHint.HighQualityAntialiasing);

@@ -7,6 +7,7 @@ import java.util.List;
 import GUI.Editor.Commands.GroupCommand;
 import GUI.Item.TouchPointCursor;
 import GUI.Multitouch.TouchItemInterface;
+import GUI.Scene.Editor.EditorScene;
 
 import com.trolltech.qt.core.QObject;
 import com.trolltech.qt.core.QPointF;
@@ -23,7 +24,7 @@ import sparshui.common.messages.events.*;
 
 public class Editor extends QObject {
 	private QUndoStack undoStack = new QUndoStack();
-	private QGraphicsScene scene;
+	private EditorScene scene;
 	
 	public Signal0 executedCommand = new Signal0();
 	public Signal0 undoneCommand = new Signal0();
@@ -39,18 +40,18 @@ public class Editor extends QObject {
 		return this.showTouchEvents;
 	} 
 	
-	public Editor(QGraphicsScene scene) {
+	public Editor(EditorScene scene) {
 		this.scene = scene;
 		this.setShowTouchEvents(false);
 	}
 	
-	public Editor(QGraphicsScene scene, boolean showTouchPoints) {
+	public Editor(EditorScene scene, boolean showTouchPoints) {
 		this.scene = scene;
 		this.setShowTouchEvents(showTouchPoints);
 	}
 
 	
-	public QGraphicsScene getScene() {
+	public EditorScene getScene() {
 		return this.scene;
 	}
 	

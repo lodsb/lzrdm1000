@@ -8,10 +8,12 @@ import sparshui.common.messages.events.DragEvent;
 
 import com.trolltech.qt.core.QPointF;
 
+import edu.uci.ics.jung.graph.util.Pair;
+
 import Control.Types.BaseType;
 import GUI.Editor.Editor;
 import GUI.Editor.Commands.SequenceDataItemMove;
-import GUI.Item.Editor.TouchableSequenceDataItem;
+import GUI.Item.Editor.SequenceDataEditor.*;
 import GUI.Scene.Editor.SequenceDataEditorScene;
 import Sequencer.EventPointsSequence;
 import Sequencer.SequenceEvalListenerInterface;
@@ -34,30 +36,31 @@ public class SequenceDataEditor<EventType extends BaseType> extends Editor imple
 	
 	private void loadFromSequence(EventPointsSequence<EventType> epseq) {
 		Iterator<Entry<Long, EventType>> iterator =  epseq.getIterator();
-		
+		System.out.println("what???");
 		while(iterator.hasNext()) {
+			System.out.println("it ");
 			Entry<Long, EventType> entry = iterator.next();
 			scene.addNewEditorItem(entry.getKey(), entry.getValue());
 		}
 	}
 
-	HashMap<Integer, QPointF> dragStartPositionMap = new HashMap<Integer, QPointF>();
+	HashMap<Integer, Pair<Object>> dragStartPositionMap = new HashMap<Integer, Pair<Object>>();
 	
 	@Override 
 	protected void handleDragEvent(DragEvent event) {
 		if(event.getSource() != null && event.getSource() instanceof TouchableSequenceDataItem) {
-			TouchableSequenceDataItem item = (TouchableSequenceDataItem) event.getSource();
+			TouchableSequenceDataItem<EventType> item = (TouchableSequenceDataItem<EventType>) event.getSource();
 			if(!event.isDrop()) {
 				if(!dragStartPositionMap.containsKey(event.getTouchID())) {
-					dragStartPositionMap.put(event.getTouchID(), event.getSceneLocation());
+					dragStartPositionMap.put(event.getTouchID(), item.getValue());
 				} 
 			} else {
-				QPointF startPos;
+				Pair<Object> pair;
 
-				if((startPos = dragStartPositionMap.get(event.getTouchID())) != null) {
+				if((pair = dragStartPositionMap.get(event.getTouchID())) != null) {
 					dragStartPositionMap.remove(event.getTouchID());
 
-					this.executeCommand(new SequenceDataItemMove(item , startPos));
+					this.executeCommand(new SequenceDataItemMove<EventType>(item , pair, item.getValue(), this.sequence));
 				}
 			}
 

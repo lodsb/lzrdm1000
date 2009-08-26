@@ -1,9 +1,12 @@
-package GUI.Item.Editor;
+package GUI.Item.Editor.SequenceDataEditor;
+
+import java.util.Map.Entry;
 
 import com.trolltech.qt.core.QPointF;
 
 import edu.uci.ics.jung.graph.util.Pair;
 import Control.Types.BaseType;
+import GUI.Item.Editor.TouchableEditorItem;
 
 public abstract class TouchableSequenceDataItem<T extends BaseType> extends TouchableEditorItem {
 	

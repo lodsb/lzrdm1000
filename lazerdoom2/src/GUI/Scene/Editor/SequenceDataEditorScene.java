@@ -1,8 +1,9 @@
 package GUI.Scene.Editor;
 
 import Control.Types.BaseType;
+import Control.Types.DoubleType;
 import GUI.Item.Editor.TouchableEditorItem;
-import GUI.Item.Editor.TouchableSequenceDataItem;
+import GUI.Item.Editor.SequenceDataEditor.*;
 
 import com.trolltech.qt.QVariant;
 import com.trolltech.qt.core.QPointF;
@@ -16,8 +17,8 @@ import com.trolltech.qt.gui.QGraphicsItem.GraphicsItemChange;
 
 public class SequenceDataEditorScene<T extends BaseType> extends EditorScene {
 
-	private static final double valueMultiplyer = 1000;
-	private static final double tickMultiplyer = 1.0;
+	public static final double valueMultiplyer = 1000;
+	public static final double tickMultiplyer = 1.0;
 	
 	QGraphicsLineItem cursor = new QGraphicsLineItem() {
 		@Override
@@ -43,13 +44,16 @@ public class SequenceDataEditorScene<T extends BaseType> extends EditorScene {
 	}
 	
 	protected TouchableSequenceDataItem<T> createNewItem(long tick, T value) {
-		return null;
+		TouchableDoubleTypeSequenceDataItem item = new TouchableDoubleTypeSequenceDataItem();
+		item.setValue(tick, (DoubleType) value);
+		
+		return (TouchableSequenceDataItem<T>) item;
 	}
 
 	public TouchableSequenceDataItem<T> addNewEditorItem(long tick, T value) {
 		TouchableSequenceDataItem<T> item = createNewItem(tick, value);
-		
-		
+		System.out.println("§ "+item);
+		this.addItem(item);
 		return item;
 	}
 	

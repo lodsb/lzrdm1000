@@ -203,7 +203,7 @@ public class SequencerView extends QGraphicsView implements Client, TouchItemInt
 		QGraphicsScene scene = this.scene();
 		
 		//basic size
-		QRectF sceneRect = scene.sceneRect();
+		QRectF sceneRect = new QRectF(0,0,2000,2000);//scene.sceneRect();
 		
 		SequenceButton button1 = new SequenceButton("addSequence");
 		SequenceButton button2 = new SequenceButton("addSynth");
@@ -259,7 +259,6 @@ public class SequencerView extends QGraphicsView implements Client, TouchItemInt
 	
 	public SequencerView(Editor editor) {
 	
-		this.parentWidget = parentWidget;
 		this.sequencerEditor = editor;
 		
 		/*
@@ -301,7 +300,7 @@ public class SequencerView extends QGraphicsView implements Client, TouchItemInt
 		
 		//this.scene().setItemIndexMethod(ItemIndexMethod.NoIndex);
 		
-		/*
+		
 		
 		SequenceItem si1 = new SequenceItem(true);
 		si1.setPos(500,500);
@@ -355,7 +354,7 @@ public class SequencerView extends QGraphicsView implements Client, TouchItemInt
 		this.scene().addItem(new SequenceConnection( si2.getSequenceOutConnector(), si4.getSequenceInConnector()));
 		this.scene().addItem(new SynthConnection(synth.getSynthInConnectors().get(1), si4.getSynthOutConnectors().get(0)));
 		this.scene().addItem(new SynthConnection(synth.getSynthInConnectors().get(0), si2.getSynthOutConnectors().get(0)));
-		this.scene().addItem(new SynthConnection(synth.getSynthInConnectors().get(2), si3.getSynthOutConnectors().get(0)));*/
+		this.scene().addItem(new SynthConnection(synth.getSynthInConnectors().get(2), si3.getSynthOutConnectors().get(0)));
 		//this.scene().addItem(new SynthConnection(synth.getSynthInConnectors().get(3), si6.getSynthOutConnectors().get(0)));
 		//this.scene().addItem(new MulticontrolItem());
 	

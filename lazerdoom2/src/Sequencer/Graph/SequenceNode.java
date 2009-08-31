@@ -13,4 +13,8 @@ public class SequenceNode {
 	public SequenceInterface getSequence() {
 		return this.si;
 	}
+	
+	public String toString() {
+		return this.si.toString();
+	}
 }

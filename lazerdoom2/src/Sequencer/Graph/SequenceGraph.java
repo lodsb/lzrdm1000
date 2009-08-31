@@ -1,23 +1,125 @@
 package Sequencer.Graph;
 
+import java.awt.Dimension;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.LinkedList;
 
 import javax.sound.midi.Sequencer;
+import javax.swing.JFrame;
 
+import Control.Types.DoubleType;
+import Sequencer.EventPointsSequence;
 import Sequencer.ParallelSequenceContainer;
 import Sequencer.SequenceContainerInterface;
 import Sequencer.SequenceInterface;
+import Sequencer.SequencePlayer;
 import Sequencer.SequencePlayerInterface;
 import Sequencer.SequencerInterface;
 import Sequencer.SequentialSequenceContainer;
+import Sequencer.TestingSequencer;
 
 import edu.uci.ics.jung.graph.DirectedSparseGraph;
 import edu.uci.ics.jung.graph.util.Pair;
+import edu.uci.ics.jung.visualization.BasicVisualizationServer;
+import edu.uci.ics.jung.visualization.decorators.ToStringLabeller;
+import edu.uci.ics.jung.algorithms.layout.ISOMLayout;
+import edu.uci.ics.jung.algorithms.layout.Layout;
 import edu.uci.ics.jung.algorithms.shortestpath.*;
 
 public class SequenceGraph {
+	private static int testID = 0;
+	
+	private static EventPointsSequence<DoubleType> makeEPS(SequencerInterface ts) {
+		EventPointsSequence<DoubleType> e1 = new EventPointsSequence<DoubleType>(ts);
+		e1.insert(new DoubleType(testID), 0);
+		testID++;
+		
+		return e1;
+	}
+	
+	public static void main(String[] argv) {
+		SequenceGraph sg = new SequenceGraph();
+		
+		
+		
+		TestingSequencer ts = new TestingSequencer();
+		
+		ParallelSequenceContainer psc = new ParallelSequenceContainer(ts);
+		
+		EventPointsSequence<DoubleType> e1 = makeEPS(ts);
+		EventPointsSequence<DoubleType> e2 = makeEPS(ts);
+		EventPointsSequence<DoubleType> e3 = makeEPS(ts);
+		EventPointsSequence<DoubleType> e4 = makeEPS(ts);
+		
+		EventPointsSequence<DoubleType> e5 = makeEPS(ts);
+		EventPointsSequence<DoubleType> e6 = makeEPS(ts);
+		EventPointsSequence<DoubleType> e7 = makeEPS(ts);
+		EventPointsSequence<DoubleType> e8 = makeEPS(ts);
+		EventPointsSequence<DoubleType> e9 = e7;
+		
+		SequencePlayer sp = new SequencePlayer(ts);
+		
+		sg.updateStructure(psc, ts);
+		sg.connect(e1, e2);
+		sg.updateStructure(psc, ts);
+		sg.connect(e2, e3);
+		sg.updateStructure(psc, ts);
+		sg.connect(sp, e4);
+		sg.connect(e4, e1);
+		//sg.connect(sp, e4);
+		sg.connect(e4, e5);
+		sg.connect(e5, e6);
+		sg.connect(e5, e7);
+		sg.connect(e7, e8);
+		sg.remove(e5);
+		//sg.disconnect(sp, e1);
+		
+		/*e1 = makeEPS(ts);
+		e2 = makeEPS(ts);
+		e3 = makeEPS(ts);
+		e4 = makeEPS(ts);
+
+		e5 = makeEPS(ts);
+		e6 = makeEPS(ts);
+		e7 = makeEPS(ts);
+		e8 = makeEPS(ts);
+
+		sg.updateStructure(psc, ts);
+		
+		sp = new SequencePlayer(ts);
+		
+		sg.connect(sp, e1);
+		sg.updateStructure(psc, ts);
+		sg.connect(e1, e2);
+		sg.updateStructure(psc, ts);
+		sg.connect(e2, e3);
+		sg.updateStructure(psc, ts);
+		sg.connect(e3, e4);		
+		sg.connect(sp, e5);
+		sg.connect(e5, e6);
+		sg.connect(e5, e7);
+		sg.connect(e7, e8);*/
+		
+		Layout<SequenceNode, Integer> layout = new ISOMLayout(sg.graph);
+		layout.setSize(new Dimension(800,800)); // sets the initial size of the space
+		BasicVisualizationServer<SequenceNode, Integer> vv =
+			new BasicVisualizationServer<SequenceNode, Integer>(layout);
+		vv.setPreferredSize(new Dimension(350,350)); //Sets the viewing area size
+		vv.getRenderContext().setVertexLabelTransformer(new ToStringLabeller());
+
+		JFrame frame = new JFrame("Simple Graph View");
+		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+		frame.getContentPane().add(vv);
+		frame.pack();
+		frame.setVisible(true);
+		
+		sg.updateStructure(psc, ts);
+		
+		System.out.println(sg.currentStructure);
+		System.out.println(psc);
+		System.exit(0);
+	}
 
 	private DirectedSparseGraph<SequenceNode, Integer> graph = new DirectedSparseGraph<SequenceNode, Integer>();
 	private UnweightedShortestPath<SequenceNode, Integer> shortestPathAlg = new UnweightedShortestPath<SequenceNode, Integer>(graph);
@@ -55,6 +157,7 @@ public class SequenceGraph {
 		
 		if((rm = sequenceNodes.get(si)) != null) {
 			connections = new LinkedList<Pair<SequenceInterface>>();
+			LinkedList<Integer> edges = new LinkedList<Integer>();
 			
 			for(Integer edge :graph.getInEdges(rm)) {
 				SequenceNode sourceNode = graph.getSource(edge);
@@ -62,13 +165,20 @@ public class SequenceGraph {
 					((SequencePlayerInterface)sourceNode.getSequence()).setSequence(null);
 				}
 				connections.add(new Pair<SequenceInterface>(sourceNode.getSequence(), rm.getSequence()));
-				graph.removeEdge(edge);
+				//graph.removeEdge(edge);
+				edges.add(edge);
 			}
 			
 			for(Integer edge :graph.getOutEdges(rm)) {
 				connections.add(new Pair<SequenceInterface>(rm.getSequence(), graph.getSource(edge).getSequence()));
+				//graph.removeEdge(edge);
+				edges.add(edge);
+			}
+			
+			for(Integer edge: edges) {
 				graph.removeEdge(edge);
 			}
+			
 			
 			graph.removeVertex(rm);
 		}
@@ -82,10 +192,12 @@ public class SequenceGraph {
 		
 		if((src = sequenceNodes.get(source)) == null) {
 			src = new SequenceNode(source);
+			sequenceNodes.put(source, src);
 		}
 		
 		if((tgt = sequenceNodes.get(target)) == null) {
 			tgt = new SequenceNode(target);
+			sequenceNodes.put(target, tgt);
 		}
 		
 		return this.connect(src, tgt);
@@ -96,9 +208,10 @@ public class SequenceGraph {
 		SequenceNode tgt;
 		
 		boolean ret = false;
-		
-		if((src = sequenceNodes.get(source)) != null && (tgt = sequenceNodes.get(target)) == null) { 
+		System.out.println(sequenceNodes.size()+" src "+sequenceNodes.get(source)+" tgt "+(sequenceNodes.get(target)));
+		if((src = sequenceNodes.get(source)) != null && (tgt = sequenceNodes.get(target)) != null) { 
 			ret = this.disconnect(src, tgt);
+			System.out.println("DISC");
 		}
 		
 		return ret;
@@ -149,6 +262,7 @@ public class SequenceGraph {
 	
 	public void updateStructure(SequenceContainerInterface rootContainer, SequencerInterface sequencer) {
 		LinkedList<SequenceStructureNode> newStructure = sequenceStructureFromGraph();
+		System.out.println(newStructure);
 		buildSequenceContainers(rootContainer, newStructure, currentStructure, sequencer);
 	}
 	
@@ -170,6 +284,7 @@ public class SequenceGraph {
 		}
 		
 		rootContainer.updateStructure(list);
+		currentStructure = newStructure;
 	}
 	
 	private SequenceStructureNode findEqualChildStructure(SequenceStructureNode child, SequenceStructureNode oldStructure) {
@@ -300,7 +415,7 @@ public class SequenceGraph {
 				
 				// always one successor
 				for(SequenceNode currentNode: graph.getSuccessors(node)) {
-					sequenceStructureFromGraphHelper(currentNode, false, currentNodes);
+					sequenceStructureFromGraphHelper(currentNode, false, sequentialNodes);
 				}
 				
 				currentNodes.add(new SequenceStructureNode(node.getSequence(), false, true, sequentialNodes));
@@ -328,6 +443,7 @@ public class SequenceGraph {
 				
 				currentNodes.add(new SequenceStructureNode(node.getSequence(), false, true, sequentialNodes));
 			} else {
+				currentNodes.add(new SequenceStructureNode(node.getSequence(), true, false, null));
 				currentNodes.add(new SequenceStructureNode(node.getSequence(), false, false, parallelNodes));
 			}
 		}

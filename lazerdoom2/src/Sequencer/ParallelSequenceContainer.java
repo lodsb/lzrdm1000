@@ -157,13 +157,15 @@ public class ParallelSequenceContainer extends BaseSequence implements SequenceC
 	@Override
 	public void updateStructure(LinkedList<SequenceInterface> updatedSequences) {
 		writeLock.lock();
-		
+
 		// check if the sequences have to be changed
 		boolean changeNecessary = false;
 		
 		int i = 0;
-		for(SequenceInterface si: this.sequences) {
-			updatedSequences.contains(si);
+		for(SequenceInterface si: updatedSequences) {
+			if(!this.sequences.contains(si)) {
+				changeNecessary = true;
+			}
 		}
 		
 		if(changeNecessary) {
@@ -190,7 +192,7 @@ public class ParallelSequenceContainer extends BaseSequence implements SequenceC
 			}
 
 			this.sequences.clear();
-
+			
 			for(SequenceInterface si: updatedSequences) {
 				this.sequences.add(si);
 			}
@@ -199,5 +201,15 @@ public class ParallelSequenceContainer extends BaseSequence implements SequenceC
 		}
 		
 		writeLock.unlock();
+	}
+	
+	public String toString() {
+		String ret = "\nparallel: (";
+		
+		for(SequenceInterface si: this.sequences) {
+			ret = ret+si+" ";
+		}
+		
+		return ret+" )";
 	}
 }

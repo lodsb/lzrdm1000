@@ -328,8 +328,8 @@ public class SequentialSequenceContainer extends BaseSequence implements Sequenc
 		boolean changeNecessary = false;
 		
 		int i = 0;
-		for(SequenceInterface si: this.sequences) {
-			if(si != updatedSequences.get(i)) {
+		for(SequenceInterface si: updatedSequences) {
+			if( (this.size()-1) < i || si != this.sequences.get(i)) {
 				changeNecessary = true;
 			} 
 			i++;
@@ -368,6 +368,16 @@ public class SequentialSequenceContainer extends BaseSequence implements Sequenc
 		}
 		
 		writeLock.unlock();
+	}
+	
+	public String toString() {
+		String ret = "\nsequential: [ ";
+		
+		for(SequenceInterface sequence: this.sequences) {
+			ret = ret+sequence+" ";
+		}
+		
+		return ret+" ]";
 	}
 
 }

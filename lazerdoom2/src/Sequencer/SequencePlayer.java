@@ -8,7 +8,8 @@ import Sequencer.SequenceEvent.SequenceEventSubtype;
 import Sequencer.SequenceEvent.SequenceEventType;
 
 public class SequencePlayer extends BaseSequence implements SequencePlayerInterface {
-	SequencePlayer(SequencerInterface sequencer) {
+	
+	public SequencePlayer(SequencerInterface sequencer) {
 		super(sequencer);
 		// TODO Auto-generated constructor stub
 	}
@@ -139,7 +140,7 @@ public class SequencePlayer extends BaseSequence implements SequencePlayerInterf
 
 	@Override
 	public long size() {
-		if(sequence != null) {
+		if(sequence.get() != null) {
 			return sequence.get().size();
 		}
 		

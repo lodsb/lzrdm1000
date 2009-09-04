@@ -128,6 +128,7 @@ public class EventPointsSequence<EventType extends BaseType> extends BaseSequenc
 	
 	@Override
 	public boolean eval(long tick) {
+		//System.out.println("eval "+tick);
 		if(tick == 0) {
 			this.postSequenceEvent(SequenceEventType.STARTED, SequenceEventSubtype.NONE, null);
 		} 

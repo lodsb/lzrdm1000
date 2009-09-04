@@ -21,7 +21,11 @@ public class SynthInfo {
 		return description;
 	}
 	
-	ControlDesc[] getControlParameters() {
+	public ControlDesc[] getControlParameters() {
 		return parameters;
+	}
+	
+	public String toString() {
+		return "Name: "+this.name+"\nDescription: "+this.description+"\nParameters: "+this.parameters;
 	}
 }

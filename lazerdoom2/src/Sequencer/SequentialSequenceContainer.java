@@ -98,7 +98,6 @@ public class SequentialSequenceContainer extends BaseSequence implements Sequenc
 	
 	@Override
 	public boolean eval(long tick) {
-		
 		if(tick == 0) {
 			this.postSequenceEvent(SequenceEventType.STARTED, SequenceEventSubtype.NONE, null);
 		}
@@ -177,6 +176,11 @@ public class SequentialSequenceContainer extends BaseSequence implements Sequenc
 	
 	@Override
 	public long size() {
+		/*System.out.println("seq size "+this.currentSize+" s "+this.sequences.size());
+		if(this.sequences.size() > 0) {
+			System.out.println("what? "+this.sequences.get(0).size());
+		}*/
+		//this.updateSize();
 		return this.currentSize;
 	}
 
@@ -308,9 +312,11 @@ public class SequentialSequenceContainer extends BaseSequence implements Sequenc
 
 	@Override
 	public void dispatchSequenceEvent(SequenceEvent se) {
+	//	System.out.println("seq size changed");
 		if(se.getSequenceMetaEventType() == SequenceMetaEventType.SEQUENCE_DATA_CHANGED_EVENT) {
 			readLock.lock();
 			this.updateSize();
+//			System.out.println("size update "+this.currentSize);
 			readLock.unlock();
 		}
 		

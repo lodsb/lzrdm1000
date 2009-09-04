@@ -13,7 +13,7 @@ public class ParameterControlBus<T extends BaseType> implements ControlBusInterf
 	protected Synth synth;
 	protected ControlDesc controlDescription;
 	
-	ParameterControlBus(ControlServer server, ControlDesc desc, Synth synth) {
+	public ParameterControlBus(ControlServer server, ControlDesc desc, Synth synth) {
 		this.server = server;
 		this.synth = synth;
 		this.controlDescription = desc;

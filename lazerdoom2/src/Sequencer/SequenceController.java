@@ -34,6 +34,10 @@ public class SequenceController extends QObject {
 		instance = this;
 	}
 	
+	public String toString() {
+		return ""+this.rootSequence;
+	}
+	
 	public boolean removeBaseSequence(BaseSequence sequence) {
 		LinkedList<Pair<SequenceInterface>> connections = graph.remove(sequence);
 		boolean ret = false;
@@ -84,6 +88,7 @@ public class SequenceController extends QObject {
 				sequencer.postSequencerEvent(new SequencerEvent(SequencerEventType.CONNECTION_ADDED, SequencerEventSubtype.SEQUENCE_PAIR, new Pair<SequenceInterface>(source, target)));
 			}
 		}
+		System.out.println("connect "+ret);
 		return ret;
 	}
 	

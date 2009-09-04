@@ -38,6 +38,8 @@ public class SequenceGraph {
 		return e1;
 	}
 	
+	//private HashMap<SequenceStructureNode, SequencePlayerInterface> sequencePlayerContainerList = new HashMap<SequenceStructureNode, SequencePlayerInterface>();
+	
 	public static void main(String[] argv) {
 		SequenceGraph sg = new SequenceGraph();
 		
@@ -72,10 +74,10 @@ public class SequenceGraph {
 		sg.connect(e5, e6);
 		sg.connect(e5, e7);
 		sg.connect(e7, e8);
-		sg.remove(e5);
+		//sg.remove(e5);
 		//sg.disconnect(sp, e1);
 		
-		/*e1 = makeEPS(ts);
+		e1 = makeEPS(ts);
 		e2 = makeEPS(ts);
 		e3 = makeEPS(ts);
 		e4 = makeEPS(ts);
@@ -99,7 +101,7 @@ public class SequenceGraph {
 		sg.connect(sp, e5);
 		sg.connect(e5, e6);
 		sg.connect(e5, e7);
-		sg.connect(e7, e8);*/
+		sg.connect(e7, e8);
 		
 		Layout<SequenceNode, Integer> layout = new ISOMLayout(sg.graph);
 		layout.setSize(new Dimension(800,800)); // sets the initial size of the space
@@ -126,6 +128,22 @@ public class SequenceGraph {
 	private HashMap<SequenceInterface, SequenceNode> sequenceNodes = new HashMap<SequenceInterface, SequenceNode>();
 	
 	private int currentEdge = 0; 
+	
+	
+	/*public SequenceGraph() {
+		Layout<SequenceNode, Integer> layout = new ISOMLayout(this.graph);
+		layout.setSize(new Dimension(800,800)); // sets the initial size of the space
+		BasicVisualizationServer<SequenceNode, Integer> vv =
+			new BasicVisualizationServer<SequenceNode, Integer>(layout);
+		vv.setPreferredSize(new Dimension(350,350)); //Sets the viewing area size
+		vv.getRenderContext().setVertexLabelTransformer(new ToStringLabeller());
+
+		JFrame frame = new JFrame("Simple Graph View");
+		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+		frame.getContentPane().add(vv);
+		frame.pack();
+		frame.setVisible(true);
+	}*/
 	
 	private LinkedList<SequenceStructureNode> currentStructure = null;
 	
@@ -220,6 +238,7 @@ public class SequenceGraph {
 	private boolean connect(SequenceNode source, SequenceNode target) {
 		boolean ret;
 		
+		
 		if(shortestPathAlg.getDistance(source, target) != null) {
 			ret = false;
 		} else {
@@ -283,6 +302,15 @@ public class SequenceGraph {
 			list.add(buildSequenceContainersHelper(newNode, oldNode, sequencer));
 		}
 		
+		System.out.println("list "+list+" size "+list.size());
+		list = new LinkedList<SequenceInterface>();
+		Collection<SequenceNode> nodes = graph.getVertices();
+		for(SequenceNode node: nodes) {
+			if(graph.inDegree(node) == 0 && (node.getSequence() instanceof SequencePlayerInterface)) {
+				list.add(node.getSequence());
+			
+			}
+		}
 		rootContainer.updateStructure(list);
 		currentStructure = newStructure;
 	}
@@ -349,10 +377,16 @@ public class SequenceGraph {
 		SequenceInterface ret;
 		
 		if(!newStructure.isNode) {
+			SequencePlayer player = null;
 			LinkedList<SequenceInterface> sequences = new LinkedList<SequenceInterface>();
 			
 			for(SequenceStructureNode ssn: newStructure.list) {
-				sequences.add(buildSequenceContainersHelper(ssn, findEqualChildStructure(ssn, oldStructure), sequencer));
+				SequenceInterface s = buildSequenceContainersHelper(ssn, findEqualChildStructure(ssn, oldStructure), sequencer);
+				if(!(s instanceof SequencePlayerInterface)) {
+					sequences.add(s);
+				} else {
+					player = (SequencePlayer) s;
+				}
 			}
 			
 			if(oldStructure != null) {
@@ -379,6 +413,10 @@ public class SequenceGraph {
 				}
 			}
 			
+			if(player != null) {
+				player.setSequence(newStructure.container);
+			}
+			
 			ret = newStructure.container;
 		} else {
 			ret = newStructure.si;
@@ -396,6 +434,7 @@ public class SequenceGraph {
 		for(SequenceNode node: nodes) {
 			if(graph.inDegree(node) == 0 && (node.getSequence() instanceof SequencePlayerInterface)) {
 				sequenceStructureFromGraphHelper(node, true, list);
+			
 			}
 		}
 		
@@ -410,9 +449,10 @@ public class SequenceGraph {
 			if(isRoot) {
 				LinkedList<SequenceStructureNode> sequentialNodes = new LinkedList<SequenceStructureNode>();
 				
+				SequenceStructureNode seqStruct = new SequenceStructureNode(node.getSequence(), false, true, sequentialNodes);
 				// !!!
 				sequentialNodes.add(new SequenceStructureNode(node.getSequence(), true, false, null));
-				
+					
 				// always one successor
 				for(SequenceNode currentNode: graph.getSuccessors(node)) {
 					sequenceStructureFromGraphHelper(currentNode, false, sequentialNodes);

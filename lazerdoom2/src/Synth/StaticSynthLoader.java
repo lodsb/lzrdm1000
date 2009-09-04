@@ -19,8 +19,11 @@ public class StaticSynthLoader implements SynthLoaderInterface {
 	
 	private HashMap<SynthInfo, SynthDef> synthInfoMap = new HashMap<SynthInfo, SynthDef>();
 	
+	private Group group;
+	
 	public StaticSynthLoader(Server server) {
 		this.server = server;
+		this.group = this.server.asTarget();
 	}
 	
 	public void init() {
@@ -40,9 +43,17 @@ public class StaticSynthLoader implements SynthLoaderInterface {
 		
 		// TestSynth1
         Control ck = Control.kr( new String[] {"freq"}, new float[] { 0.0f});
-        synthDef = new SynthDef( "SimpleSynth", UGen.ar( "Out", UGen.ir( 0 ), UGen.ar( "SinOsc", ck.getChannel(0))));
+        synthDef = new SynthDef( "SimpleSineSynth", UGen.ar( "Out", UGen.ir( 0 ), UGen.ar( "SinOsc", ck.getChannel(0))));
         ControlDesc ckd = ck.getDesc(0);
 		synthInfo = new SynthInfo(synthDef.getName(), "A simple Sine-Synth", new ControlDesc[]{ckd});
+		synthInfoMap.put(synthInfo, synthDef);
+		
+		// TestSynth2
+        Control ck2 = Control.kr( new String[] {"freq"}, new float[] { 0.0f});
+        synthDef = new SynthDef( "SimpleSawSynth", UGen.ar( "Out", UGen.ir( 0 ), UGen.ar( "Saw", ck2.getChannel(0))));
+        ControlDesc ckd2 = ck.getDesc(0);
+		synthInfo = new SynthInfo(synthDef.getName(), "A simple Saw-Synth", new ControlDesc[]{ckd2});
+		synthInfoMap.put(synthInfo, synthDef);
 		
        /* Control ck = Control.kr( new String[] { "freq", "out" }, new float
         		[] { 440f, 0f });
@@ -95,9 +106,15 @@ public class StaticSynthLoader implements SynthLoaderInterface {
 	public Synth instantiateSynth(SynthInfo synthInfo) {
 		SynthDef synthDef = synthInfoMap.get(synthInfo);
 		Synth synth = null;
-		
+		System.out.println("[StaticSynthLoader] loading synth: "+synthInfo);
 		if(synthDef != null) {
-			synth = Synth.basicNew(synthInfo.getName(), this.server);
+			try {
+				synth = Synth.head(this.group, synthInfo.getName());
+			} catch (IOException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+			System.out.println(synth);
 		}
  		
 		return synth; 

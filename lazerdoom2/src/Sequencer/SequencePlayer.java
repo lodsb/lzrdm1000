@@ -19,12 +19,12 @@ public class SequencePlayer extends BaseSequence implements SequencePlayerInterf
 	private AtomicBoolean startSequence = new AtomicBoolean();
 	private long scheduledStartTicks = 0;
 	
-	private long relativeTicks = 0;
+	private long startTicks = 0;
 	
 	private AtomicBoolean stopSequence = new AtomicBoolean();
 	private long scheduledStopTicks = 0;
 	
-	private AtomicBoolean isRunning;
+	private AtomicBoolean isRunning = new AtomicBoolean();
 	
 	@Override
 	public SequenceInterface getSequence() {
@@ -73,7 +73,7 @@ public class SequencePlayer extends BaseSequence implements SequencePlayerInterf
 		SequencePlayer sp = new SequencePlayer(this.getSequencer());
 		sp.startSequence.set(this.startSequence.get());
 		sp.stopSequence.set(this.stopSequence.get());
-		sp.relativeTicks = this.relativeTicks;
+		sp.startTicks = this.startTicks;
 		sp.sequence.set(this.sequence.get());
 		
 		return sp;
@@ -81,15 +81,16 @@ public class SequencePlayer extends BaseSequence implements SequencePlayerInterf
 
 	@Override
 	public boolean eval(long tick) {
+		//System.out.println("player eval");
+//		System.out.print(" sp "+tick+" ");
 		if(sequence.get() != null) {
 			if(isRunning.get()) {
-				relativeTicks = tick-relativeTicks;
-				sequence.get().eval(relativeTicks);
+				sequence.get().eval(tick-startTicks);
 			} else {
 				if(startSequence.get()) {
 					if(scheduledStartTicks == 0) {
-						relativeTicks = tick;
-						sequence.get().eval(relativeTicks);
+						startTicks = tick;
+						sequence.get().eval(0);
 						isRunning.set(true);
 						
 						startSequence.set(false);
@@ -100,11 +101,9 @@ public class SequencePlayer extends BaseSequence implements SequencePlayerInterf
 						scheduledStartTicks--;
 					}
 				} else if(stopSequence.get()) {
-					relativeTicks = tick-relativeTicks;
-					
 					if(scheduledStopTicks >= 0) {
 						scheduledStopTicks--;
-						sequence.get().eval(relativeTicks);
+						sequence.get().eval(tick-startTicks);
 						
 						this.postSequenceEvent(SequenceEventType.SEQUENCE_PLAYER_STOPPED, SequenceEventSubtype.NONE, null);
 						
@@ -143,8 +142,11 @@ public class SequencePlayer extends BaseSequence implements SequencePlayerInterf
 		if(sequence.get() != null) {
 			return sequence.get().size();
 		}
-		
 		return 0;
+	}
+	
+	public String toString() {
+		return "Player: { "+this.sequence+" }";
 	}
 
 }

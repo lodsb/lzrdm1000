@@ -41,7 +41,7 @@ public class SynthManager {
 		return (List<Synth>) loadedSynths.clone();
 	}
 	
-	public Synth createInstance(SynthInfo info) {
+	public Synth createSynthInstance(SynthInfo info) {
 		Synth synth = null;
 		
 		SynthLoaderInterface sli = synthLoaderMap.get(info);

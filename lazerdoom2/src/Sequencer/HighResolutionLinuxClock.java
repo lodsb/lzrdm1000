@@ -8,6 +8,10 @@ public class HighResolutionLinuxClock implements ClockInterface, Runnable{
 	
 	private long clockStart;
 	
+	public HighResolutionLinuxClock(SequencerInterface sequencer) {
+		this.sequencer = sequencer;
+	}
+	
 	//FIXME: fix path
 	static {
 		System.load("/home/lodsb/idpworkspace2svn/workspace/lazerdoom2/src/Sequencer/Native/LinuxClock/linuxclock.so");

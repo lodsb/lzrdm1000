@@ -47,6 +47,10 @@ public class SequencerMenuButton extends TouchableGraphicsItem {
 			case addSequence:
 				this.elementID = "addSequence";
 				break;
+			case addSequencePlayer:
+				this.elementID = "addSequencePlayer";
+				break;
+				
 		}
 		
 		this.actionType = actionType;

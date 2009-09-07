@@ -19,6 +19,8 @@ public class SequenceConnector extends TouchableGraphicsItem {
 	private static QColor selectionColor = new QColor(255,2,104);
 
 	private static int stdAlpha = 130;
+	
+	private boolean isInConnector = false;
 
 	public static QRectF boundingRect = new QRectF(0,0,50,50);
 	private static double centerX = boundingRect.width()/2;
@@ -29,13 +31,18 @@ public class SequenceConnector extends TouchableGraphicsItem {
 
 	private QColor customColor = new QColor(200,200,200);
 
-	public SequenceConnector() {
+	public SequenceConnector(boolean isInConnector) {
 		//this.setFlag(GraphicsItemFlag.ItemIsSelectable,true);
 		this.setZValue(10.0);
 
+		this.isInConnector = isInConnector;
 		//customColor.setAlpha(stdAlpha);
 		
 		
+	}
+	
+	public boolean isInConnector() {
+		return this.isInConnector;
 	}
 	
 	public QLineF baseToTopLineInScene() {

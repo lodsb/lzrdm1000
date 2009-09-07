@@ -20,6 +20,8 @@ import com.trolltech.qt.gui.QStyleOptionGraphicsItem;
 import com.trolltech.qt.gui.QWidget;
 import com.trolltech.qt.svg.QSvgRenderer;
 import GUI.Multitouch.*;
+import GUI.View.SequencerView;
+import Sequencer.BaseSequence;
 import Sequencer.SequenceEvent;
 import Sequencer.SequenceEventListenerInterface;
 import Sequencer.SequencePlayer;
@@ -147,7 +149,17 @@ public class SequencePlayerItem extends BaseSequenceViewItem implements Connecta
 	private SequencePlayer sequencePlayer;
 	
 	public SequencePlayerItem(SequencePlayer sequencePlayer) {
+		super();
 		this.sequencePlayer = sequencePlayer;
+
+	
+			SequenceConnector connector = new SequenceConnector(false);
+			//connector.scale(2.0, 2.0);
+			connector.setZValue(100.0);
+			connector.setParent(this);
+			connector.rotate(90.0);
+			connector.setPos(200,75);
+			this.outConnector = connector;
 		
 		QSvgRenderer renderer = new QSvgRenderer(svgFileName);
 		playButton = new Button(renderer, "playing", "play");
@@ -162,13 +174,7 @@ public class SequencePlayerItem extends BaseSequenceViewItem implements Connecta
 		stopButton.setParentItem(this);
 		stopButton.setPos(100,140);
 		
-		SequenceConnector connector = new SequenceConnector();
-		//connector.scale(2.0, 2.0);
-		connector.setZValue(0.23);
-		connector.setParentItem(this);
-		connector.rotate(90.0);
-		connector.setPos(200,75);
-		this.outConnector = connector;
+		this.setParent(SequencerView.getInstance());
 		
 		//this.setFlag(GraphicsItemFlag.ItemIsMovable, true);
 		//this.setFlag(GraphicsItemFlag.ItemIsSelectable, true);
@@ -285,6 +291,11 @@ public class SequencePlayerItem extends BaseSequenceViewItem implements Connecta
 			this.playButton.setState(ButtonState.OFF);
 			this.stopButton.setState(ButtonState.BLINKING);
 		} 
+	}
+
+	@Override
+	public BaseSequence getBaseSequence() {
+		return this.sequencePlayer;
 	}
 
 }

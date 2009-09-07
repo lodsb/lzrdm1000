@@ -172,6 +172,69 @@
        y1="107.36218"
        x2="-73.571426"
        y2="107.36218" />
+    <radialGradient
+       inkscape:collect="always"
+       xlink:href="#linearGradient3187"
+       id="radialGradient2448"
+       gradientUnits="userSpaceOnUse"
+       gradientTransform="matrix(-0.1111111,2.0991073,-2.061659,-0.1091288,304.24807,235.19597)"
+       cx="-153.46545"
+       cy="62.993553"
+       fx="-153.46545"
+       fy="62.993553"
+       r="45" />
+    <linearGradient
+       inkscape:collect="always"
+       xlink:href="#linearGradient3187"
+       id="linearGradient2450"
+       gradientUnits="userSpaceOnUse"
+       gradientTransform="translate(337.14285,-174.75251)"
+       x1="-163.57143"
+       y1="107.36218"
+       x2="-73.571426"
+       y2="107.36218" />
+    <radialGradient
+       inkscape:collect="always"
+       xlink:href="#linearGradient3187"
+       id="radialGradient2459"
+       gradientUnits="userSpaceOnUse"
+       gradientTransform="matrix(-0.1111111,2.0991073,-2.061659,-0.1091288,304.24807,235.19597)"
+       cx="-153.46545"
+       cy="62.993553"
+       fx="-153.46545"
+       fy="62.993553"
+       r="45" />
+    <linearGradient
+       inkscape:collect="always"
+       xlink:href="#linearGradient3187"
+       id="linearGradient2461"
+       gradientUnits="userSpaceOnUse"
+       gradientTransform="translate(337.14285,-174.75251)"
+       x1="-163.57143"
+       y1="107.36218"
+       x2="-73.571426"
+       y2="107.36218" />
+    <radialGradient
+       inkscape:collect="always"
+       xlink:href="#linearGradient3187"
+       id="radialGradient2464"
+       gradientUnits="userSpaceOnUse"
+       gradientTransform="matrix(-0.1111111,2.0991073,-2.061659,-0.1091288,492.46236,429.37163)"
+       cx="-153.46545"
+       cy="62.993553"
+       fx="-153.46545"
+       fy="62.993553"
+       r="45" />
+    <linearGradient
+       inkscape:collect="always"
+       xlink:href="#linearGradient3187"
+       id="linearGradient2466"
+       gradientUnits="userSpaceOnUse"
+       gradientTransform="translate(525.35714,19.423149)"
+       x1="-163.57143"
+       y1="107.36218"
+       x2="-73.571426"
+       y2="107.36218" />
   </defs>
   <sodipodi:namedview
      id="base"
@@ -184,13 +247,13 @@
      inkscape:pageopacity="0.0"
      inkscape:pageshadow="2"
      inkscape:zoom="1.4"
-     inkscape:cx="243.16163"
+     inkscape:cx="149.5902"
      inkscape:cy="951.48674"
      inkscape:document-units="px"
      inkscape:current-layer="layer1"
      showgrid="false"
      inkscape:window-width="1280"
-     inkscape:window-height="964"
+     inkscape:window-height="967"
      inkscape:window-x="-5"
      inkscape:window-y="-3" />
   <metadata
@@ -361,6 +424,44 @@
          width="90"
          id="rect3231"
          style="opacity:0.93500001;fill:url(#radialGradient3301);fill-opacity:1;fill-rule:evenodd;stroke:url(#linearGradient3303);stroke-width:0;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:0.010582" />
+    </g>
+    <g
+       id="addSequencePlayer"
+       inkscape:label="#g2489">
+      <rect
+         ry="11.834319"
+         y="76.785316"
+         x="356.78571"
+         height="100"
+         width="100"
+         id="rect2438"
+         style="opacity:0.93500001;fill:#aa8800;fill-opacity:1;fill-rule:evenodd;stroke:#ffffff;stroke-width:0;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:0.010582" />
+      <rect
+         ry="10.650887"
+         y="81.785316"
+         x="361.78571"
+         height="90"
+         width="90"
+         id="rect2440"
+         style="opacity:0.93500001;fill:#ffdd55;fill-opacity:1;fill-rule:evenodd;stroke:#ffffff;stroke-width:0;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:0.010582" />
+      <text
+         id="text2442"
+         y="141.36539"
+         x="368.29938"
+         style="font-size:40px;font-style:normal;font-weight:normal;fill:#000000;fill-opacity:1;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1;font-family:Bitstream Vera Sans"
+         xml:space="preserve"><tspan
+           y="141.36539"
+           x="368.29938"
+           id="tspan2444"
+           sodipodi:role="line">PLR</tspan></text>
+      <rect
+         ry="10.650887"
+         y="81.785316"
+         x="361.78571"
+         height="90"
+         width="90"
+         id="rect2446"
+         style="opacity:0.93500001;fill:url(#radialGradient2464);fill-opacity:1;fill-rule:evenodd;stroke:url(#linearGradient2466);stroke-width:0;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:0.010582" />
     </g>
   </g>
 </svg>

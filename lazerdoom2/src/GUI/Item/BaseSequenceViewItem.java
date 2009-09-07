@@ -8,6 +8,7 @@ import com.trolltech.qt.gui.QGraphicsSceneMouseEvent;
 import com.trolltech.qt.gui.QPainterPath;
 
 import GUI.Multitouch.TouchableGraphicsItem;
+import Sequencer.BaseSequence;
 
 abstract public class BaseSequenceViewItem extends TouchableGraphicsItem {
 	private static QRectF rect = new QRectF(0,0,200,200);
@@ -23,6 +24,8 @@ abstract public class BaseSequenceViewItem extends TouchableGraphicsItem {
 		}
 		return p;
 	}
+	
+	public abstract BaseSequence getBaseSequence();
 	
 	public void mouseMoveEvent(QGraphicsSceneMouseEvent event) {
 		this.setPosition(this.mapToScene(event.pos()));
@@ -44,7 +47,7 @@ abstract public class BaseSequenceViewItem extends TouchableGraphicsItem {
 	public void dockCursor(EditorCursor cursor) {
 		cursors.add(cursor);
 	}
-	
+		
 	public void undockCursor(EditorCursor cursor) {
 		cursors.remove(cursor);
 	}

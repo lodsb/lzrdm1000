@@ -250,7 +250,8 @@ public class lazerdoom extends QWidget {
 		this.setMouseTracking(true);
 		
 		QApplication.setOverrideCursor(cursor);
-		this.showMaximized();
+		//this.showMaximized();
+		this.showFullScreen();
 		
 		this.core.start();
 		//System.out.println("**********"+QApplication.overrideCursor());

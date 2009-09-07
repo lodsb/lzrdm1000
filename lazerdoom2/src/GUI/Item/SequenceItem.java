@@ -132,12 +132,12 @@ public class SequenceItem extends BaseSequenceViewItem implements ConnectableSeq
 		customColor = color;
 	}
 	
-	public BaseSequence getSequence() {
+	public BaseSequence getBaseSequence() {
 		return this.sequence;
 	}
 	
 	private void addPorts() {
-		SequenceConnector connector = new SequenceConnector();
+		SequenceConnector connector = new SequenceConnector(false);
 		//connector.scale(2.0, 2.0);
 		connector.setZValue(100.0);
 		connector.setParent(this);
@@ -146,7 +146,7 @@ public class SequenceItem extends BaseSequenceViewItem implements ConnectableSeq
 		
 		this.outConnector = connector;
 		
-		connector = new SequenceConnector();
+		connector = new SequenceConnector(true);
 		//connector.scale(2.0, 2.0);
 		connector.setParent(this);
 		connector.rotate(-90.0);

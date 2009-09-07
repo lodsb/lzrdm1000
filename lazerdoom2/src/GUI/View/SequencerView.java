@@ -213,52 +213,52 @@ public class SequencerView extends QGraphicsView implements Client, TouchItemInt
 		
 		SequencerMenuButton button1 = new SequencerMenuButton(ActionType.addSequence);
 		SequencerMenuButton button2 = new SequencerMenuButton(ActionType.addSynth);
-		//SequencerMenuButton button3 = new SequencerMenuButton("delete");
+		SequencerMenuButton button3 = new SequencerMenuButton(ActionType.addSequencePlayer);
 				
 		QRectF buttonRect = button1.boundingRect();
 		double verticalOffset = (sceneRect.height() - (buttonRect.height()*3))/2;
 		
 		button1.setPos(buttonRect.width(),verticalOffset);
 		button2.setPos(buttonRect.width(),verticalOffset+margin+buttonRect.height());
-		//button3.setPos(buttonRect.width(),verticalOffset+2*(margin+buttonRect.height()));
+		button3.setPos(buttonRect.width(),verticalOffset+2*(margin+buttonRect.height()));
 		
 		
 		button1.setParent(this);
 		button2.setParent(this);
-		//button3.setParent(this);
+		button3.setParent(this);
 		
 		scene.addItem(button1);
 		scene.addItem(button2);
-		//scene.addItem(button3);
+		scene.addItem(button3);
 		
 		menuItems.add(button1);
 		menuItems.add(button2);
-		//menuItems.add(button3);
+		menuItems.add(button3);
 
-		button1 = new SequencerMenuButton(ActionType.addSequence);
+		button3 = new SequencerMenuButton(ActionType.addSequence);
 		button2 = new SequencerMenuButton(ActionType.addSynth);
-		//button1 = new SequencerMenuButton("delete");
+		button1 = new SequencerMenuButton(ActionType.addSequencePlayer);
 		
 		button1.setPos(sceneRect.width()-buttonRect.width(),verticalOffset);
 		button2.setPos(sceneRect.width()-buttonRect.width(),verticalOffset+margin+buttonRect.height());
-		//button3.setPos(sceneRect.width()-buttonRect.width(),verticalOffset+2*(margin+buttonRect.height()));
+		button3.setPos(sceneRect.width()-buttonRect.width(),verticalOffset+2*(margin+buttonRect.height()));
 		
 		button1.rotate(180.0);
 		button2.rotate(180.0);
-		//button3.rotate(180.0);
+		button3.rotate(180.0);
 
 		button1.setParent(this);
 		button2.setParent(this);
-		//button3.setParent(this);
+		button3.setParent(this);
 
 		
 		scene.addItem(button1);
 		scene.addItem(button2);
-		//scene.addItem(button3);
+		scene.addItem(button3);
 		
 		menuItems.add(button1);
 		menuItems.add(button2);
-		//menuItems.add(button3);
+		menuItems.add(button3);
 	}
 	
 	private Editor sequencerEditor;

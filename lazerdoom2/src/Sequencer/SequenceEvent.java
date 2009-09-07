@@ -1,6 +1,6 @@
 package Sequencer;
 public class SequenceEvent {
-	enum SequenceEventType {
+	public enum SequenceEventType {
 		_internal_transportation_events,
 		//TRANSPORTATION
 		STARTED,

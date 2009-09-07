@@ -124,7 +124,7 @@ public class SequenceGraph {
 	}
 
 	private DirectedSparseGraph<SequenceNode, Integer> graph = new DirectedSparseGraph<SequenceNode, Integer>();
-	private UnweightedShortestPath<SequenceNode, Integer> shortestPathAlg = new UnweightedShortestPath<SequenceNode, Integer>(graph);
+	private UnweightedShortestPath<SequenceNode, Integer> shortestPathAlg = new UnweightedShortestPath<SequenceNode, Integer>(graph);;
 	private HashMap<SequenceInterface, SequenceNode> sequenceNodes = new HashMap<SequenceInterface, SequenceNode>();
 	
 	private int currentEdge = 0; 
@@ -238,8 +238,7 @@ public class SequenceGraph {
 	private boolean connect(SequenceNode source, SequenceNode target) {
 		boolean ret;
 		
-		
-		if(shortestPathAlg.getDistance(source, target) != null) {
+		if(source == target) {
 			ret = false;
 		} else {
 			if(!graph.containsVertex(source)) {
@@ -249,8 +248,12 @@ public class SequenceGraph {
 			if(!graph.containsVertex(target)) {
 				graph.addVertex(target);
 			}
-			
+
+			shortestPathAlg.reset(); 
+
 			if(graph.inDegree(target) != 0) {
+				ret = false;
+			} else if(shortestPathAlg.getDistance(source, target) != null) {
 				ret = false;
 			} else {
 				graph.addEdge(currentEdge++, source, target);
@@ -258,10 +261,10 @@ public class SequenceGraph {
 			}
 			
 			// for sequence-players set the target to the sequence that has to be played
-			SequenceInterface si;
+			/*SequenceInterface si;
 			if((si = source.getSequence()) instanceof SequencePlayerInterface) {
 				((SequencePlayerInterface)si).setSequence(target.getSequence());
-			}
+			}*/
 		}
 		
 		return ret;

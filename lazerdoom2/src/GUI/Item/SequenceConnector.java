@@ -1,5 +1,6 @@
 package GUI.Item;
 
+import sparshui.common.Event;
 import GUI.Multitouch.*;
 import com.trolltech.qt.core.QPointF;
 import com.trolltech.qt.core.QRectF;
@@ -29,14 +30,14 @@ public class SequenceConnector extends TouchableGraphicsItem {
 	private QColor customColor = new QColor(200,200,200);
 
 	public SequenceConnector() {
-		this.setFlag(GraphicsItemFlag.ItemIsSelectable,true);
+		//this.setFlag(GraphicsItemFlag.ItemIsSelectable,true);
 		this.setZValue(10.0);
 
 		//customColor.setAlpha(stdAlpha);
 		
 		
 	}
-
+	
 	public QLineF baseToTopLineInScene() {
 
 		double x1 = boundingRect.topLeft().x()+boundingRect.width()/2;

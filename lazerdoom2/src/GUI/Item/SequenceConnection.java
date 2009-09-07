@@ -15,6 +15,7 @@ import com.trolltech.qt.gui.QStyleOptionGraphicsItem;
 import com.trolltech.qt.gui.QWidget;
 import com.trolltech.qt.gui.QGraphicsItem.GraphicsItemFlag;
 import GUI.Multitouch.*;
+import GUI.View.SequencerView;
 
 public class SequenceConnection extends TouchableGraphicsItem {
 
@@ -72,6 +73,8 @@ public class SequenceConnection extends TouchableGraphicsItem {
 		this.dst = dst;
 		this.setZValue(10.0);
 		this.updatePath();
+		
+		this.setParent(SequencerView.getInstance());
 	}
 	
 	private void updatePath() {

@@ -12,6 +12,7 @@ import GUI.Scene.Editor.EditorScene;
 import com.trolltech.qt.core.QObject;
 import com.trolltech.qt.core.QPointF;
 import com.trolltech.qt.gui.QColor;
+import com.trolltech.qt.gui.QGraphicsEllipseItem;
 import com.trolltech.qt.gui.QGraphicsItemInterface;
 import com.trolltech.qt.gui.QGraphicsPathItem;
 import com.trolltech.qt.gui.QGraphicsScene;
@@ -71,8 +72,12 @@ public class Editor extends QObject {
 	
 	public void handleTouchEvent(TouchEvent event) {
 		if(this.showTouchEvents) {
+			System.out.println("trueeeeeeeee");
+			
 				TouchPointCursor tc = null;
 				TouchEvent e = (TouchEvent) event;
+				
+				System.out.println(e.getState()+"+++++++++");
 				
 				if(e.getState() == TouchState.BIRTH) {					
 					tc = new TouchPointCursor();
@@ -108,11 +113,25 @@ public class Editor extends QObject {
 		} else if(event instanceof DeleteEvent) {
 			DeleteEvent e = (DeleteEvent) event;
 			this.handleDeleteEvent(e);
+		} else if(event instanceof DragEvent) {
+			DragEvent e = (DragEvent) event;
+			this.handleDragEvent(e);
 		}
 	}
 	
+	private QGraphicsEllipseItem deleteEllipse = null;
 	protected void handleDeleteEvent(DeleteEvent event) {
 		
+		if(event instanceof DeleteEvent) {
+			if(deleteEllipse == null) {
+				deleteEllipse = new QGraphicsEllipseItem(-15,-15,30,30);
+				deleteEllipse.setPen(new QPen(QColor.red));
+				this.scene.addItem(deleteEllipse);
+			}
+			if(((DeleteEvent) event).getCrossPoint() != null) {
+				deleteEllipse.setPos(event.getSceneCrossPoint());
+			}
+		}
 	}
 	
 	private HashMap<Integer, QGraphicsPathItem> gestureVisualizationsMap = new HashMap<Integer, QGraphicsPathItem>();

@@ -20,6 +20,16 @@ public class DeleteEvent extends ExtendedGestureEvent {
 		return this.crossPoint;
 	}
 	
+	private QPointF sceneCrossPoint;
+	
+	public void setSceneCrossPoint(QPointF point) {
+		this.sceneCrossPoint = point;
+	}
+	
+	public QPointF getSceneCrossPoint() {
+		return this.sceneCrossPoint;
+	}
+	
 	@Override
 	public int getEventType() {
 		return EventType.DELETE_EVENT.ordinal();

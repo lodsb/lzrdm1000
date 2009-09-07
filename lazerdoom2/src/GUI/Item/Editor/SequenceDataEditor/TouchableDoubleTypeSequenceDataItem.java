@@ -44,7 +44,7 @@ public class TouchableDoubleTypeSequenceDataItem extends TouchableSequenceDataIt
 			line = new QLineF(0, 0, 0, parentPos.y());
 			this.setLine(line);
 			this.setPos(parentPos.x(), 0);
-			System.out.println(line);
+			//System.out.println(line);
 		}
 	}
 	
@@ -64,7 +64,9 @@ public class TouchableDoubleTypeSequenceDataItem extends TouchableSequenceDataIt
 	
 	@Override
 	public void paint(QPainter painter, QStyleOptionGraphicsItem option, QWidget widget) {
-		System.out.println("--- "+this.pos());
+		//FIXME: whole lot of repaints?! why?
+		
+	//	System.out.println("--- "+this.pos());
 		sharedRenderer.render(painter, "node", this.boundingRect());
 		line.updateLine();
 		if(firstRun) {

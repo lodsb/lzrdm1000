@@ -185,11 +185,11 @@ public class Core {
 		//this.startJack();
 		
 		// Wait till jackd settled down
-		try {
+		/*try {
 			Thread.sleep(1000);
 		} catch (InterruptedException e1) {
 			e1.printStackTrace();
-		}
+		}*/
 		
 		try {
 			superColliderServer = new Server("localhost");
@@ -213,6 +213,8 @@ public class Core {
 		
 		
 		Core.instance = this;
+		
+		this.createAndShowServerPanel();
 	}
 	
 	public SynthInstance createSynthInstance(SynthInfo info) {

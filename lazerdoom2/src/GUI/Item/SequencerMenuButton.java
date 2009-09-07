@@ -13,11 +13,17 @@ import com.trolltech.qt.gui.QWidget;
 import com.trolltech.qt.svg.QGraphicsSvgItem;
 import com.trolltech.qt.svg.QSvgRenderer;
 
-public class SequenceButton extends TouchableGraphicsItem {
+public class SequencerMenuButton extends TouchableGraphicsItem {
 	// botton-icons.svg includes:
 	// "delete"
 	// "addSynth"
 	// "addSequence"
+	
+	public enum ActionType {
+		addSynth,
+		addSequence,
+		addSequencePlayer
+	};
 	
 	private static String svgFileName = System.getProperty("user.dir")+"/src/GUI/Item/SVG/button-icons.svg";
 
@@ -25,15 +31,29 @@ public class SequenceButton extends TouchableGraphicsItem {
 	private String elementID;
 	
 	private QRectF boundingRect = new QRectF(-50.0, -50.0, 100,100);
+	private ActionType actionType;
 	
 	
 	public String elementID() {
 		return elementID;
 	}
 	
-	public SequenceButton(String elementID) {
+	public SequencerMenuButton(ActionType actionType) {
 		super();
-		this.elementID = elementID;
+		switch(actionType) {
+			case addSynth:
+				this.elementID = "addSynth";
+				break;
+			case addSequence:
+				this.elementID = "addSequence";
+				break;
+		}
+		
+		this.actionType = actionType;
+	}
+	
+	public ActionType getActionType() {
+		return this.actionType;
 	}
 
 	@Override

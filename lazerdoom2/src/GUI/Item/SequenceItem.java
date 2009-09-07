@@ -1,5 +1,13 @@
 package GUI.Item;
 import GUI.Multitouch.*;
+import GUI.View.SequencerView;
+import Sequencer.BaseSequence;
+import Sequencer.Pause;
+import Sequencer.SequenceEvalListenerInterface;
+import Sequencer.SequenceEvent;
+import Sequencer.SequenceEventListenerInterface;
+import Sequencer.SequenceEvent.SequenceEventType;
+
 import com.trolltech.qt.core.QRectF;
 import com.trolltech.qt.core.QSizeF;
 import com.trolltech.qt.gui.QPainter;
@@ -9,6 +17,8 @@ import java.awt.Color;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Random;
+
+import lazerdoom.Core;
 
 import com.trolltech.qt.core.QPoint;
 import com.trolltech.qt.core.QPointF;
@@ -33,7 +43,7 @@ import com.trolltech.qt.gui.QStyleOptionGraphicsItem;
 import com.trolltech.qt.gui.QWidget;
 import com.trolltech.qt.gui.QPainter.RenderHint;
 
-public class SequenceItem extends BaseSequenceViewItem implements ConnectableSequenceInterface, ConnectableSynthInterface {
+public class SequenceItem extends BaseSequenceViewItem implements ConnectableSequenceInterface, ConnectableSynthInterface, SequenceEventListenerInterface, SequenceEvalListenerInterface {
 
 	private static QColor normalColor = new QColor(130,130,130); 
 	private static QColor actionColor = new QColor(211,120,0);
@@ -96,26 +106,41 @@ public class SequenceItem extends BaseSequenceViewItem implements ConnectableSeq
 		return pixmap.scaledToHeight(rectSizeWidth/upsampling, TransformationMode.SmoothTransformation);
 	}
 	
-	public SequenceItem(boolean isPause) {
-		this.setFlag(GraphicsItemFlag.ItemIsMovable, true);
-		this.setFlag(GraphicsItemFlag.ItemIsSelectable, true);
+	private BaseSequence sequence;
+	
+	public SequenceItem(BaseSequence sequence) {
+	//	this.setFlag(GraphicsItemFlag.ItemIsMovable, true);
+	//	this.setFlag(GraphicsItemFlag.ItemIsSelectable, true);
 
 		this.setBrushes();
 
-		this.isPause = isPause;
-
-		addPorts();
+		this.sequence = sequence;
+		
+		if(sequence instanceof Pause) {
+			this.isPause = true;
+		}
+		this.addPorts();
+		this.sequenceLength = this.sequence.size();
+		
+		Core.getInstance().getSequenceController().registerSequenceInterfaceEventListener(sequence, this);
+		Core.getInstance().getSequenceController().connectToSequenceLocalTickSignal(sequence, this);
+		
+		this.setParent(SequencerView.getInstance());
 	}
 
 	public void setCustomColor(QColor color) {
 		customColor = color;
 	}
 	
+	public BaseSequence getSequence() {
+		return this.sequence;
+	}
+	
 	private void addPorts() {
 		SequenceConnector connector = new SequenceConnector();
 		//connector.scale(2.0, 2.0);
-		connector.setZValue(0.23);
-		connector.setParentItem(this);
+		connector.setZValue(100.0);
+		connector.setParent(this);
 		connector.rotate(90.0);
 		connector.setPos(200,75);
 		
@@ -123,10 +148,10 @@ public class SequenceItem extends BaseSequenceViewItem implements ConnectableSeq
 		
 		connector = new SequenceConnector();
 		//connector.scale(2.0, 2.0);
-		connector.setParentItem(this);
+		connector.setParent(this);
 		connector.rotate(-90.0);
 		connector.setPos(0,125);
-		connector.setZValue(0.0);
+		connector.setZValue(100.0);
 		//blah.addToGroup(this);
 		
 		this.setZValue(1.0);
@@ -147,10 +172,12 @@ public class SequenceItem extends BaseSequenceViewItem implements ConnectableSeq
 			
 			SynthOutConnector synthOutConnector = new SynthOutConnector("Sequence");
 			//connector.scale(2.0, 2.0);
-			synthOutConnector.setZValue(0.23);
+			synthOutConnector.setZValue(100.0);
 			synthOutConnector.setParentItem(this);
 			synthOutConnector.rotate(180.0);
 			synthOutConnector.setPos(125,240);
+			
+			synthOutConnector.setParent(this);
 			synthOutPorts.add(synthOutConnector);
 		}
 		
@@ -176,6 +203,10 @@ public class SequenceItem extends BaseSequenceViewItem implements ConnectableSeq
 		return boundingRect;
 	}
 
+	private int currentSequencePlayhead = 0;
+	private long sequenceLength = 0;
+	private boolean isPlaying = false;
+	
 	@Override
 	public void paint(QPainter painter, QStyleOptionGraphicsItem option, QWidget w) {
 		QColor frameColor;
@@ -199,7 +230,9 @@ public class SequenceItem extends BaseSequenceViewItem implements ConnectableSeq
 		painter.drawEllipse(contentsRect);
 		
 		painter.setBrush(actionColor);
-		painter.drawPie(contentsRect, 16*90, -5000);
+		if(isPlaying) {
+			painter.drawPie(contentsRect, currentSequencePlayhead, -360*16);
+		}
 	
 		painter.setBrush(gradientBrush);
 		painter.setPen(frameColor);
@@ -242,6 +275,29 @@ public class SequenceItem extends BaseSequenceViewItem implements ConnectableSeq
 	public QSizeF getMaximumSize() {
 		// TODO Auto-generated method stub
 		return null;
+	}
+
+	@Override
+	public void dispatchSequenceEvent(SequenceEvent se) {
+		if(se.getSequenceEventType() == SequenceEvent.SequenceEventType.SET_LENGTH) {
+			this.sequenceLength = (Long)se.getArgument();
+			
+			this.update();
+		} else if(se.getSequenceEventType() == SequenceEvent.SequenceEventType.STARTED) {
+			this.isPlaying = true;
+		} else if(se.getSequenceEventType() == SequenceEvent.SequenceEventType.STOPPED) {
+			this.isPlaying = false;
+		}
+	}
+
+	@Override
+	public void dispatchEvalEvent(Long tick) {
+		if(this.sequenceLength > 0) {
+			// pie fullcirle is 360*16
+			this.currentSequencePlayhead = (int)((float)((float)tick/(float)sequenceLength)*360.0*16.0);
+			
+			this.update();
+		}
 	}
 
 }

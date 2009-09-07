@@ -52,6 +52,7 @@ import com.trolltech.qt.gui.QGraphicsScene.ItemIndexMethod;
 import com.trolltech.qt.gui.QSizePolicy.ControlType;
 import com.trolltech.qt.gui.QSizePolicy.Policy;
 import com.trolltech.qt.opengl.QGLWidget;
+import lazerdoom.lazerdoom;
 
 import edu.uci.ics.jung.graph.util.Pair;
 
@@ -61,6 +62,7 @@ import GUI.Editor.Editor;
 import GUI.Editor.SequenceDataEditor.SequenceDataEditor;
 import GUI.Item.*;
 import GUI.Item.Editor.TouchableEditor;
+import GUI.Item.SequencerMenuButton.ActionType;
 
 import java.util.Map.Entry;
 import SceneItems.TouchPointCursor;
@@ -76,9 +78,18 @@ import java.util.concurrent.Semaphore;
 import java.util.concurrent.SynchronousQueue;
 import java.util.concurrent.atomic.AtomicLong;
 
+import lazerdoom.lazerdoom;
+
 public class SequencerView extends QGraphicsView implements Client, TouchItemInterface {	
 
 	private QWidget parentWidget;
+	private lazerdoom lzrdm;
+	
+	private static SequencerView instance;
+	
+	public static SequencerView getInstance() {
+		return SequencerView.instance;
+	}
 	
 	public static QGLWidget sharedGlWidget;
 	private LinkedList<TouchableEditor> editors = new LinkedList<TouchableEditor>();
@@ -187,15 +198,10 @@ public class SequencerView extends QGraphicsView implements Client, TouchItemInt
 	 *
 	 */
 	
-	private static SequencerView instance = null;
-	public static SequencerView getInstance() {
-		return instance;
-	}
-	
 	private int viewGroupID = 1;
 	private LinkedList<Integer> viewGestures = new LinkedList<Integer>();
 	
-	private LinkedList<SequenceButton> menuItems = new LinkedList<SequenceButton>();
+	private LinkedList<SequencerMenuButton> menuItems = new LinkedList<SequencerMenuButton>();
 	
 	private void createMenuItems() {
 		double margin = 10;
@@ -205,68 +211,69 @@ public class SequencerView extends QGraphicsView implements Client, TouchItemInt
 		//basic size
 		QRectF sceneRect = new QRectF(0,0,2000,2000);//scene.sceneRect();
 		
-		SequenceButton button1 = new SequenceButton("addSequence");
-		SequenceButton button2 = new SequenceButton("addSynth");
-		SequenceButton button3 = new SequenceButton("delete");
-		
+		SequencerMenuButton button1 = new SequencerMenuButton(ActionType.addSequence);
+		SequencerMenuButton button2 = new SequencerMenuButton(ActionType.addSynth);
+		//SequencerMenuButton button3 = new SequencerMenuButton("delete");
+				
 		QRectF buttonRect = button1.boundingRect();
 		double verticalOffset = (sceneRect.height() - (buttonRect.height()*3))/2;
 		
 		button1.setPos(buttonRect.width(),verticalOffset);
 		button2.setPos(buttonRect.width(),verticalOffset+margin+buttonRect.height());
-		button3.setPos(buttonRect.width(),verticalOffset+2*(margin+buttonRect.height()));
+		//button3.setPos(buttonRect.width(),verticalOffset+2*(margin+buttonRect.height()));
 		
-		scene.addItem(button1);
-		scene.addItem(button2);
-		scene.addItem(button3);
-		
-		menuItems.add(button1);
-		menuItems.add(button2);
-		menuItems.add(button3);
-
-		button3 = new SequenceButton("addSequence");
-		button2 = new SequenceButton("addSynth");
-		button1 = new SequenceButton("delete");
 		
 		button1.setParent(this);
 		button2.setParent(this);
-		button3.setParent(this);
+		//button3.setParent(this);
+		
+		scene.addItem(button1);
+		scene.addItem(button2);
+		//scene.addItem(button3);
+		
+		menuItems.add(button1);
+		menuItems.add(button2);
+		//menuItems.add(button3);
 
+		button1 = new SequencerMenuButton(ActionType.addSequence);
+		button2 = new SequencerMenuButton(ActionType.addSynth);
+		//button1 = new SequencerMenuButton("delete");
 		
 		button1.setPos(sceneRect.width()-buttonRect.width(),verticalOffset);
 		button2.setPos(sceneRect.width()-buttonRect.width(),verticalOffset+margin+buttonRect.height());
-		button3.setPos(sceneRect.width()-buttonRect.width(),verticalOffset+2*(margin+buttonRect.height()));
+		//button3.setPos(sceneRect.width()-buttonRect.width(),verticalOffset+2*(margin+buttonRect.height()));
 		
 		button1.rotate(180.0);
 		button2.rotate(180.0);
-		button3.rotate(180.0);
+		//button3.rotate(180.0);
 
 		button1.setParent(this);
 		button2.setParent(this);
-		button3.setParent(this);
+		//button3.setParent(this);
 
 		
 		scene.addItem(button1);
 		scene.addItem(button2);
-		scene.addItem(button3);
+		//scene.addItem(button3);
 		
 		menuItems.add(button1);
 		menuItems.add(button2);
-		menuItems.add(button3);
+		//menuItems.add(button3);
 	}
 	
 	private Editor sequencerEditor;
 	
-	public SequencerView(Editor editor) {
+	public SequencerView(Editor editor, lazerdoom lzrdm) {
 	
 		this.sequencerEditor = editor;
+		this.lzrdm = lzrdm;
 		
 		/*
 		 * Gestures supported by the view
 		 */
 		
-		//viewGestures.add(sparshui.gestures.GestureType.TOUCH_GESTURE.ordinal());
-		//viewGestures.add(sparshui.gestures.GestureType.DRAG_GESTURE.ordinal());
+		viewGestures.add(sparshui.gestures.GestureType.TOUCH_GESTURE.ordinal());
+		viewGestures.add(sparshui.gestures.GestureType.DRAG_GESTURE.ordinal());
 		viewGestures.add(sparshui.gestures.GestureType.GROUP_GESTURE.ordinal());
 		viewGestures.add(sparshui.gestures.GestureType.DELETE_GESTURE.ordinal());
 		
@@ -297,9 +304,11 @@ public class SequencerView extends QGraphicsView implements Client, TouchItemInt
 		createMenuItems();
 		this.centerOn(new QPointF(sceneRect.height()/2, sceneRect.width()/2));
 		this.scale(scale, scale);
+		this.viewport().setSizePolicy(Policy.Maximum, Policy.Maximum);
+		this.setSceneRect(this.scene().sceneRect());
 		
 		//this.scene().setItemIndexMethod(ItemIndexMethod.NoIndex);
-		
+		/*
 		
 		
 		SequenceItem si1 = new SequenceItem(true);
@@ -354,7 +363,7 @@ public class SequencerView extends QGraphicsView implements Client, TouchItemInt
 		this.scene().addItem(new SequenceConnection( si2.getSequenceOutConnector(), si4.getSequenceInConnector()));
 		this.scene().addItem(new SynthConnection(synth.getSynthInConnectors().get(1), si4.getSynthOutConnectors().get(0)));
 		this.scene().addItem(new SynthConnection(synth.getSynthInConnectors().get(0), si2.getSynthOutConnectors().get(0)));
-		this.scene().addItem(new SynthConnection(synth.getSynthInConnectors().get(2), si3.getSynthOutConnectors().get(0)));
+		this.scene().addItem(new SynthConnection(synth.getSynthInConnectors().get(2), si3.getSynthOutConnectors().get(0)));*/
 		//this.scene().addItem(new SynthConnection(synth.getSynthInConnectors().get(3), si6.getSynthOutConnectors().get(0)));
 		//this.scene().addItem(new MulticontrolItem());
 	
@@ -424,7 +433,7 @@ public class SequencerView extends QGraphicsView implements Client, TouchItemInt
 		//gv.setSizeIncrement(500, 800);
 		//x.setWidget(new QGraphicsView());
 
-		EventPointsSequence<DoubleType> s = new EventPointsSequence<DoubleType>(new TestingSequencer());
+		/*EventPointsSequence<DoubleType> s = new EventPointsSequence<DoubleType>(new TestingSequencer());
 		s.insert(new DoubleType(0.5), 100);
 		s.insert(new DoubleType(-0.5), 200);
 		s.insert(new DoubleType(1.0), 300);
@@ -443,7 +452,7 @@ public class SequencerView extends QGraphicsView implements Client, TouchItemInt
 		fview.setScene(sc);
 		this.scene().addItem(editor);
 		editor.setPos(800, 800);
-		this.registerEditor(editor);
+		this.registerEditor(editor);*/
 	}
 		
 	public void registerTouchItem(TouchItemInterface it) {
@@ -600,6 +609,7 @@ public class SequencerView extends QGraphicsView implements Client, TouchItemInt
 					TouchEvent e = (TouchEvent) event;
 					e.setSceneLocation(convertScreenPos(e.getX(), e.getY()));
 				} 
+				System.out.println(it);
 				it.processEvent(event);
 			}
 		//}
@@ -631,22 +641,21 @@ public class SequencerView extends QGraphicsView implements Client, TouchItemInt
 
 	@Override
 	public void mousePressEvent(QMouseEvent event) {
-	     System.out.println("??????????CLICK CLICK CLICK CLICK" + event.x() +  " " +event.y());
-	     super.mousePressEvent(event);
+		this.lzrdm.handleMousePressEvent(event);
+	    super.mousePressEvent(event);
 	}
-//	
-//	@Override
-//	public void mouseMoveEvent(QMouseEvent event) {
-//		System.out.println("move move move"+ event.x() +  " " +event.y());
-//		this.scene().addEllipse(event.x(), event.y(), 30,30);
-//		//System.out.println(viewport().visibleRegion());
-//		super.mouseMoveEvent(event);
-//	}
-//	
-//	@Override
-//	public void mouseReleaseEvent(QMouseEvent event) {
-//		super.mouseReleaseEvent(event);
-//	}
+	
+	@Override
+	public void mouseMoveEvent(QMouseEvent event) {
+		this.lzrdm.handleMouseMoveEvent(event);
+		super.mouseMoveEvent(event);
+	}
+	
+	@Override
+	public void mouseReleaseEvent(QMouseEvent event) {
+		this.lzrdm.handleMouseReleaseEvent(event);
+		super.mouseReleaseEvent(event);
+	}
 
 	
 	private void sendMouseEventFromTouchEvent(TouchEvent touchEvent) {
@@ -671,28 +680,18 @@ public class SequencerView extends QGraphicsView implements Client, TouchItemInt
 			TouchEvent e = (TouchEvent) event;
 			e.setSceneLocation(convertScreenPos(e.getX(), e.getY()));
 			this.sequencerEditor.handleTouchEvent(e);
+			System.out.println("WHA?");
 		} 
 		if(event instanceof ExtendedGestureEvent) {
 			ExtendedGestureEvent e = (ExtendedGestureEvent) event;
 			e.setSceneLocation(convertScreenPos(e.getRelX(), e.getRelY()));
-			this.sequencerEditor.handleExtendedGestureEvent(e);
-			
-			if(event instanceof DeleteEvent) {
-				if(ellipse == null) {
-					ellipse = new QGraphicsEllipseItem(-30,-30,60,60);
-					ellipse.setPen(new QPen(QColor.white));
-					ellipse.setPos(500,500);
-					this.scene().addItem(ellipse);
-					ellipse = new QGraphicsEllipseItem(-15,-15,30,30);
-					ellipse.setPen(new QPen(QColor.red));
-					this.scene().addItem(ellipse);
-				}
+			if(e instanceof DeleteEvent) {
 				if(((DeleteEvent) e).getCrossPoint() != null) {
-					QPointF point = convertScreenPos(((DeleteEvent) e).getCrossPoint().x(),((DeleteEvent) e).getCrossPoint().y());
-					ellipse.setPos(point);
-					System.out.println("WHATxdddd "+point);
+					((DeleteEvent) e).setSceneCrossPoint(convertScreenPos(((DeleteEvent) e).getCrossPoint().x(),((DeleteEvent) e).getCrossPoint().y()));
 				}
 			}
+			
+			this.sequencerEditor.handleExtendedGestureEvent(e);
 
 		}
 		/*if(event instanceof DragEvent) {

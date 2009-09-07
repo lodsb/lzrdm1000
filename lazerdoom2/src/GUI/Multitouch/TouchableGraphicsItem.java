@@ -62,7 +62,9 @@ public abstract class TouchableGraphicsItem extends QGraphicsItem implements Tou
 	@Override
 	public boolean processEvent(Event event) {
 		if(parent != null && enableTouchEvents) {
-			event.setSource(this);
+			if(event.getSource() == null) {
+				event.setSource(this);
+			}
 			return parent.processEvent(event);
 		} 
 		

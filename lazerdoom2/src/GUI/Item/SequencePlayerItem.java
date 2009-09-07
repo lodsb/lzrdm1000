@@ -3,6 +3,8 @@ package GUI.Item;
 import java.util.LinkedList;
 import java.util.List;
 
+import lazerdoom.Core;
+
 import sparshui.common.Event;
 import sparshui.common.TouchState;
 import sparshui.common.messages.events.TouchEvent;
@@ -18,8 +20,12 @@ import com.trolltech.qt.gui.QStyleOptionGraphicsItem;
 import com.trolltech.qt.gui.QWidget;
 import com.trolltech.qt.svg.QSvgRenderer;
 import GUI.Multitouch.*;
+import Sequencer.SequenceEvent;
+import Sequencer.SequenceEventListenerInterface;
+import Sequencer.SequencePlayer;
+import Sequencer.SequenceEvent.SequenceEventType;
 
-public class SequencePlayerItem extends BaseSequenceViewItem implements ConnectableSequenceInterface {
+public class SequencePlayerItem extends BaseSequenceViewItem implements ConnectableSequenceInterface, SequenceEventListenerInterface {
 	
 	private static QRectF boundingRect = new QRectF(0,0,200,200);
 	private QRectF centerRect = new QRectF(39.5,39.5, 121, 121);
@@ -138,16 +144,21 @@ public class SequencePlayerItem extends BaseSequenceViewItem implements Connecta
 		}
 	}
 	
+	private SequencePlayer sequencePlayer;
 	
-	public SequencePlayerItem() {
+	public SequencePlayerItem(SequencePlayer sequencePlayer) {
+		this.sequencePlayer = sequencePlayer;
+		
 		QSvgRenderer renderer = new QSvgRenderer(svgFileName);
 		playButton = new Button(renderer, "playing", "play");
 		playButton.pressed.connect(this, "stopPressed()");
+		playButton.setState(ButtonState.OFF);
 		playButton.setParentItem(this);
 		playButton.setPos(100,60);
 			
 		stopButton = new Button(renderer, "stopping", "stop");
 		stopButton.pressed.connect(this, "stopPressed()");
+		stopButton.setState(ButtonState.ON);
 		stopButton.setParentItem(this);
 		stopButton.setPos(100,140);
 		
@@ -159,17 +170,30 @@ public class SequencePlayerItem extends BaseSequenceViewItem implements Connecta
 		connector.setPos(200,75);
 		this.outConnector = connector;
 		
-		this.setFlag(GraphicsItemFlag.ItemIsMovable, true);
-		this.setFlag(GraphicsItemFlag.ItemIsSelectable, true);
+		//this.setFlag(GraphicsItemFlag.ItemIsMovable, true);
+		//this.setFlag(GraphicsItemFlag.ItemIsSelectable, true);
 		this.updateGradientBrush();
+		
+		Core.getInstance().getSequenceController().registerSequenceInterfaceEventListener(sequencePlayer, this);
 	}
 	
+	private long startTicks = 0;
+	private long stopTicks = 0;
+	
 	private void stopPressed() {
-		
+		if(stopTicks == 0) {
+			this.sequencePlayer.stopSequenceImmidiately();
+		} else {
+			this.sequencePlayer.scheduleStop(stopTicks);
+		}
 	}
 	
 	private void playPressed() {
-		
+		if(startTicks == 0) {
+			this.sequencePlayer.startSequenceImmidiately();
+		} else {
+			this.sequencePlayer.scheduleStart(startTicks);
+		}
 	}
 	
 	@Override
@@ -238,6 +262,29 @@ public class SequencePlayerItem extends BaseSequenceViewItem implements Connecta
 	public QSizeF getMaximumSize() {
 		// TODO Auto-generated method stub
 		return null;
+	}
+
+	@Override
+	public void dispatchSequenceEvent(SequenceEvent se) {
+		if(se.getSequenceEventType() == SequenceEventType.SEQUENCE_PLAYER_STARTED) {
+			this.playButton.setState(ButtonState.ON);
+			this.stopButton.setState(ButtonState.OFF);
+		} 
+
+		if(se.getSequenceEventType() == SequenceEventType.SEQUENCE_PLAYER_STOPPED) {
+			this.playButton.setState(ButtonState.OFF);
+			this.stopButton.setState(ButtonState.ON);
+		} 
+		
+		if(se.getSequenceEventType() == SequenceEventType.SEQUENCE_PLAYER_STARTING) {
+			this.playButton.setState(ButtonState.BLINKING);
+			this.stopButton.setState(ButtonState.OFF);
+		}
+		
+		if(se.getSequenceEventType() == SequenceEventType.SEQUENCE_PLAYER_STARTING) {
+			this.playButton.setState(ButtonState.OFF);
+			this.stopButton.setState(ButtonState.BLINKING);
+		} 
 	}
 
 }

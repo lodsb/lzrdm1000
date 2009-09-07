@@ -29,10 +29,8 @@ public class SinglePointDragGesture extends MultiPointDragGesture {
 	@Override
 	protected Vector<Event> processDeath(TouchData touchData) {
 		Vector<Event> events = new Vector<Event>();
-		DragEvent e = new DragEvent(_offsetCentroid.getX(), _offsetCentroid.getY());
+		DragEvent e = new DragEvent(_offsetCentroid, false, true, touchData.getUniqueID());
 		super.processDeath(touchData);
-		e.setTouchID(touchData.getUniqueID());
-		e.setDrop(true);
 		events.add(e);
 		return events;
 	}

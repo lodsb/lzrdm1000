@@ -173,7 +173,6 @@ public class SequenceItem extends BaseSequenceViewItem implements ConnectableSeq
 			SynthOutConnector synthOutConnector = new SynthOutConnector("Sequence");
 			//connector.scale(2.0, 2.0);
 			synthOutConnector.setZValue(100.0);
-			synthOutConnector.setParentItem(this);
 			synthOutConnector.rotate(180.0);
 			synthOutConnector.setPos(125,240);
 			

@@ -19,7 +19,7 @@ import Sequencer.Sequencer;
 import Sequencer.Graph.SequenceGraph;
 import Synth.SynthInfo;
 import Synth.SynthInstance;
-import Synth.SynthManager;
+import Synth.SynthController;
 import de.sciss.jcollider.Server;
 import de.sciss.jcollider.Synth;
 import de.sciss.jcollider.gui.ServerPanel;
@@ -29,7 +29,7 @@ public class Core {
 	private Sequencer sequencer;
 	private SequenceController sequenceController;
 	private ControlServer controlServer;
-	private SynthManager synthManager; 
+	private SynthController synthController; 
 	private Server superColliderServer;
 	private Process jackProcess; 
 	
@@ -73,8 +73,8 @@ public class Core {
 		core.getSequenceController().connectSequences(sp, e3);
 		core.getSequenceController().connectSequences(e3, e4);
 		
-		SynthInstance si = core.createSynthInstance((core.getSynthManager().getAvailableSynths().get(0)));
-		SynthInstance si2 = core.createSynthInstance((core.getSynthManager().getAvailableSynths().get(1)));
+		SynthInstance si = core.getSynthController().createSynthInstance((core.getSynthController().getAvailableSynths().get(0)));
+		SynthInstance si2 = core.getSynthController().createSynthInstance((core.getSynthController().getAvailableSynths().get(1)));
 		
 		
 		
@@ -208,32 +208,21 @@ public class Core {
 		clock.setInterval(Sequencer.bpmToPPQNanos(this.stdTempo));
 		
 		this.startSupercolliderServer();
-		synthManager = new SynthManager(this.superColliderServer);
-		synthManager.init();
+		synthController = new SynthController(this.superColliderServer, this.controlServer);
+		synthController.init();
 		
 		
 		Core.instance = this;
 		
 		this.createAndShowServerPanel();
 	}
-	
-	public SynthInstance createSynthInstance(SynthInfo info) {
-		Synth synth = this.synthManager.createSynthInstance(info);
-		SynthInstance synthInstance = null;
-		
-		if(info != null) {
-			synthInstance = new SynthInstance(this.controlServer, info, synth);
-		}
-			
-		return synthInstance;
-	}
 
 	public SequenceController getSequenceController() {
 		return this.sequenceController;
 	}
 	
-	public SynthManager getSynthManager() {
-		return this.synthManager;
+	public SynthController getSynthController() {
+		return this.synthController;
 	}
 	
 	public Server getScServer() {

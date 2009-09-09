@@ -10,7 +10,7 @@ import com.trolltech.qt.gui.QPainterPath;
 import GUI.Multitouch.TouchableGraphicsItem;
 import Sequencer.BaseSequence;
 
-abstract public class BaseSequenceViewItem extends BaseSequencerItem {
+abstract public class BaseSequencerItem extends TouchableGraphicsItem {
 	private static QRectF rect = new QRectF(0,0,200,200);
 	private static QPainterPath p = null;
 	
@@ -24,8 +24,6 @@ abstract public class BaseSequenceViewItem extends BaseSequencerItem {
 		}
 		return p;
 	}
-	
-	public abstract BaseSequence getBaseSequence();
 	
 	/*public void mouseMoveEvent(QGraphicsSceneMouseEvent event) {
 		this.setPosition(this.mapToScene(event.pos()));

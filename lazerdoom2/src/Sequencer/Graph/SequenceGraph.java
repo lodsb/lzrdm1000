@@ -286,6 +286,8 @@ public class SequenceGraph {
 		LinkedList<SequenceStructureNode> newStructure = sequenceStructureFromGraph();
 		System.out.println(newStructure);
 		buildSequenceContainers(rootContainer, newStructure, currentStructure, sequencer);
+		System.out.println("GRAPH STRUCTURE: "+rootContainer);
+		System.out.println("#######");
 	}
 	
 	private void buildSequenceContainers(SequenceContainerInterface rootContainer, LinkedList<SequenceStructureNode> newStructure, LinkedList<SequenceStructureNode> oldStructure, SequencerInterface sequencer) {

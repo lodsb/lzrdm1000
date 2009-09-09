@@ -17,9 +17,14 @@ import com.trolltech.qt.gui.QPen;
 import com.trolltech.qt.gui.QRadialGradient;
 import com.trolltech.qt.gui.QStyleOptionGraphicsItem;
 import com.trolltech.qt.gui.QWidget;
-import GUI.Multitouch.*;
 
-public class SynthesizerItem extends BaseSequenceViewItem implements ConnectableSynthInterface {
+import Control.ParameterControlBus;
+import GUI.Multitouch.*;
+import GUI.View.SequencerView;
+import Sequencer.BaseSequence;
+import Synth.SynthInstance;
+
+public class SynthesizerItem extends BaseSynthesizerItem implements ConnectableSynthInterface {
 	private QRectF contentsRect = new QRectF(39.5,39.5, 121, 121);
 	private static QColor normalColor = new QColor(130,130,130); 
 	private static QColor actionColor = new QColor(211,120,0);
@@ -36,24 +41,31 @@ public class SynthesizerItem extends BaseSequenceViewItem implements Connectable
 
 	private QImage mnemonic = createMnemonic(boundingRect, 10, 8, 40);
 
-	public SynthesizerItem(String[] inPortNames) {
+	private SynthInstance synth;
+	
+	public SynthesizerItem(SynthInstance synth) {
 		this.setBrushes();
+		this.synth = synth;
 		
-		this.setFlag(GraphicsItemFlag.ItemIsMovable, true);
-		this.setFlag(GraphicsItemFlag.ItemIsSelectable, true);
+		/*this.setFlag(GraphicsItemFlag.ItemIsMovable, true);
+		this.setFlag(GraphicsItemFlag.ItemIsSelectable, true);*/
 		
-		this.addPorts(inPortNames);
+		this.addPorts();
+		
+		this.setParent(SequencerView.getInstance());
 	}
 	
-	private void addPorts(String[] inPortNames) {
+	private void addPorts() {
 		inPorts = new LinkedList<SynthInConnector>();
 		outPorts = new LinkedList<SynthOutConnector>();
 		
-		if(inPortNames == null) {
+		ParameterControlBus[] busses = this.synth.getControlBusses();
+		
+		if(busses == null || busses.length == 0) {
 			return;
 		}
 		
-		int numberOfIns = inPortNames.length;
+		int numberOfIns = busses.length;
 
 		SynthInConnector connector;
 
@@ -74,17 +86,17 @@ public class SynthesizerItem extends BaseSequenceViewItem implements Connectable
 
 		for(double i = alignment; i < 1.0; i+=increment) {
 			if(i <= 0.0) continue;
-			QPointF p = path.pointAtPercent(i);
+			QPointF p = path.pointAtPercent(1.0-i);
 			ptList.add(p);
-			rotList.add(path.angleAtPercent(i));
+			rotList.add(path.angleAtPercent(1.0-i));
 		}
 
 
 		int i = 0;
 		for(QPointF p: ptList) {
-			connector = new SynthInConnector(inPortNames[i]);
+			connector = new SynthInConnector(busses[i].getControlDesc().getName(), busses[i], this.synth);
 			//connector.scale(2.0, 2.0);
-			connector.setParentItem(this);
+			connector.setParent(this);
 			connector.rotateCentered(-rotList.get(i));
 			connector.setPos(p);
 			inPorts.add(connector);
@@ -214,4 +226,14 @@ public class SynthesizerItem extends BaseSequenceViewItem implements Connectable
 		return null;
 	}
 
+	@Override
+	public SynthInstance getSynthesizer() {
+		return this.synth;
+	}
+
+	@Override
+	public void setSynthesizer(SynthInstance synth) {
+		// TODO Auto-generated method stub
+		
+	}
 }

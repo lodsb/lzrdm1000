@@ -19,7 +19,7 @@ import Sequencer.SequenceContainerInterface;
 import Sequencer.Sequencer;
 import Sequencer.HighResolutionPollingClock;
 import Sequencer.SequencerInterface;
-import Synth.SynthManager;
+import Synth.SynthController;
 import de.sciss.jcollider.*;
 import de.sciss.jcollider.gui.ServerPanel;
 
@@ -28,7 +28,7 @@ public class LazerDoom extends QWidget {
 	private Sequencer sequencer;
 	private SequenceContainerInterface mainSequenceContainer;
 	private ControlServer controlServer;
-	private SynthManager synthManager; 
+	private SynthController synthManager; 
 	private Server superColliderServer;
 	private JFrame serverPanel;
 	
@@ -84,7 +84,7 @@ public class LazerDoom extends QWidget {
 		clock = new HighResolutionPollingClock(100000, (SequencerInterface) sequencer);
 		
 		this.startSupercolliderServer();
-		synthManager = new SynthManager(this.superColliderServer);
+		synthManager = new SynthController(this.superColliderServer);
 		synthManager.init();
 		clock.start();
 		

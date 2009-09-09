@@ -3,7 +3,7 @@ package Sequencer;
 import Control.ControlBusInterface;
 import Control.Types.BaseType;
 
-interface EventSequenceInterface<EventType extends BaseType> extends SequenceInterface {
+public interface EventSequenceInterface<EventType extends BaseType> extends SequenceInterface {
 	//package
 	void insert(EventType t, long tick);
 	void remove(long tick);

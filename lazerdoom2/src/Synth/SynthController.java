@@ -4,9 +4,14 @@ import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 
+import Control.ControlServer;
+import Control.ParameterControlBus;
+import Sequencer.EventSequenceInterface;
+import Synth.Graph.SynthesizerGraph;
+
 import de.sciss.jcollider.*;
 
-public class SynthManager {
+public class SynthController {
 	private Server server;
 	
 	private LinkedList<SynthLoaderInterface> synthLoaderList = new LinkedList<SynthLoaderInterface>();
@@ -15,10 +20,14 @@ public class SynthManager {
 	private HashMap<SynthInfo, SynthLoaderInterface> synthLoaderMap = new HashMap<SynthInfo, SynthLoaderInterface>();
 	private HashMap<Synth, SynthInfo> synthInfoMap = new HashMap<Synth, SynthInfo>();
 	
-	private StaticSynthLoader staticSynthLoader;
+	private SynthesizerGraph graph = new SynthesizerGraph();
 	
-	public SynthManager(Server server) {
+	private StaticSynthLoader staticSynthLoader;
+	private ControlServer controlServer;
+	
+	public SynthController(Server server, ControlServer controlServer) {
 		this.server = server;
+		this.controlServer = controlServer;
 		staticSynthLoader = new StaticSynthLoader(this.server);
 	}
 	
@@ -41,7 +50,11 @@ public class SynthManager {
 		return (List<Synth>) loadedSynths.clone();
 	}
 	
-	public Synth createSynthInstance(SynthInfo info) {
+	public boolean connect(EventSequenceInterface seq, SynthInstance synth, ParameterControlBus controlBus) {
+		return this.graph.connect(seq, synth, controlBus);
+	}
+	
+	public SynthInstance createSynthInstance(SynthInfo info) {
 		Synth synth = null;
 		
 		SynthLoaderInterface sli = synthLoaderMap.get(info);
@@ -54,7 +67,13 @@ public class SynthManager {
 			}
 		}
 		
-		return synth;
+		SynthInstance synthInstance = null;
+		
+		if(info != null) {
+			synthInstance = new SynthInstance(this.controlServer, info, synth);
+		}
+			
+		return synthInstance;
 	}
 	
 	public SynthInfo getSynthInfo(Synth synth) {

@@ -36,6 +36,14 @@ public class SynthConnector extends TouchableGraphicsItem {
 		//this.setTransform(new QTransform().translate(p.x(), p.y()));
 	}
 	
+	protected void setIsInPort(boolean isIn) {
+		this.isInPort = isIn;
+	}
+	
+	public boolean isInPort() {
+		return this.isInPort;
+	}
+	
 	public SynthConnector() {
 		this.setFlag(GraphicsItemFlag.ItemIsSelectable,true);
 		this.setZValue(10);

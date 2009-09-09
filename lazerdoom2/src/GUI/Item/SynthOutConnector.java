@@ -6,6 +6,7 @@ public class SynthOutConnector extends SynthConnector {
 
 	public SynthOutConnector(String parameterName) {
 		this.parameterName = parameterName;
+		super.setIsInPort(false);
 	}
 
 	public String getParameterName() {

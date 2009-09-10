@@ -1,5 +1,8 @@
 package GUI.Item;
 
+import java.util.LinkedList;
+import java.util.List;
+
 import com.trolltech.qt.core.QPointF;
 import com.trolltech.qt.core.QRectF;
 import com.trolltech.qt.core.QSizeF;
@@ -49,6 +52,22 @@ public class SynthConnector extends TouchableGraphicsItem {
 		this.setZValue(10);
 	}
 
+	
+	private LinkedList<SynthConnection> connections = new LinkedList<SynthConnection>();
+	
+	public void addConnection(SynthConnection connection) {
+		this.connections.add(connection);
+	}
+	
+	public void removeConnection(SynthConnection connection) {
+		this.connections.remove(connection);
+	}
+	
+	public List<SynthConnection> getConnections() {
+		return this.connections;
+	}
+	
+	
 	public QLineF baseToTopLineInScene() {
 
 		double x1 = boundingRect.topLeft().x()+boundingRect.width()/2;

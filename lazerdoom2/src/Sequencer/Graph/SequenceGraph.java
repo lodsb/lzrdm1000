@@ -177,22 +177,29 @@ public class SequenceGraph {
 			connections = new LinkedList<Pair<SequenceInterface>>();
 			LinkedList<Integer> edges = new LinkedList<Integer>();
 			
-			for(Integer edge :graph.getInEdges(rm)) {
-				SequenceNode sourceNode = graph.getSource(edge);
-				if(sourceNode.getSequence() instanceof SequencePlayerInterface) {
-					((SequencePlayerInterface)sourceNode.getSequence()).setSequence(null);
+			Collection<Integer> inEdges = graph.getInEdges(rm);
+			
+			if(inEdges != null) {
+				for(Integer edge : inEdges) {
+					SequenceNode sourceNode = graph.getSource(edge);
+					if(sourceNode.getSequence() instanceof SequencePlayerInterface) {
+						((SequencePlayerInterface)sourceNode.getSequence()).setSequence(null);
+					}
+					connections.add(new Pair<SequenceInterface>(sourceNode.getSequence(), rm.getSequence()));
+					//graph.removeEdge(edge);
+					edges.add(edge);
 				}
-				connections.add(new Pair<SequenceInterface>(sourceNode.getSequence(), rm.getSequence()));
-				//graph.removeEdge(edge);
-				edges.add(edge);
+
 			}
+			Collection<Integer> outEdges = graph.getOutEdges(rm);
 			
-			for(Integer edge :graph.getOutEdges(rm)) {
-				connections.add(new Pair<SequenceInterface>(rm.getSequence(), graph.getSource(edge).getSequence()));
-				//graph.removeEdge(edge);
-				edges.add(edge);
+			if(outEdges != null) {
+				for(Integer edge : outEdges) {
+					connections.add(new Pair<SequenceInterface>(rm.getSequence(), graph.getSource(edge).getSequence()));
+					//graph.removeEdge(edge);
+					edges.add(edge);
+				}
 			}
-			
 			for(Integer edge: edges) {
 				graph.removeEdge(edge);
 			}
@@ -275,6 +282,9 @@ public class SequenceGraph {
 		Integer edge = graph.findEdge(source, target);
 		
 		if(edge != null) {
+			if(source.getSequence() instanceof SequencePlayer) {
+				((SequencePlayer) source.getSequence()).setSequence(null);
+			}
 			graph.removeEdge(edge);
 			ret = true;
 		}
@@ -394,7 +404,7 @@ public class SequenceGraph {
 				}
 			}
 			
-			if(oldStructure != null) {
+			if(oldStructure != null && oldStructure.container != null) {
 				oldStructure.container.updateStructure(sequences);
 				newStructure.container = oldStructure.container;
 			} else {

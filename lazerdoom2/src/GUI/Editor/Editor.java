@@ -11,6 +11,8 @@ import GUI.Scene.Editor.EditorScene;
 
 import com.trolltech.qt.core.QObject;
 import com.trolltech.qt.core.QPointF;
+import com.trolltech.qt.core.QTimer;
+import com.trolltech.qt.gui.QBrush;
 import com.trolltech.qt.gui.QColor;
 import com.trolltech.qt.gui.QGraphicsEllipseItem;
 import com.trolltech.qt.gui.QGraphicsItemInterface;
@@ -72,12 +74,12 @@ public class Editor extends QObject {
 	
 	public void handleTouchEvent(TouchEvent event) {
 		if(this.showTouchEvents) {
-			System.out.println("trueeeeeeeee");
+			//System.out.println("trueeeeeeeee");
 			
 				TouchPointCursor tc = null;
 				TouchEvent e = (TouchEvent) event;
 				
-				System.out.println(e.getState()+"+++++++++");
+				//System.out.println(e.getState()+"+++++++++");
 				
 				if(e.getState() == TouchState.BIRTH) {					
 					tc = new TouchPointCursor();
@@ -120,17 +122,31 @@ public class Editor extends QObject {
 	}
 	
 	private QGraphicsEllipseItem deleteEllipse = null;
+	private QTimer deleteEllipseTimer = new QTimer();
 	protected void handleDeleteEvent(DeleteEvent event) {
 		
-		if(event instanceof DeleteEvent) {
+		if(event.isSuccessful()) {
 			if(deleteEllipse == null) {
-				deleteEllipse = new QGraphicsEllipseItem(-15,-15,30,30);
+				deleteEllipse = new QGraphicsEllipseItem(-20,-20,40,40);
 				deleteEllipse.setPen(new QPen(QColor.red));
+				deleteEllipse.setBrush(new QBrush(QColor.red));
 				this.scene.addItem(deleteEllipse);
+				
+				deleteEllipseTimer.timeout.connect(this, "deleteEllipseShowTimeout()");
+				deleteEllipse.hide();
 			}
 			if(((DeleteEvent) event).getCrossPoint() != null) {
+				//deleteEllipseTimer.stop();
 				deleteEllipse.setPos(event.getSceneCrossPoint());
+				deleteEllipse.show();
+				deleteEllipseTimer.start(1000);
 			}
+		}
+	}
+	
+	private void deleteEllipseShowTimeout() {
+		if(deleteEllipse != null && deleteEllipse.isVisible()) {
+			deleteEllipse.hide();
 		}
 	}
 	

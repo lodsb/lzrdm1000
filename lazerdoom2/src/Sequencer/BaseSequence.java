@@ -2,6 +2,7 @@ package Sequencer;
 
 import java.util.concurrent.ConcurrentLinkedQueue;
 
+import GUI.View.SequencerView;
 import Sequencer.SequenceEvent.SequenceEventSubtype;
 import Sequencer.SequenceEvent.SequenceEventType;
 
@@ -31,11 +32,12 @@ public abstract class BaseSequence extends QObject implements SequenceInterface 
 	
 	void _pumpSequenceEvent(SequenceEvent se) {
 		for(SequenceEventListenerInterface seli: eventListeners) {
-			seli.dispatchSequenceEvent(se);
+			SequencerView.getInstance().propagateSequenceEvent(seli, se);
 		}
 	}
 	
 	void _pumpSequenceEval(long tick) {
+		System.out.println("DFDDDDSSD");
 		for(SequenceEvalListenerInterface svali: evalListeners) {
 			svali.dispatchEvalEvent(tick);
 		}
@@ -65,8 +67,15 @@ public abstract class BaseSequence extends QObject implements SequenceInterface 
 	@Override
 	public abstract SequenceInterface deepCopy();
 
+	private long updateResolution = 2;
 	@Override
-	public abstract boolean eval(long tick);
+	public boolean eval(long tick) {
+		if(tick % updateResolution == 0) {
+			this.postSequenceEvent(SequenceEventType.EVALUATED_LOW_FREQ, SequenceEventSubtype.TICK, tick);
+		}
+		
+		return true;
+	}
 
 	@Override
 	public abstract boolean isRunning();

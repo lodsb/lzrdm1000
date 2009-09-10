@@ -145,6 +145,7 @@ public class EventPointsSequence<EventType extends BaseType> extends BaseSequenc
 		tick = tick+this.startOffset;
 		EventType event;
 		// random
+		super.eval(tick);
 		if((event = events.get(tick)) != null) {
 			for(ControlBusInterface<EventType> bus: this.controlBuses) {
 				bus.setValue(this, tick, event);

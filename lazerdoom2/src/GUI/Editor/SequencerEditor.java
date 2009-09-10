@@ -1,23 +1,35 @@
 package GUI.Editor;
 
-import com.trolltech.qt.core.QPointF;
+import java.util.LinkedList;
+import java.util.List;
 
+import com.trolltech.qt.core.QPointF;
+import com.trolltech.qt.core.QRectF;
+import com.trolltech.qt.gui.QGraphicsItemInterface;
+
+import sparshui.common.messages.events.DeleteEvent;
 import sparshui.common.messages.events.DragEvent;
 import GUI.Editor.Commands.ConnectSequencesCommand;
 import GUI.Editor.Commands.ConnectSynthCommand;
 import GUI.Editor.Commands.CreateSequenceCommand;
 import GUI.Editor.Commands.CreateSequencePlayerCommand;
 import GUI.Editor.Commands.CreateSynthInstanceCommand;
+import GUI.Editor.Commands.DeleteSequenceConnectionCommand;
+import GUI.Editor.Commands.DeleteSequenceItemCommand;
+import GUI.Editor.Commands.DeleteSynthConnectionCommand;
 import GUI.Item.BaseSequenceViewItem;
 import GUI.Item.BaseSequencerItem;
 import GUI.Item.ConnectableSequenceInterface;
 import GUI.Item.ConnectableSynthInterface;
+import GUI.Item.SequenceConnection;
 import GUI.Item.SequenceConnector;
 import GUI.Item.SequenceItem;
 import GUI.Item.SequencerMenuButton;
+import GUI.Item.SynthConnection;
 import GUI.Item.SynthConnector;
 import GUI.Item.SynthInConnector;
 import GUI.Item.SynthOutConnector;
+import GUI.Multitouch.TouchableGraphicsItem;
 import GUI.Scene.Editor.EditorScene;
 
 public class SequencerEditor extends Editor {
@@ -26,6 +38,42 @@ public class SequencerEditor extends Editor {
 		super(scene, showTouchPoints);
 	}
 
+	private QRectF crossRect = new QRectF(-10, -10, 20,20);
+	
+	@Override
+	protected void handleDeleteEvent(DeleteEvent event) {
+		super.handleDeleteEvent(event);
+		
+		if(event.isSuccessful()) {
+			QPointF crossPoint = event.getSceneCrossPoint();
+			
+			crossRect.setX(crossPoint.x()-10.0);
+			crossRect.setY(crossPoint.y()-10.0);
+			crossRect.setWidth(20);
+			crossRect.setHeight(20);
+			List<QGraphicsItemInterface> items = this.getScene().items(crossRect);
+			
+			for(QGraphicsItemInterface item: items) {
+				if(item instanceof TouchableGraphicsItem) {
+					if(item instanceof SequenceItem) {
+						this.executeCommand(new DeleteSequenceItemCommand((SequenceItem)item, this.getScene()));
+						break;
+					}
+					
+					if(item instanceof SequenceConnection) {
+						this.executeCommand(new DeleteSequenceConnectionCommand((SequenceConnection)item, this.getScene()));
+						break;
+					}
+					
+					if(item instanceof SynthConnection) {
+						this.executeCommand(new DeleteSynthConnectionCommand((SynthConnection)item, this.getScene()));
+						break;
+					}
+				}
+			}
+		}
+	}
+	
 	@Override
 	protected void handleDragEvent(DragEvent event) {
 		if(event.getSource() instanceof BaseSequencerItem) {

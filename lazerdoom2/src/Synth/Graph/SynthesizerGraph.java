@@ -1,6 +1,7 @@
 package Synth.Graph;
 
 import java.beans.EventSetDescriptor;
+import java.util.Collection;
 import java.util.HashMap;
 
 import Sequencer.BaseSequence;
@@ -39,5 +40,61 @@ public class SynthesizerGraph {
 		seq.addControlBus(controlBus);
 		
 		return true;
+	}
+	
+	public boolean remove(SynthInstance synth) {
+		boolean ret = false;
+		
+		SynthesizerNode node = this.synthesizerNodes.get(synth);
+		
+		if(node != null) {
+			Collection<ParameterControlBusEdge> edges = graph.getInEdges(node);
+			
+			for(ParameterControlBusEdge edge: edges) {
+				SynthesizerNode source = graph.getSource(edge);
+				if(source.isSequenceNode()) {
+					source.getEventSequence().removeControlBus(edge.getParameterControlBus());
+				}
+			}
+			
+			graph.removeVertex(node);
+		}
+		
+		return ret;
+	}
+	
+	public boolean remove(EventSequenceInterface sequence) {
+		boolean ret = false;
+		
+		SynthesizerNode node = this.synthesizerNodes.get(sequence);
+		
+		if(node != null) {
+			if(node.isSequenceNode()) {
+				node.getEventSequence().removeAllControlBusses();
+			}
+			
+			graph.removeVertex(node);
+		}
+		
+		return ret;
+	}
+
+	public boolean disconnect(EventSequenceInterface sequence, SynthInstance synth) {
+		boolean ret = false;
+		SynthesizerNode synNode = this.synthesizerNodes.get(synth);
+		SynthesizerNode seqNode = this.synthesizerNodes.get(synth);
+		
+		if(synNode != null && seqNode != null) {
+			ParameterControlBusEdge edge = graph.findEdge(seqNode, synNode);
+			
+			if(edge != null) {
+				graph.removeEdge(edge);
+				seqNode.getEventSequence().removeControlBus(edge.getParameterControlBus());
+				
+				ret = true;
+			}
+		}
+		
+		return ret; 
 	}
 }

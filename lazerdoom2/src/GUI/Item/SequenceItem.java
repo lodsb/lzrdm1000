@@ -43,7 +43,7 @@ import com.trolltech.qt.gui.QStyleOptionGraphicsItem;
 import com.trolltech.qt.gui.QWidget;
 import com.trolltech.qt.gui.QPainter.RenderHint;
 
-public class SequenceItem extends BaseSequenceViewItem implements ConnectableSequenceInterface, ConnectableSynthInterface, SequenceEventListenerInterface, SequenceEvalListenerInterface {
+public class SequenceItem extends BaseSequenceViewItem implements ConnectableSequenceInterface, ConnectableSynthInterface, SequenceEventListenerInterface {
 
 	private static QColor normalColor = new QColor(130,130,130); 
 	private static QColor actionColor = new QColor(211,120,0);
@@ -123,7 +123,8 @@ public class SequenceItem extends BaseSequenceViewItem implements ConnectableSeq
 		this.sequenceLength = this.sequence.size();
 		
 		Core.getInstance().getSequenceController().registerSequenceInterfaceEventListener(sequence, this);
-		Core.getInstance().getSequenceController().connectToSequenceLocalTickSignal(sequence, this);
+		//Core.getInstance().getSequenceController().connectToSequenceLocalEval(sequence, this);
+		//Core.getInstance().getSequenceController().connectToGlobalTickSignal(this, "globalTick(java.lang.Long)");
 		
 		this.setParent(SequencerView.getInstance());
 	}
@@ -230,7 +231,7 @@ public class SequenceItem extends BaseSequenceViewItem implements ConnectableSeq
 		
 		painter.setBrush(actionColor);
 		if(isPlaying) {
-			painter.drawPie(contentsRect, currentSequencePlayhead, -360*16);
+			painter.drawPie(contentsRect, 90*16, -currentSequencePlayhead);
 		}
 	
 		painter.setBrush(gradientBrush);
@@ -278,9 +279,14 @@ public class SequenceItem extends BaseSequenceViewItem implements ConnectableSeq
 
 	@Override
 	public void dispatchSequenceEvent(SequenceEvent se) {
-		if(se.getSequenceEventType() == SequenceEvent.SequenceEventType.SET_LENGTH) {
+		if(se.getSequenceEventType() == SequenceEventType.EVALUATED_LOW_FREQ) {
+			if(this.sequenceLength > 0) {
+				long tick = (Long) se.getArgument();
+				this.currentSequencePlayhead = (int)((float)((float)tick/(float)sequenceLength)*360.0*16.0);
+			}
+		} else if(se.getSequenceEventType() == SequenceEvent.SequenceEventType.SET_LENGTH) {
 			this.sequenceLength = (Long)se.getArgument();
-			
+
 			this.update();
 		} else if(se.getSequenceEventType() == SequenceEvent.SequenceEventType.STARTED) {
 			this.isPlaying = true;
@@ -289,14 +295,5 @@ public class SequenceItem extends BaseSequenceViewItem implements ConnectableSeq
 		}
 	}
 
-	@Override
-	public void dispatchEvalEvent(Long tick) {
-		if(this.sequenceLength > 0) {
-			// pie fullcirle is 360*16
-			this.currentSequencePlayhead = (int)((float)((float)tick/(float)sequenceLength)*360.0*16.0);
-			
-			this.update();
-		}
-	}
 
 }

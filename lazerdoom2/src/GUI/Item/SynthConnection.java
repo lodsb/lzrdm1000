@@ -14,6 +14,7 @@ import com.trolltech.qt.gui.QStyleOptionGraphicsItem;
 import com.trolltech.qt.gui.QWidget;
 
 import GUI.Multitouch.*;
+import GUI.View.SequencerView;
 
 public class SynthConnection extends TouchableGraphicsItem {
 
@@ -69,8 +70,26 @@ public class SynthConnection extends TouchableGraphicsItem {
 		
 		this.src = src;
 		this.dst = dst;
-		this.setZValue(10.0);
+		this.setZValue(-110.0);
 		this.updatePath();
+		
+		this.setParent(SequencerView.getInstance());
+		
+		this.src.addConnection(this);
+		this.dst.addConnection(this);
+	}
+	
+	public void remove() {
+		this.src.removeConnection(this);
+		this.dst.removeConnection(this);
+	}
+	
+	public SynthConnector getSource() {
+		return this.src;
+	}
+	
+	public SynthConnector getDestination() {
+		return this.dst;
 	}
 	
 	private void updatePath() {
@@ -117,6 +136,11 @@ public class SynthConnection extends TouchableGraphicsItem {
 		return path.controlPointRect();
 	}
 
+	@Override
+	public QPainterPath shape() {
+		return this.path;
+	}
+	
 	@Override
 	public QSizeF getPreferedSize() {
 		// TODO Auto-generated method stub

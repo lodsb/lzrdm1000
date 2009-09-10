@@ -54,6 +54,23 @@ public class SynthController {
 		return this.graph.connect(seq, synth, controlBus);
 	}
 	
+	public boolean remove(EventSequenceInterface sequence) {
+		return this.graph.remove(sequence);
+	}
+	
+	public boolean remove(SynthInstance synth) {
+		boolean ret = this.graph.remove(synth);
+		if(ret) {
+			this.unloadSynth(synth);
+		}
+		
+		return ret;
+	}
+	
+	private void unloadSynth(SynthInstance synth) {
+		System.out.println("unload synth not yet implemented");
+	}
+	
 	public SynthInstance createSynthInstance(SynthInfo info) {
 		Synth synth = null;
 		
@@ -89,6 +106,10 @@ public class SynthController {
 		for(SynthInfo si: synthList) {
 			synthLoaderMap.put(si, synthLoader);
 		}
+	}
+
+	public boolean disconnect(EventSequenceInterface sequence, SynthInstance synth) {
+		return this.graph.disconnect(sequence, synth);
 	}
 	
 }

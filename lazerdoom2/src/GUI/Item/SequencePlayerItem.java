@@ -71,21 +71,29 @@ public class SequencePlayerItem extends BaseSequenceViewItem implements Connecta
 			this.stateOnElementID = stateOnElementID;
 			this.stateOffElementID = stateOffElementID;
 			
+			this.startTimer.connect(timer, "start()");
+			this.stopTimer.connect(timer, "stop()");
+			
 			this.timer.timeout.connect(this, "timerSlot()");
+			this.timer.setInterval(this.timerInterval);
 			
 			viewGestures.add(sparshui.gestures.GestureType.TOUCH_GESTURE.ordinal());
 		}
 		
+		
+		private Signal0 startTimer = new Signal0();
+		private Signal0 stopTimer = new Signal0();
+		
 		void setState(ButtonState state) {
 			if(state == ButtonState.ON) {
 				isButtonOn = true;
-				this.timer.stop();
+				this.stopTimer.emit();
 			} else if(state == ButtonState.OFF) {
 				isButtonOn = false;
-				this.timer.stop();
+				this.stopTimer.emit();
 			} else {
 				isButtonOn = false;
-				this.timer.start(timerInterval);
+				this.startTimer.emit();
 			}
 			
 			this.state = state;
@@ -163,7 +171,7 @@ public class SequencePlayerItem extends BaseSequenceViewItem implements Connecta
 		
 		QSvgRenderer renderer = new QSvgRenderer(svgFileName);
 		playButton = new Button(renderer, "playing", "play");
-		playButton.pressed.connect(this, "stopPressed()");
+		playButton.pressed.connect(this, "playPressed()");
 		playButton.setState(ButtonState.OFF);
 		playButton.setParentItem(this);
 		playButton.setPos(100,60);
@@ -195,6 +203,7 @@ public class SequencePlayerItem extends BaseSequenceViewItem implements Connecta
 	}
 	
 	private void playPressed() {
+		System.out.println("WHAT!!!!");
 		if(startTicks == 0) {
 			this.sequencePlayer.startSequenceImmidiately();
 		} else {
@@ -272,6 +281,7 @@ public class SequencePlayerItem extends BaseSequenceViewItem implements Connecta
 
 	@Override
 	public void dispatchSequenceEvent(SequenceEvent se) {
+		System.out.println("FUCKING EVENT: "+se);
 		if(se.getSequenceEventType() == SequenceEventType.SEQUENCE_PLAYER_STARTED) {
 			this.playButton.setState(ButtonState.ON);
 			this.stopButton.setState(ButtonState.OFF);
@@ -291,6 +301,8 @@ public class SequencePlayerItem extends BaseSequenceViewItem implements Connecta
 			this.playButton.setState(ButtonState.OFF);
 			this.stopButton.setState(ButtonState.BLINKING);
 		} 
+		
+		this.update();
 	}
 
 	@Override

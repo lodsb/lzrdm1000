@@ -67,6 +67,8 @@ import GUI.Item.SequencerMenuButton.ActionType;
 import java.util.Map.Entry;
 import SceneItems.TouchPointCursor;
 import Sequencer.EventPointsSequence;
+import Sequencer.SequenceEvent;
+import Sequencer.SequenceEventListenerInterface;
 import Sequencer.SequencerInterface;
 import Sequencer.TestingSequencer;
 import GUI.Multitouch.*;
@@ -89,6 +91,48 @@ public class SequencerView extends QGraphicsView implements Client, TouchItemInt
 	
 	public static SequencerView getInstance() {
 		return SequencerView.instance;
+	}
+	
+	private class SequenceEventContainer {
+		SequenceEventListenerInterface seli;
+		SequenceEvent se;
+		public SequenceEventContainer(SequenceEventListenerInterface seli, SequenceEvent se) {
+			this.seli = seli;
+			this.se = se;
+		}
+	}
+	
+	private LinkedBlockingQueue<SequenceEventContainer> sequenceEventContainerList = new LinkedBlockingQueue<SequenceEventContainer>();
+	
+	public void propagateSequenceEvent(SequenceEventListenerInterface seli, SequenceEvent se) {
+		try {
+			sequenceEventContainerList.put(new SequenceEventContainer(seli, se));
+		} catch (InterruptedException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+	}
+	
+	private class SequenceEventThread extends QObject implements Runnable {
+
+		@Override
+		public void run() {
+			SequenceEventContainer sec;
+			
+			while(true) {
+				try {
+					sec = sequenceEventContainerList.take();
+					
+					if(sec != null) {
+						sec.seli.dispatchSequenceEvent(sec.se);
+					}
+				} catch (InterruptedException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+			}
+		}
+		
 	}
 	
 	public static QGLWidget sharedGlWidget;
@@ -280,9 +324,9 @@ public class SequencerView extends QGraphicsView implements Client, TouchItemInt
 		this.setCacheMode(QGraphicsView.CacheModeFlag.CacheNone);
 		this.setViewportUpdateMode(ViewportUpdateMode.FullViewportUpdate);
 		this.sharedGlWidget = new QGLWidget();
-		System.out.println(this.sharedGlWidget);
+		//System.out.println(this.sharedGlWidget);
 		this.setViewport(this.sharedGlWidget);
-		System.out.println("fdsdf "+this.viewportUpdateMode());
+		//System.out.println("fdsdf "+this.viewportUpdateMode());
 		
 		SequencerView.instance = this;
 		
@@ -295,6 +339,12 @@ public class SequencerView extends QGraphicsView implements Client, TouchItemInt
 		
 		this.registerTouchItem(this);
 	
+		SequenceEventThread st = new SequenceEventThread();
+		QThread sequenceEventThread = new QThread(st);
+		sequenceEventThread.start();
+		st.moveToThread(sequenceEventThread);
+		
+		
 		//updateTimer.timeout.connect(this, "update()");
 		//updateTimer.start(1000/60);
 	}
@@ -609,7 +659,7 @@ public class SequencerView extends QGraphicsView implements Client, TouchItemInt
 					TouchEvent e = (TouchEvent) event;
 					e.setSceneLocation(convertScreenPos(e.getX(), e.getY()));
 				} 
-				System.out.println(it);
+				//System.out.println(it);
 				it.processEvent(event);
 			}
 		//}
@@ -680,7 +730,7 @@ public class SequencerView extends QGraphicsView implements Client, TouchItemInt
 			TouchEvent e = (TouchEvent) event;
 			e.setSceneLocation(convertScreenPos(e.getX(), e.getY()));
 			this.sequencerEditor.handleTouchEvent(e);
-			System.out.println("WHA?");
+			//System.out.println("WHA?");
 		} 
 		if(event instanceof ExtendedGestureEvent) {
 			ExtendedGestureEvent e = (ExtendedGestureEvent) event;

@@ -71,10 +71,26 @@ public class SequenceConnection extends TouchableGraphicsItem {
 		
 		this.src = src;
 		this.dst = dst;
-		this.setZValue(10.0);
+		this.setZValue(-110.0);
 		this.updatePath();
 		
 		this.setParent(SequencerView.getInstance());
+		
+		this.src.addConnection(this);
+		this.dst.addConnection(this);
+	}
+	
+	public void remove() {
+		this.src.removeConnection(this);
+		this.src.removeConnection(this);
+	}
+	
+	public SequenceConnector getSource() {
+		return this.src;
+	}
+	
+	public SequenceConnector getDestination() {
+		return this.dst;
 	}
 	
 	private void updatePath() {
@@ -119,6 +135,11 @@ public class SequenceConnection extends TouchableGraphicsItem {
 	@Override
 	public QRectF boundingRect() {
 		return path.controlPointRect();
+	}
+	
+	@Override
+	public QPainterPath shape() {
+		return this.path;
 	}
 
 	@Override

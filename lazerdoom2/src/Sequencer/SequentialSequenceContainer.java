@@ -334,11 +334,15 @@ public class SequentialSequenceContainer extends BaseSequence implements Sequenc
 		boolean changeNecessary = false;
 		
 		int i = 0;
-		for(SequenceInterface si: updatedSequences) {
-			if( (this.size()-1) < i || si != this.sequences.get(i)) {
-				changeNecessary = true;
-			} 
-			i++;
+		if(this.sequences.size() == updatedSequences.size()) {
+			for(SequenceInterface si: updatedSequences) {
+				if(si != this.sequences.get(i)) {
+					changeNecessary = true;
+				} 
+				i++;
+			}
+		} else {
+			changeNecessary = true;
 		}
 		
 		if(changeNecessary) {

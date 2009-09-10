@@ -56,6 +56,9 @@ public class ParallelSequenceContainer extends BaseSequence implements SequenceC
 
 	@Override
 	public boolean eval(long tick) {
+		/*if(tick % 100 == 0) {
+			System.out.println("BANG size "+this.sequences.size()+" length "+this.currentSize+ " current eval "+tick);
+		}*/
 		if(tick == 0) {
 			this.postSequenceEvent(SequenceEventType.STARTED, SequenceEventSubtype.NONE, null);
 		}
@@ -65,7 +68,7 @@ public class ParallelSequenceContainer extends BaseSequence implements SequenceC
 		readLock.lock();
 		for(SequenceInterface sequence: sequences) {
 			//System.out.print(" pp "+sequence.size()+" ");
-				if(tick < sequence.size() || sequence.isRunning()) {
+				if(tick < sequence.size() || sequence instanceof SequencePlayer) {
 					currentlyRunning = currentlyRunning | sequence.eval(tick);
 				}
 		}
@@ -73,6 +76,7 @@ public class ParallelSequenceContainer extends BaseSequence implements SequenceC
 		
 		
 		if(!currentlyRunning) {
+			//System.out.println("STOPPED PARALLEL SHIT");
 			this.postSequenceEvent(SequenceEventType.STOPPED, SequenceEventSubtype.NONE, null);
 		}
 
@@ -148,10 +152,10 @@ public class ParallelSequenceContainer extends BaseSequence implements SequenceC
 
 	@Override
 	public void dispatchSequenceEvent(SequenceEvent se) {
-		System.out.println("parallel size changed");
 		if(se.getSequenceMetaEventType() == SequenceMetaEventType.SEQUENCE_DATA_CHANGED_EVENT) {
 			readLock.lock();
 			this.updateSize();
+			System.out.println("parallel size changed");
 			System.out.println("size "+this.currentSize+" "+this);
 			if(sequences.size() > 0) {
 				System.out.println(this.sequences.get(0).size());

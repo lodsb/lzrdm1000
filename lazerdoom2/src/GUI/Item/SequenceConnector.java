@@ -1,5 +1,8 @@
 package GUI.Item;
 
+import java.util.LinkedList;
+import java.util.List;
+
 import sparshui.common.Event;
 import GUI.Multitouch.*;
 import com.trolltech.qt.core.QPointF;
@@ -43,6 +46,20 @@ public class SequenceConnector extends TouchableGraphicsItem {
 	
 	public boolean isInConnector() {
 		return this.isInConnector;
+	}
+	
+	private LinkedList<SequenceConnection> connections = new LinkedList<SequenceConnection>();
+	
+	public void addConnection(SequenceConnection connection) {
+		this.connections.add(connection);
+	}
+	
+	public void removeConnection(SequenceConnection connection) {
+		this.connections.remove(connection);
+	}
+	
+	public List<SequenceConnection> getConnections() {
+		return this.connections;
 	}
 	
 	public QLineF baseToTopLineInScene() {

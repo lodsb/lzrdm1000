@@ -34,10 +34,12 @@ public class SequencePlayer extends BaseSequence implements SequencePlayerInterf
 	@Override
 	public void scheduleStart(long ticks) {
 		isRunning.set(false);
-		startSequence.set(true);
-		scheduledStartTicks = ticks;
-		
-		this.postSequenceEvent(SequenceEventType.SEQUENCE_PLAYER_STARTING, SequenceEventSubtype.TICK, ticks);
+		if(this.sequence.get() != null) {
+			startSequence.set(true);
+			scheduledStartTicks = ticks;
+
+			this.postSequenceEvent(SequenceEventType.SEQUENCE_PLAYER_STARTING, SequenceEventSubtype.TICK, ticks);
+		}
 	}
 
 	@Override
@@ -57,8 +59,10 @@ public class SequencePlayer extends BaseSequence implements SequencePlayerInterf
 	@Override
 	public void startSequenceImmidiately() {
 		isRunning.set(false);
-		startSequence.set(true);
-		scheduledStartTicks = 0;
+		if(this.sequence.get() != null) { 
+			startSequence.set(true);
+			scheduledStartTicks = 0;
+		}
 	}
 
 	@Override
@@ -81,11 +85,21 @@ public class SequencePlayer extends BaseSequence implements SequencePlayerInterf
 
 	@Override
 	public boolean eval(long tick) {
-		//System.out.println("player eval");
+	/*	if(tick % 100 == 0) {
+			System.out.println("player eval "+tick+" t-s "+(tick-startTicks));
+		}*/
 //		System.out.print(" sp "+tick+" ");
 		if(sequence.get() != null) {
 			if(isRunning.get()) {
-				sequence.get().eval(tick-startTicks);
+					if(tick % 100 == 0) {
+				System.out.println("player eval "+tick+" t-s "+(tick-startTicks));
+			}
+				
+					this.isRunning.set(sequence.get().eval(tick-startTicks));
+					
+					if(!this.isRunning.get()) {
+						this.postSequenceEvent(SequenceEventType.SEQUENCE_PLAYER_STOPPED, SequenceEventSubtype.NONE, null);
+					}
 			} else {
 				if(startSequence.get()) {
 					if(scheduledStartTicks == 0) {
@@ -94,7 +108,6 @@ public class SequencePlayer extends BaseSequence implements SequencePlayerInterf
 						isRunning.set(true);
 						
 						startSequence.set(false);
-						
 						this.postSequenceEvent(SequenceEventType.SEQUENCE_PLAYER_STARTED, SequenceEventSubtype.NONE, null);
 						
 					} else {

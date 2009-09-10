@@ -108,7 +108,7 @@ public class SequenceController extends QObject {
 		this.sequencer.globalTickSignal.connect(slotObject, method);
 	} 
 	
-	public void connectToSequenceLocalTickSignal(BaseSequence si, SequenceEvalListenerInterface svali) {
+	public void connectToSequenceLocalEval(BaseSequence si, SequenceEvalListenerInterface svali) {
 		si.registerSequenceEvalListener(svali);
 	}
 	

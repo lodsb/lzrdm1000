@@ -5,6 +5,7 @@ public class SequenceEvent {
 		//TRANSPORTATION
 		STARTED,
 		STOPPED,
+		EVALUATED_LOW_FREQ, 
 		
 		_internal_sequence_data_changed_events,
 		//CONTAINERS

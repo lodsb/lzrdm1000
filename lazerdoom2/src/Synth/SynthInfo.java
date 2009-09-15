@@ -13,11 +13,11 @@ public class SynthInfo {
 		this.parameters = controlParameters;
 	}
 	
-	String getName() {
+	public String getName() {
 		return name;
 	}
 	
-	String getDescription() {
+	public String getDescription() {
 		return description;
 	}
 	

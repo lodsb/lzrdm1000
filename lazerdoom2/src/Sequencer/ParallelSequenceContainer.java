@@ -173,10 +173,14 @@ public class ParallelSequenceContainer extends BaseSequence implements SequenceC
 		boolean changeNecessary = false;
 		
 		int i = 0;
-		for(SequenceInterface si: updatedSequences) {
-			if(!this.sequences.contains(si)) {
-				changeNecessary = true;
+		if(this.sequences.size() == updatedSequences.size()) { 
+			for(SequenceInterface si: updatedSequences) {
+				if(!this.sequences.contains(si)) {
+					changeNecessary = true;
+				}
 			}
+		} else {
+			changeNecessary = true;
 		}
 		
 		if(changeNecessary) {

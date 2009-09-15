@@ -43,7 +43,7 @@ public class SynthesizerGraph {
 	}
 	
 	public boolean remove(SynthInstance synth) {
-		boolean ret = false;
+		boolean ret = true;
 		
 		SynthesizerNode node = this.synthesizerNodes.get(synth);
 		

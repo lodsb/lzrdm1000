@@ -25,9 +25,9 @@ public class CreateSequenceCommand extends BaseEditorCommand {
 	public boolean execute() {
 		Core core = Core.getInstance();
 		
-		EventPointsSequence<DoubleType> sequence = core.getSequenceController().createDoubleTypeEventPointsSequence();
-		sequence.setLength(100);
-		SequenceItem item = new SequenceItem(sequence);
+		/*EventPointsSequence<DoubleType> sequence = core.getSequenceController().createDoubleTypeEventPointsSequence();
+		sequence.setLength(100);*/
+		SequenceItem item = new SequenceItem();
 		
 		this.scene.addItem(item);
 		item.setPos(pos);

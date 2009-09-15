@@ -5,7 +5,9 @@ import java.util.LinkedList;
 import java.util.List;
 
 import sparshui.common.Event;
+import sparshui.common.messages.events.DeleteEvent;
 import sparshui.common.messages.events.DragEvent;
+import sparshui.common.messages.events.ExtendedGestureEvent;
 import sparshui.common.messages.events.TouchEvent;
 import GUI.Item.EditorCursor;
 import GUI.Item.SequenceConnection;
@@ -15,6 +17,7 @@ import GUI.Item.SynthConnection;
 import GUI.Item.SynthesizerItem;
 import GUI.Item.TouchPointCursor;
 import GUI.Multitouch.TouchItemInterface;
+import GUI.Multitouch.TouchableGraphicsItem;
 import GUI.View.SequencerView;
 import SceneItems.Util;
 
@@ -43,17 +46,27 @@ public class TouchableGraphicsView extends QGraphicsView implements TouchItemInt
 	
 	
 	public TouchableGraphicsView(TouchableEditor editor) {
-		allowedGestures.add(sparshui.gestures.GestureType.TOUCH_GESTURE.ordinal());
+		/*allowedGestures.add(sparshui.gestures.GestureType.TOUCH_GESTURE.ordinal());
+		allowedGestures.add(sparshui.gestures.GestureType.DELETE_GESTURE.ordinal());*/
 		//this.setScene(new QGraphicsScene());
 		this.setupViewport(new QGLWidget((QWidget)null, (QGLWidget)SequencerView.sharedGlWidget));
 		//this.setCacheMode(CacheModeFlag.CacheBackground);
-		this.setRenderHint(RenderHint.HighQualityAntialiasing);
+		//this.setRenderHint(RenderHint.HighQualityAntialiasing);
 		//this.setViewportUpdateMode(ViewportUpdateMode.FullViewportUpdate);
 		this.editor = editor;
 	}
 	
 	public Pair<Object> getGroupIDViewCoordinates(QPointF pos) {
-		return new Pair<Object>(new Integer(this.id), this);
+		/*QPointF itemCoordinates = editor.mapFromScene(pos);
+		QPointF posM = this.mapToScene((int)itemCoordinates.x(), (int)itemCoordinates.y());
+		System.out.println(pos+" "+posM+" "+itemCoordinates);
+		QGraphicsItemInterface item;
+		
+		if((item = editor.getCurrentEditor().getScene().itemAt(posM)) != null && item instanceof TouchableGraphicsItem) {
+			return new Pair<Object>(((TouchableGraphicsItem) item).getGroupID(), item);
+		}*/
+		
+		return new Pair<Object>(this.id, this);
 	}
 	
 	public void enableTouchEvents(boolean enableTouchEvents) {
@@ -62,31 +75,51 @@ public class TouchableGraphicsView extends QGraphicsView implements TouchItemInt
 	
 	@Override
 	public List<Integer> getAllowedGestures() {
-		return allowedGestures;
+		return this.editor.getCurrentEditor().getAllowedGestures();
 	}
 
 	@Override
 	public int getGroupID() {
-		return id;
+		return this.id;
 	}
 
 	@Override
 	public boolean processEvent(Event event) {
+		System.out.println("MEHEH");
 		if(event instanceof TouchEvent) {
 			TouchEvent e = (TouchEvent) event;
 			QPointF itemCoordinates = editor.mapFromScene(e.getSceneLocation());
 			e.setSceneLocation(this.mapToScene((int)itemCoordinates.x(), (int)itemCoordinates.y()));
-			TouchPointCursor tc = new TouchPointCursor();
-			this.scene().addItem(tc);
-			tc.setPos(e.getSceneLocation());
-		} else if (event instanceof DragEvent) {
-			DragEvent e = (DragEvent) event;
-			e.setSceneLocation(this.mapToScene((int)e.getSceneLocation().x(), (int)e.getSceneLocation().y()));
-			TouchPointCursor tc = new TouchPointCursor();
-			this.scene().addItem(tc);
-			tc.setPos(e.getSceneLocation());
+			this.editor.getCurrentEditor().handleTouchEvent(e);
+			//System.out.println("WHA?");
+		} 
+		if(event instanceof ExtendedGestureEvent) {
+			ExtendedGestureEvent e = (ExtendedGestureEvent) event;
+			QPointF itemCoordinates = editor.mapFromScene(e.getSceneLocation());
+			e.setSceneLocation(this.mapToScene((int)itemCoordinates.x(), (int)itemCoordinates.y()));
+			if(e instanceof DeleteEvent) {
+				if(((DeleteEvent) e).getCrossPoint() != null) {
+					QPointF crossPoint = editor.mapFromScene(e.getSceneLocation());
+					((DeleteEvent) e).setSceneCrossPoint(this.mapToScene((int)crossPoint.x(), (int)crossPoint.y()));
+				}
+			}
+			
+			this.editor.getCurrentEditor().handleExtendedGestureEvent(e);
+
 		}
-		
-		return true;
+		/*if(event instanceof DragEvent) {
+			DragEvent de = (DragEvent) event;
+			
+			TouchableGraphicsItem tii;
+			
+			if((tii = (TouchableGraphicsItem) de.getSource()) != null && tii.getParent() == this) {
+				System.out.println(">***");
+				System.out.println(de);
+				System.out.println(de.getTouchID());
+				System.out.println(de.isDrop());
+				System.out.println("***>");
+			}
+		}*/
+		return false;
 	}
 }

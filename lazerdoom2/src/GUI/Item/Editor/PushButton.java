@@ -8,6 +8,7 @@ import sparshui.common.TouchState;
 import sparshui.common.messages.events.TouchEvent;
 import sparshui.gestures.GestureType;
 
+import GUI.Editor.Editor;
 import GUI.Multitouch.TouchableGraphicsItem;
 
 import com.trolltech.qt.core.QPointF;
@@ -20,10 +21,11 @@ import com.trolltech.qt.gui.QFont;
 import com.trolltech.qt.gui.QFontMetrics;
 import com.trolltech.qt.gui.QPainter;
 import com.trolltech.qt.gui.QPen;
+import com.trolltech.qt.gui.QRadialGradient;
 import com.trolltech.qt.gui.QStyleOptionGraphicsItem;
 import com.trolltech.qt.gui.QWidget;
 
-public class PushButton extends TouchableGraphicsItem {
+public class PushButton extends TouchableEditorItem {
 
 	private LinkedList<Integer> allowedGestures = new LinkedList<Integer>();
 	private String labelText;
@@ -38,7 +40,8 @@ public class PushButton extends TouchableGraphicsItem {
 	
 	public Signal1<TouchableGraphicsItem> buttonPressed = new Signal1<TouchableGraphicsItem>();
 	
-	public PushButton(String labelText) {
+	public PushButton(Editor editor, String labelText) {
+		super(editor);
 		allowedGestures.add(GestureType.TOUCH_GESTURE.ordinal());
 		this.labelText = labelText;
 		
@@ -60,6 +63,17 @@ public class PushButton extends TouchableGraphicsItem {
 		this.update();
 	}
 	
+	private boolean isEnabled = true;
+	
+	public void setButtonEnabled(boolean enabled) {
+		this.isEnabled = enabled;
+		this.update();
+	}
+	
+	public boolean isButtonEnabled() {
+		return this.isEnabled;
+	}
+	
 	@Override
 	public QRectF boundingRect() {
 		return size;
@@ -68,17 +82,22 @@ public class PushButton extends TouchableGraphicsItem {
 	@Override
 	public void paint(QPainter painter, QStyleOptionGraphicsItem option,
 			QWidget widget) {
-		painter.setPen(QPen.NoPen);
-		painter.setBrush(normalBrush);
-		painter.drawRect(size);
+		//painter.setPen(QPen.NoPen);
+		//painter.setBrush(normalBrush);
+		//painter.drawRect(size);
 		if(pressed) {
 			painter.setBrush(pressedBrush);
 		} else {
 			painter.setBrush(normalBrush);
 		}
 		
-		painter.setPen(QColor.black);
-		painter.drawRoundedRect(size, 100,100);
+		if(this.isEnabled) {
+			painter.setPen(QColor.black);
+		} else {
+			painter.setPen(QColor.darkGray);
+		}
+		
+		painter.drawRoundedRect(size, 25,25);
 		painter.drawText(size, 0x84, labelText);
 	}
 
@@ -105,7 +124,7 @@ public class PushButton extends TouchableGraphicsItem {
 			}	
 			else if(e.getState() == TouchState.DEATH) {
 					this.buttonPressed.emit(this);	
-			} else {
+			/*} else {*/
 				this.pressed = false;
 				update();
 			}

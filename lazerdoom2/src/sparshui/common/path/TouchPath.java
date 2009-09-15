@@ -61,7 +61,7 @@ public class TouchPath {
 						
 						intersectionPoint = pi;
 						
-						System.out.println(" elemcount "+intersection.elementCount()+" "+p1+" "+p2+" "+path1.elementCount()+" "+path2.elementCount()+" pi "+pi);
+						//System.out.println(" elemcount "+intersection.elementCount()+" "+p1+" "+p2+" "+path1.elementCount()+" "+path2.elementCount()+" pi "+pi);
 						
 					}
 					//intersectionPoint = intersection.elementAt(0).toPoint();

@@ -2,6 +2,8 @@ package Sequencer;
 
 import java.util.concurrent.ConcurrentLinkedQueue;
 
+import lazerdoom.LzrDmObjectInterface;
+
 import GUI.View.SequencerView;
 import Sequencer.SequenceEvent.SequenceEventSubtype;
 import Sequencer.SequenceEvent.SequenceEventType;
@@ -9,7 +11,7 @@ import Sequencer.SequenceEvent.SequenceEventType;
 import com.trolltech.qt.QSignalEmitter;
 import com.trolltech.qt.core.QObject;
 
-public abstract class BaseSequence extends QObject implements SequenceInterface {
+public abstract class BaseSequence extends QObject implements SequenceInterface, LzrDmObjectInterface {
 
 	ConcurrentLinkedQueue<SequenceEventListenerInterface> eventListeners = new ConcurrentLinkedQueue<SequenceEventListenerInterface>();
 	ConcurrentLinkedQueue<SequenceEvalListenerInterface> evalListeners = new ConcurrentLinkedQueue<SequenceEvalListenerInterface>();
@@ -67,7 +69,7 @@ public abstract class BaseSequence extends QObject implements SequenceInterface 
 	@Override
 	public abstract SequenceInterface deepCopy();
 
-	private long updateResolution = 2;
+	private long updateResolution = 5;
 	@Override
 	public boolean eval(long tick) {
 		if(tick % updateResolution == 0) {

@@ -10,9 +10,11 @@ import com.trolltech.qt.gui.QPainter;
 import com.trolltech.qt.gui.QPen;
 import com.trolltech.qt.gui.QStyleOptionGraphicsItem;
 import com.trolltech.qt.gui.QWidget;
+
+import GUI.Editor.Editor;
 import GUI.Multitouch.TouchableGraphicsItem;
 
-public class TextLabel extends TouchableGraphicsItem {
+public class TextLabel extends TouchableEditorItem {
 
 	private String labelText;
 	private QRectF size = null;
@@ -23,7 +25,8 @@ public class TextLabel extends TouchableGraphicsItem {
 	
 	public Signal1<TouchableGraphicsItem> buttonPressed = new Signal1<TouchableGraphicsItem>();
 	
-	public TextLabel(String labelText) {
+	public TextLabel(Editor editor, String labelText) {
+		super(editor);
 		this.labelText = labelText;
 		
 		this.updateSize();

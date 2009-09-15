@@ -103,7 +103,7 @@ public class SequencePlayer extends BaseSequence implements SequencePlayerInterf
 			} else {
 				if(startSequence.get()) {
 					if(scheduledStartTicks == 0) {
-						startTicks = tick;
+						startTicks = tick+1;
 						sequence.get().eval(0);
 						isRunning.set(true);
 						

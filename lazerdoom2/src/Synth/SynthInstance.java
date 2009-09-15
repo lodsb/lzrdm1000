@@ -1,12 +1,13 @@
 package Synth;
 
+import lazerdoom.LzrDmObjectInterface;
 import de.sciss.jcollider.ControlDesc;
 import de.sciss.jcollider.Synth;
 import Control.ControlServer;
 import Control.ParameterControlBus;
 import Control.Types.*;
 
-public class SynthInstance {
+public class SynthInstance implements LzrDmObjectInterface {
 	
 	private SynthInfo info;
 	private ParameterControlBus[] controlBusses;

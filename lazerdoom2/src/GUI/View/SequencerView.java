@@ -4,6 +4,7 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
+import GUI.Editor.*;
 
 import sparshui.client.Client;
 import sparshui.common.Event;
@@ -25,6 +26,7 @@ import com.trolltech.qt.core.QRectF;
 import com.trolltech.qt.core.QTimer;
 import com.trolltech.qt.core.Qt;
 import com.trolltech.qt.core.QEvent.Type;
+import com.trolltech.qt.core.Qt.FillRule;
 import com.trolltech.qt.core.Qt.KeyboardModifier;
 import com.trolltech.qt.core.Qt.MouseButton;
 import com.trolltech.qt.core.Qt.MouseButtons;
@@ -45,6 +47,7 @@ import com.trolltech.qt.gui.QMouseEvent;
 import com.trolltech.qt.gui.QPainter;
 import com.trolltech.qt.gui.QPainterPath;
 import com.trolltech.qt.gui.QPen;
+import com.trolltech.qt.gui.QPolygonF;
 import com.trolltech.qt.gui.QRadialGradient;
 import com.trolltech.qt.gui.QSizePolicy;
 import com.trolltech.qt.gui.QWidget;
@@ -62,6 +65,8 @@ import GUI.Editor.Editor;
 import GUI.Editor.SequenceDataEditor.SequenceDataEditor;
 import GUI.Item.*;
 import GUI.Item.Editor.TouchableEditor;
+import GUI.Item.Editor.TouchableEditorItem;
+import GUI.Item.Editor.TouchableGraphicsView;
 import GUI.Item.SequencerMenuButton.ActionType;
 
 import java.util.Map.Entry;
@@ -84,6 +89,11 @@ import lazerdoom.lazerdoom;
 
 public class SequencerView extends QGraphicsView implements Client, TouchItemInterface {	
 
+	private BaseSequencerItemEditorController sequenceEditorController = new BaseSequencerItemEditorController();
+	public BaseSequencerItemEditorController getItemEditorController() {
+		return this.sequenceEditorController;
+	}
+	
 	private QWidget parentWidget;
 	private lazerdoom lzrdm;
 	
@@ -258,51 +268,62 @@ public class SequencerView extends QGraphicsView implements Client, TouchItemInt
 		SequencerMenuButton button1 = new SequencerMenuButton(ActionType.addSequence);
 		SequencerMenuButton button2 = new SequencerMenuButton(ActionType.addSynth);
 		SequencerMenuButton button3 = new SequencerMenuButton(ActionType.addSequencePlayer);
+		SequencerMenuButton button4 = new SequencerMenuButton(ActionType.addEditor);
 				
 		QRectF buttonRect = button1.boundingRect();
-		double verticalOffset = (sceneRect.height() - (buttonRect.height()*3))/2;
+		double verticalOffset = (sceneRect.height() - (buttonRect.height()*4))/2;
 		
 		button1.setPos(buttonRect.width(),verticalOffset);
 		button2.setPos(buttonRect.width(),verticalOffset+margin+buttonRect.height());
 		button3.setPos(buttonRect.width(),verticalOffset+2*(margin+buttonRect.height()));
+		button4.setPos(buttonRect.width(),verticalOffset+3*(margin+buttonRect.height()));
 		
 		
 		button1.setParent(this);
 		button2.setParent(this);
 		button3.setParent(this);
+		button4.setParent(this);
 		
 		scene.addItem(button1);
 		scene.addItem(button2);
 		scene.addItem(button3);
+		scene.addItem(button4);
 		
 		menuItems.add(button1);
 		menuItems.add(button2);
 		menuItems.add(button3);
+		menuItems.add(button4);
 
-		button3 = new SequencerMenuButton(ActionType.addSequence);
-		button2 = new SequencerMenuButton(ActionType.addSynth);
-		button1 = new SequencerMenuButton(ActionType.addSequencePlayer);
+		button4 = new SequencerMenuButton(ActionType.addSequence);
+		button3 = new SequencerMenuButton(ActionType.addSynth);
+		button2 = new SequencerMenuButton(ActionType.addSequencePlayer);
+		button1 = new SequencerMenuButton(ActionType.addEditor);
 		
 		button1.setPos(sceneRect.width()-buttonRect.width(),verticalOffset);
 		button2.setPos(sceneRect.width()-buttonRect.width(),verticalOffset+margin+buttonRect.height());
 		button3.setPos(sceneRect.width()-buttonRect.width(),verticalOffset+2*(margin+buttonRect.height()));
+		button4.setPos(sceneRect.width()-buttonRect.width(),verticalOffset+3*(margin+buttonRect.height()));
 		
 		button1.rotate(180.0);
 		button2.rotate(180.0);
 		button3.rotate(180.0);
+		button4.rotate(180.0);
 
 		button1.setParent(this);
 		button2.setParent(this);
 		button3.setParent(this);
+		button4.setParent(this);
 
 		
 		scene.addItem(button1);
 		scene.addItem(button2);
 		scene.addItem(button3);
+		scene.addItem(button4);
 		
 		menuItems.add(button1);
 		menuItems.add(button2);
 		menuItems.add(button3);
+		menuItems.add(button4);
 	}
 	
 	private Editor sequencerEditor;
@@ -503,6 +524,13 @@ public class SequencerView extends QGraphicsView implements Client, TouchItemInt
 		this.scene().addItem(editor);
 		editor.setPos(800, 800);
 		this.registerEditor(editor);*/
+		//SynthesizerEditor synthEd = new SynthesizerEditor();
+		//TouchableEditor editor = new TouchableEditor();
+		//editor.setCurrentEditor(synthEd);
+		//this.scene().addItem(editor);
+		//editor.setPos(500,500);
+		//this.registerEditor(editor);
+		//this.update();
 	}
 		
 	public void registerTouchItem(TouchItemInterface it) {
@@ -581,10 +609,15 @@ public class SequencerView extends QGraphicsView implements Client, TouchItemInt
 			int retVal = -1;
 			
 			for(TouchableEditor editor: editors) {
-				QPointF point = editor.mapFromScene(convertScreenPos(x,y));
+				System.out.println("size "+editors);
+				QPolygonF poly = editor.mapToScene(editor.boundingRect());
+				QPointF point = convertScreenPos(x,y);
+				//System.out.println(poly.containsPoint(possy, FillRule.OddEvenFill));
+				//System.out.println(possy+" LOLOLOL " +poly.contains(convertScreenPos(x,y))+" "+poly+" kldkdk "+editor.boundingRect()+" üps "+editor.pos());
 				System.out.println("editor");
-				if(editor.boundingRect().contains(point)) {
-					Pair<Object> pair = editor.getGroupIDViewCoordinates(point);
+				if(poly.containsPoint(point, FillRule.OddEvenFill)) {
+					System.out.println(editor);
+					Pair<Object> pair = editor.getGroupIDViewCoordinates(convertScreenPos(x,y));
 					
 					if(pair != null && pair.getSecond() != null) {
 						retVal = (Integer) pair.getFirst();
@@ -621,48 +654,21 @@ public class SequencerView extends QGraphicsView implements Client, TouchItemInt
 	}
 	
 	private void processEventLocalThread(Integer id, Event event) {
-		//this.update();
-		/*if(id == viewGroupID) {
+		TouchItemInterface it = null;
+		if((it  = touchItemGroupIDMap.get(id)) != null) {
 			if(event instanceof TouchEvent) {
-				TouchPointCursor tc = null;
+
 				TouchEvent e = (TouchEvent) event;
+				e.setSceneLocation(convertScreenPos(e.getX(), e.getY()));
+			} else if(event instanceof DragEvent) {
+				DragEvent e = (DragEvent) event;
 				
-				if(e.getState() == TouchState.BIRTH) {					
-					tc = new TouchPointCursor();
-					this.scene().addItem(tc);	
-					
-						
-					touchPointCursors.put(e.getTouchID(), tc);
-					tc.setPos(convertScreenPos(e.getX(), e.getY()));
-					tc.setZValue(-100.0);
-					
-					tc.setVisible(true);
-					
-					tc.setHTMLText("<b>ID: </b>"+e.getTouchID()+"<br><b>Pos x/y: <b>"+convertScreenPos(e.getX(), e.getY()).x()+"/"+convertScreenPos(e.getX(), e.getY()).y());
-					
-				} else if(e.getState() == TouchState.MOVE) {
-					tc = touchPointCursors.get(e.getTouchID());
-					tc.setPos(convertScreenPos(e.getX(), e.getY()));
-					tc.setHTMLText("<b>ID: </b>"+e.getTouchID()+"<br><b>Pos x/y: <b>"+convertScreenPos(e.getX(), e.getY()).x()+"/"+convertScreenPos(e.getX(), e.getY()).y());
-				} else if(e.getState() == TouchState.DEATH) {
-					tc = touchPointCursors.get(e.getTouchID());
-					touchPointCursors.remove(tc);
-					this.scene().removeItem(tc);
-					tc.setVisible(false);
-				}
-				
-			} 
-		} else {*/
-			TouchItemInterface it = null;
-			if((it  = touchItemGroupIDMap.get(id)) != null) {
-				if(event instanceof TouchEvent) {
-					TouchEvent e = (TouchEvent) event;
-					e.setSceneLocation(convertScreenPos(e.getX(), e.getY()));
-				} 
-				//System.out.println(it);
-				it.processEvent(event);
+				e.setSceneLocation(convertScreenPos(e.getRelX(), e.getRelY()));
 			}
-		//}
+			
+
+			it.processEvent(event);
+		}
 	}
 	
 	

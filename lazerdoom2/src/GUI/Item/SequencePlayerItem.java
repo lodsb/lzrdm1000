@@ -4,6 +4,7 @@ import java.util.LinkedList;
 import java.util.List;
 
 import lazerdoom.Core;
+import lazerdoom.LzrDmObjectInterface;
 
 import sparshui.common.Event;
 import sparshui.common.TouchState;
@@ -308,6 +309,15 @@ public class SequencePlayerItem extends BaseSequenceViewItem implements Connecta
 	@Override
 	public BaseSequence getBaseSequence() {
 		return this.sequencePlayer;
+	}
+
+	@Override
+	public boolean isInitialized() {
+		return true;
+	}
+
+	@Override
+	public void setContentObject(LzrDmObjectInterface object) {
 	}
 
 }

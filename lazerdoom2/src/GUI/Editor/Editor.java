@@ -43,6 +43,13 @@ public class Editor extends QObject {
 		return this.showTouchEvents;
 	} 
 	
+	protected Editor() {
+	}
+	
+	protected void setScene(EditorScene scene) {
+		this.scene = scene;
+	}
+	
 	public Editor(EditorScene scene) {
 		this.scene = scene;
 		this.setShowTouchEvents(false);

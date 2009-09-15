@@ -30,6 +30,7 @@ public class DeleteSequenceItemCommand extends BaseEditorCommand {
 			ret = Core.getInstance().getSequenceController().removeBaseSequence(this.sequenceItem.getBaseSequence());
 			if(ret) {
 				this.scene.removeItem(this.sequenceItem);
+				this.sequenceItem.undockAllCursors();
 				
 				LinkedList<SequenceConnection> seqConnections = new LinkedList<SequenceConnection>();
 				
@@ -61,7 +62,10 @@ public class DeleteSequenceItemCommand extends BaseEditorCommand {
 					}
 					
 				}
-			}
+			} else if(!this.sequenceItem.isInitialized()) {
+				this.scene.removeItem(this.sequenceItem);
+				this.sequenceItem.undockAllCursors();
+			} 
 		return ret;
 	}
 

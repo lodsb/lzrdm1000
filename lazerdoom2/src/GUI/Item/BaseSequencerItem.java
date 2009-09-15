@@ -2,6 +2,8 @@ package GUI.Item;
 
 import java.util.LinkedList;
 
+import lazerdoom.LzrDmObjectInterface;
+
 import com.trolltech.qt.core.QPointF;
 import com.trolltech.qt.core.QRectF;
 import com.trolltech.qt.gui.QGraphicsSceneMouseEvent;
@@ -25,6 +27,9 @@ abstract public class BaseSequencerItem extends TouchableGraphicsItem {
 		return p;
 	}
 	
+	public abstract boolean isInitialized();
+	public abstract void setContentObject(LzrDmObjectInterface object);
+	
 	/*public void mouseMoveEvent(QGraphicsSceneMouseEvent event) {
 		this.setPosition(this.mapToScene(event.pos()));
 	}*/
@@ -42,8 +47,30 @@ abstract public class BaseSequencerItem extends TouchableGraphicsItem {
 		super.setPos(pos);
 	}*/
 	
+	public void setPosition(QPointF pos) {
+		if(cursors.size() != 0) {
+			//QPointF currentPos = this.pos();
+			QPointF offset = new QPointF(this.pos().x()-pos.x(), this.pos().y()-pos.y());
+			
+			for(EditorCursor cursor: cursors) {
+				QPointF cursorPos = cursor.pos();
+				cursor.setPos(cursorPos.x()-offset.x(), cursorPos.y()-offset.y());
+			}
+		}
+		
+		this.setPos(pos);
+	}
+	
 	public void dockCursor(EditorCursor cursor) {
+		System.out.println("DOCKKKKKKEKEKEKEKEK");
 		cursors.add(cursor);
+	}
+	
+	public void undockAllCursors() {
+		for(EditorCursor cursor: this.cursors) {
+			cursor.setUndocked();
+		}
+		cursors.clear();
 	}
 		
 	public void undockCursor(EditorCursor cursor) {

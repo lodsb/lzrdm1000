@@ -4,6 +4,8 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Random;
 
+import lazerdoom.LzrDmObjectInterface;
+
 import com.trolltech.qt.core.QPointF;
 import com.trolltech.qt.core.QRectF;
 import com.trolltech.qt.core.QSizeF;
@@ -43,15 +45,9 @@ public class SynthesizerItem extends BaseSynthesizerItem implements ConnectableS
 
 	private SynthInstance synth;
 	
-	public SynthesizerItem(SynthInstance synth) {
+	public SynthesizerItem() {
 		this.setBrushes();
-		this.synth = synth;
-		
-		/*this.setFlag(GraphicsItemFlag.ItemIsMovable, true);
-		this.setFlag(GraphicsItemFlag.ItemIsSelectable, true);*/
-		
-		this.addPorts();
-		
+
 		this.setParent(SequencerView.getInstance());
 	}
 	
@@ -233,7 +229,25 @@ public class SynthesizerItem extends BaseSynthesizerItem implements ConnectableS
 
 	@Override
 	public void setSynthesizer(SynthInstance synth) {
-		// TODO Auto-generated method stub
+		if(synth != null) {
+			this.isInitialized = true;
+			this.synth = synth;
+			this.addPorts();		
+		}
+		
+	}
+
+	private boolean isInitialized = false;
+	@Override
+	public boolean isInitialized() {
+		return this.isInitialized;
+	}
+
+	@Override
+	public void setContentObject(LzrDmObjectInterface object) {
+		if(object instanceof SynthInstance) {
+			this.setSynthesizer((SynthInstance) object);			
+		}
 		
 	}
 }

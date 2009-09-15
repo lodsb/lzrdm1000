@@ -22,7 +22,8 @@ public class SequencerMenuButton extends TouchableGraphicsItem {
 	public enum ActionType {
 		addSynth,
 		addSequence,
-		addSequencePlayer
+		addSequencePlayer,
+		addEditor
 	};
 	
 	private static String svgFileName = System.getProperty("user.dir")+"/src/GUI/Item/SVG/button-icons.svg";
@@ -49,6 +50,9 @@ public class SequencerMenuButton extends TouchableGraphicsItem {
 				break;
 			case addSequencePlayer:
 				this.elementID = "addSequencePlayer";
+				break;
+			case addEditor:
+				this.elementID = "addEditor";
 				break;
 				
 		}

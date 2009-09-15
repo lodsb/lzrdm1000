@@ -19,6 +19,7 @@ import java.util.List;
 import java.util.Random;
 
 import lazerdoom.Core;
+import lazerdoom.LzrDmObjectInterface;
 
 import com.trolltech.qt.core.QPoint;
 import com.trolltech.qt.core.QPointF;
@@ -108,21 +109,12 @@ public class SequenceItem extends BaseSequenceViewItem implements ConnectableSeq
 	
 	private BaseSequence sequence;
 	
-	public SequenceItem(BaseSequence sequence) {
+	public SequenceItem() {
 	//	this.setFlag(GraphicsItemFlag.ItemIsMovable, true);
 	//	this.setFlag(GraphicsItemFlag.ItemIsSelectable, true);
 
 		this.setBrushes();
 
-		this.sequence = sequence;
-		
-		if(sequence instanceof Pause) {
-			this.isPause = true;
-		}
-		this.addPorts();
-		this.sequenceLength = this.sequence.size();
-		
-		Core.getInstance().getSequenceController().registerSequenceInterfaceEventListener(sequence, this);
 		//Core.getInstance().getSequenceController().connectToSequenceLocalEval(sequence, this);
 		//Core.getInstance().getSequenceController().connectToGlobalTickSignal(this, "globalTick(java.lang.Long)");
 		
@@ -292,6 +284,34 @@ public class SequenceItem extends BaseSequenceViewItem implements ConnectableSeq
 			this.isPlaying = true;
 		} else if(se.getSequenceEventType() == SequenceEvent.SequenceEventType.STOPPED) {
 			this.isPlaying = false;
+		}
+	}
+
+	private boolean isInitialized = false;
+	@Override
+	public boolean isInitialized() {
+		return isInitialized;
+	}
+
+	@Override
+	public void setContentObject(LzrDmObjectInterface object) {
+		if(object instanceof BaseSequence) {
+			this.isInitialized = true;
+			
+			BaseSequence sequence = (BaseSequence) object;
+			
+			this.sequence = sequence;
+			
+			if(sequence instanceof Pause) {
+				this.isPause = true;
+			}
+			this.addPorts();
+			this.sequenceLength = this.sequence.size();
+			
+			Core.getInstance().getSequenceController().registerSequenceInterfaceEventListener(sequence, this);
+			
+			this.update();
+
 		}
 	}
 

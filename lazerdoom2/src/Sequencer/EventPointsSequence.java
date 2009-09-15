@@ -133,10 +133,10 @@ public class EventPointsSequence<EventType extends BaseType> extends BaseSequenc
 			this.postSequenceEvent(SequenceEventType.STARTED, SequenceEventSubtype.NONE, null);
 		} 
 		
-		if(tick > this.sequenceLength) {
+		if(tick > this.sequenceLength+1) {
 			this.isRunning = false;
 			return false;
-		} else if(tick == this.sequenceLength) {
+		} else if(tick == this.sequenceLength-1) {
 			this.isRunning = false;
 			this.postSequenceEvent(SequenceEventType.STOPPED, SequenceEventSubtype.NONE, null);
 			return false;

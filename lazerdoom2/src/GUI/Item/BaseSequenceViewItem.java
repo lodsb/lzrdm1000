@@ -14,8 +14,6 @@ abstract public class BaseSequenceViewItem extends BaseSequencerItem {
 	private static QRectF rect = new QRectF(0,0,200,200);
 	private static QPainterPath p = null;
 	
-	private LinkedList<EditorCursor> cursors = new LinkedList<EditorCursor>();
-	
 	public QPainterPath shape() {
 		
 		if(p == null) {
@@ -43,12 +41,4 @@ abstract public class BaseSequenceViewItem extends BaseSequencerItem {
 		}
 		super.setPos(pos);
 	}*/
-	
-	public void dockCursor(EditorCursor cursor) {
-		cursors.add(cursor);
-	}
-		
-	public void undockCursor(EditorCursor cursor) {
-		cursors.remove(cursor);
-	}
 }

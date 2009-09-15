@@ -25,13 +25,18 @@ import com.trolltech.qt.svg.QSvgRenderer;
 
 import edu.uci.ics.jung.graph.util.Pair;
 
+import GUI.Editor.BaseSequencerItemEditor;
+import GUI.Editor.Editor;
 import GUI.Multitouch.TouchableGraphicsItem;
 import GUI.Scene.Editor.EditorScene;
+import GUI.View.SequencerView;
 import SceneItems.*;
 
 public class TouchableEditor extends TouchableGraphicsWidget {
 
 
+	public Signal0 closeEditor = new Signal0();
+	
 	public class EditorButton extends TouchableGraphicsItem {
 		
 		public Signal0 pressed = new Signal0();
@@ -52,13 +57,16 @@ public class TouchableEditor extends TouchableGraphicsWidget {
 			gestures.add(sparshui.gestures.GestureType.TOUCH_GESTURE.ordinal());
 		}
 		
+		/*
 		@Override
 		public List<Integer> getAllowedGestures() {
+			System.out.println("WJWJWJWJWJWJWJWJWJWJ "+this.getGroupID());
 			return gestures;
 		}
 		
 		@Override
 		public boolean processEvent(Event event) {
+			System.out.println("CLOSE PRESSSED");
 			if(event instanceof TouchEvent) {
 				TouchEvent e = (TouchEvent) event;
 				if(e.getState() == TouchState.DEATH) {
@@ -68,7 +76,7 @@ public class TouchableEditor extends TouchableGraphicsWidget {
 			
 			return true;
 		}
-		
+		*/
 		public String elementID() {
 			return elementID;
 		}
@@ -108,7 +116,7 @@ public class TouchableEditor extends TouchableGraphicsWidget {
 
 	
 	
-	private class EditorHeader extends TouchableGraphicsItem {
+	public class EditorHeader extends TouchableGraphicsItem {
 		private QRectF boundingRect;
 		private QColor color = QColor.black;
 		private QPainterPath path;
@@ -216,9 +224,24 @@ public class TouchableEditor extends TouchableGraphicsWidget {
 	private TouchableGraphicsViewContainer graphicsViewContainer;
 	private QGraphicsLinearLayout baseLayout;
 	
-	public void setScene(EditorScene scene) {
-		this.graphicsView.setScene(scene);
+	private LinkedList<Integer> allowedGestures = new LinkedList<Integer>();
+	
+	private BaseSequencerItemEditor editor  = null;
+	
+	public BaseSequencerItemEditor getCurrentEditor() {
+		return editor;
 	}
+	
+	public void setCurrentEditor(BaseSequencerItemEditor editor) {
+		this.editor = editor;
+		EditorScene scene = editor.getScene();
+		this.graphicsView.setScene(scene);
+		this.graphicsView.setSceneRect(scene.sceneRect());
+		this.graphicsView.update();
+		this.show();
+	}
+	
+	private EditorButton closeButton;
 	
 	public TouchableEditor() {
 		baseLayout = new QGraphicsLinearLayout();
@@ -231,25 +254,26 @@ public class TouchableEditor extends TouchableGraphicsWidget {
 		
 		header = new EditorHeader(new QRectF(0,0,400,75));
 		header.rotate(90.0);
-		header.setParentItem(this);
+		header.setParent(this);
 		header.setPos(885, 100);
 		
-		EditorButton closeButton = new EditorButton("delete");
-		closeButton.pressed.connect(this, "closeEditor()");
-		closeButton.setParentItem(this);
+		closeButton = new EditorButton("delete");
+		closeButton.pressed.connect(this.closeEditor);
+		closeButton.setParent(this);
 		closeButton.setPos(847,450);
 		closeButton.setZValue(10);
 		
 		this.setFlag(GraphicsItemFlag.ItemIsMovable, true);
 		this.setFlag(GraphicsItemFlag.ItemIsSelectable, true);
 		
+		//this.setParent(SequencerView.getInstance());
+		
+		this.allowedGestures.add(sparshui.gestures.GestureType.DRAG_GESTURE.ordinal());
+		this.allowedGestures.add(sparshui.gestures.GestureType.TOUCH_GESTURE.ordinal());
+		
 
 	}
-	
-	private void closeEditor() {
 		
-	}
-	
 	public void setColor(QColor color){
 		header.setColor(color);
 	}
@@ -262,7 +286,7 @@ public class TouchableEditor extends TouchableGraphicsWidget {
 	@Override
 	public List<Integer> getAllowedGestures() {
 		System.out.println("GAG");
-		return this.graphicsView.getAllowedGestures();
+		return this.allowedGestures;
 	}
 
 	@Override
@@ -270,18 +294,30 @@ public class TouchableEditor extends TouchableGraphicsWidget {
 		return this.id;
 	}
 
+	QPointF dragOffset = null;
 	@Override
 	public boolean processEvent(Event event) {
-		// parent scene -> view
 		if(event instanceof TouchEvent) {
-			TouchEvent e = (TouchEvent) event;
-			e.setSceneLocation(this.mapFromScene(e.getSceneLocation()));
-		} else if (event instanceof DragEvent) {
-			DragEvent e = (DragEvent) event;
-			e.setSceneLocation(this.mapFromScene(e.getSceneLocation()));					
+			if(event.getSource() == this.closeButton && ((TouchEvent)event).getState() == TouchState.DEATH) {
+				this.closeEditor.emit();
+			}
+		}else {
+			if(event instanceof DragEvent) {
+				DragEvent e = (DragEvent) event;
+				
+				if(e.isOngoing()) {
+					if(dragOffset == null) {
+						dragOffset = this.mapFromScene(e.getSceneLocation());
+					} else {
+						this.setPos(((DragEvent)event).getSceneLocation().x()-dragOffset.x(), ((DragEvent)event).getSceneLocation().y()-dragOffset.y());
+					}
+					
+				} else {
+					dragOffset = null;
+				}
+			}
 		}
-		System.out.println("MEGA");
-		return this.graphicsView.processEvent(event);
+		return true;
 	}
-	
+
 }

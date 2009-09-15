@@ -6,10 +6,21 @@ import com.trolltech.qt.gui.QPainter;
 import com.trolltech.qt.gui.QStyleOptionGraphicsItem;
 import com.trolltech.qt.gui.QWidget;
 
+import GUI.Editor.Editor;
 import GUI.Multitouch.TouchableGraphicsItem;
 
 public class TouchableEditorItem extends TouchableGraphicsItem {
 
+	private Editor editor;
+	
+	public TouchableEditorItem(Editor editor) {
+		this.editor = editor;
+	}
+	
+	public Editor getEditor() {
+		return this.editor;
+	}
+	
 	@Override
 	public QRectF boundingRect() {
 		// TODO Auto-generated method stub

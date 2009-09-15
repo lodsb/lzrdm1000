@@ -21,8 +21,7 @@ public class CreateSynthInstanceCommand extends BaseEditorCommand {
 
 	@Override
 	public boolean execute() {
-		SynthInstance synthInstance = Core.getInstance().getSynthController().createSynthInstance(Core.getInstance().getSynthController().getAvailableSynths().get(0));
-		SynthesizerItem item = new SynthesizerItem(synthInstance);
+		SynthesizerItem item = new SynthesizerItem();
 		this.scene.addItem(item);
 		item.setPos(this.pos);
 		

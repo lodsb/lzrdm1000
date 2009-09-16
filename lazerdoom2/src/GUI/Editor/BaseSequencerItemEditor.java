@@ -8,6 +8,8 @@ import GUI.Scene.Editor.EditorScene;
 
 public abstract class BaseSequencerItemEditor extends Editor {
 
+	public Signal0 sceneChanged = new Signal0();
+	
 	public abstract void setItem(BaseSequencerItem item);
 	public abstract boolean allowViewpointChange();
 	public abstract List<Integer> getAllowedGestures();

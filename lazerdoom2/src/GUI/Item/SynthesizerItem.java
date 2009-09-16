@@ -52,6 +52,14 @@ public class SynthesizerItem extends BaseSynthesizerItem implements ConnectableS
 	}
 	
 	private void addPorts() {
+		if(this.scene() != null) {
+			if(inPorts != null) {
+				for(SynthInConnector in: inPorts) {
+					scene().removeItem(in);
+				}	
+			}
+		}
+		
 		inPorts = new LinkedList<SynthInConnector>();
 		outPorts = new LinkedList<SynthOutConnector>();
 		

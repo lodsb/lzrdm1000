@@ -8,11 +8,14 @@ import lazerdoom.Core;
 import com.trolltech.qt.gui.QGraphicsItemInterface;
 
 import sparshui.common.messages.events.TouchEvent;
+import GUI.Editor.Commands.SynthesizerEditor.SetCurrentSynthCommand;
+import GUI.Editor.Commands.SynthesizerEditor.XchgSynthesizerCommand;
 import GUI.Item.BaseSequencerItem;
 import GUI.Item.SynthesizerItem;
 import GUI.Multitouch.TouchableGraphicsItem;
 import GUI.Scene.Editor.EditorScene;
 import GUI.Scene.Editor.SynthesizerScene;
+import GUI.View.SequencerView;
 import SceneItems.Util;
 import Synth.SynthInfo;
 import Synth.SynthInstance;
@@ -53,10 +56,19 @@ public class SynthesizerEditor extends BaseSequencerItemEditor {
 		
 	}
 	
-	private void setCurrentSynth(SynthInstance synth) {
+	private void pSetCurrentSynth(SynthInstance synth) {
+			if(currentSynth == null) {
+				this.executeCommand(new SetCurrentSynthCommand(synth, this));
+			} else {
+				this.executeCommand(new XchgSynthesizerCommand(synthesizerItem, currentSynth, synth, this,  SequencerView.getInstance().getSequencerEditor()));
+			}
+	}
+	
+	public void setCurrentSynth(SynthInstance synth) {
 		if(synthesizerItem != null) {
-			synthesizerItem.setContentObject(synth);
 			currentSynth = synth;
+			synthesizerItem.setContentObject(synth);
+			this.editorScene.setCurrentSynth(this.currentSynth.getSynthInfo().getName());
 		}
 	}
 	
@@ -98,9 +110,9 @@ public class SynthesizerEditor extends BaseSequencerItemEditor {
 	}
 	
 	private void loadPressed() {
-		this.currentSynth = Core.getInstance().getSynthController().createSynthInstance(this.availableSynths.get(currentSynthIndex));
-		this.editorScene.setCurrentSynth(this.currentSynth.getSynthInfo().getName());
-		this.setCurrentSynth(currentSynth);
+//		this.currentSynth = Core.getInstance().getSynthController().createSynthInstance(this.availableSynths.get(currentSynthIndex));
+//		this.editorScene.setCurrentSynth(this.currentSynth.getSynthInfo().getName());
+		this.pSetCurrentSynth(Core.getInstance().getSynthController().createSynthInstance(this.availableSynths.get(currentSynthIndex)));
 	}
 	
 	@Override

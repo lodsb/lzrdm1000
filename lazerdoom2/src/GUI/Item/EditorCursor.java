@@ -72,6 +72,10 @@ public class EditorCursor extends TouchableGraphicsItem {
 	
 	private TouchableEditor editor = null;
 	
+	private void editorSceneChanged() {
+		
+	}
+	
 	public void showTouchableEditor(BaseSequencerItemEditor editor) {
 		if(this.editor == null) {
 			this.editor = new TouchableEditor();
@@ -85,10 +89,14 @@ public class EditorCursor extends TouchableGraphicsItem {
 			SequencerView.getInstance().registerEditor(this.editor);
 			
 		} else {
+			this.editor.getCurrentEditor().sceneChanged.disconnect(this);
 			this.editor.setCurrentEditor(editor);
 			
 			this.editor.setVisible(true);
 		}
+		
+		this.editor.getCurrentEditor().sceneChanged.connect(this, "editorSceneChanged()");
+		
 	}
 	
 	// how to destroy it?!?

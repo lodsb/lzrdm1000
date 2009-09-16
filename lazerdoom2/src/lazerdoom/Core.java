@@ -221,6 +221,11 @@ public class Core {
 		return this.sequenceController;
 	}
 	
+	public long beatMeasureToPPQ(int beat, int measure) {
+		long PPQbar = this.sequencer.PPQ*4;
+		return (PPQbar*beat)/measure;
+	}
+	
 	public SynthController getSynthController() {
 		return this.synthController;
 	}

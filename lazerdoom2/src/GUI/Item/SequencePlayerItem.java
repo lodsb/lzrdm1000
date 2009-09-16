@@ -195,11 +195,16 @@ public class SequencePlayerItem extends BaseSequenceViewItem implements Connecta
 	private long startTicks = 0;
 	private long stopTicks = 0;
 	
+	public void setScheduleTicks(long ticks) {
+		startTicks = ticks;
+		stopTicks = ticks;
+	}
+	
 	private void stopPressed() {
 		if(stopTicks == 0) {
 			this.sequencePlayer.stopSequenceImmidiately();
 		} else {
-			this.sequencePlayer.scheduleStop(stopTicks);
+			this.sequencePlayer.scheduleStopNext(stopTicks);
 		}
 	}
 	
@@ -208,7 +213,7 @@ public class SequencePlayerItem extends BaseSequenceViewItem implements Connecta
 		if(startTicks == 0) {
 			this.sequencePlayer.startSequenceImmidiately();
 		} else {
-			this.sequencePlayer.scheduleStart(startTicks);
+			this.sequencePlayer.scheduleStartNext(startTicks);
 		}
 	}
 	
@@ -282,7 +287,6 @@ public class SequencePlayerItem extends BaseSequenceViewItem implements Connecta
 
 	@Override
 	public void dispatchSequenceEvent(SequenceEvent se) {
-		System.out.println("FUCKING EVENT: "+se);
 		if(se.getSequenceEventType() == SequenceEventType.SEQUENCE_PLAYER_STARTED) {
 			this.playButton.setState(ButtonState.ON);
 			this.stopButton.setState(ButtonState.OFF);

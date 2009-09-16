@@ -326,9 +326,9 @@ public class SequencerView extends QGraphicsView implements Client, TouchItemInt
 		menuItems.add(button4);
 	}
 	
-	private Editor sequencerEditor;
+	private SequencerEditor sequencerEditor;
 	
-	public SequencerView(Editor editor, lazerdoom lzrdm) {
+	public SequencerView(SequencerEditor editor, lazerdoom lzrdm) {
 	
 		this.sequencerEditor = editor;
 		this.lzrdm = lzrdm;
@@ -727,6 +727,10 @@ public class SequencerView extends QGraphicsView implements Client, TouchItemInt
 		}
 		
 		QApplication.sendEvent(this.parentWidget, event);
+	}
+	
+	public SequencerEditor getSequencerEditor() {
+		return this.sequencerEditor;
 	}
 	
 	QGraphicsEllipseItem ellipse = null;

@@ -20,6 +20,11 @@ public class BaseSequencerItemEditorController extends QObject {
 				editor.setItem(item);
 			} 
 			
+			if(item instanceof SequencePlayerItem) {
+				editor = new SequencePlayerEditor();
+				editor.setItem(item);
+			}
+			
 			sequencerItemEditors.put(item, editor);
 		}
 		

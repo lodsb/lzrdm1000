@@ -20,6 +20,7 @@ public class SequencePlayer extends BaseSequence implements SequencePlayerInterf
 	private long scheduledStartTicks = 0;
 	
 	private long startTicks = 0;
+	private long currentTick = 0;
 	
 	private AtomicBoolean stopSequence = new AtomicBoolean();
 	private long scheduledStopTicks = 0;
@@ -31,6 +32,18 @@ public class SequencePlayer extends BaseSequence implements SequencePlayerInterf
 		return sequence.get();
 	}
 
+	public void scheduleStartNext(long ticks) {
+		long lastEventTick = this.currentTick%ticks;
+		long nextEventTick = ticks-lastEventTick;
+		this.scheduleStart(nextEventTick);  
+	}
+	
+	public void scheduleStopNext(long ticks) {
+		long lastEventTick = this.currentTick%ticks;
+		long nextEventTick = ticks-lastEventTick;
+		this.scheduleStop(nextEventTick);  
+	}
+	
 	@Override
 	public void scheduleStart(long ticks) {
 		isRunning.set(false);
@@ -85,6 +98,7 @@ public class SequencePlayer extends BaseSequence implements SequencePlayerInterf
 
 	@Override
 	public boolean eval(long tick) {
+		currentTick = 0;
 	/*	if(tick % 100 == 0) {
 			System.out.println("player eval "+tick+" t-s "+(tick-startTicks));
 		}*/

@@ -1,8 +1,11 @@
 package Sequencer;
 
 import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.concurrent.atomic.AtomicLong;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.concurrent.locks.ReentrantLock;
+
+import lazerdoom.Core;
 
 import Sequencer.SequenceEvent.SequenceEventSubtype;
 import Sequencer.SequenceEvent.SequenceEventType;
@@ -11,7 +14,6 @@ public class SequencePlayer extends BaseSequence implements SequencePlayerInterf
 	
 	public SequencePlayer(SequencerInterface sequencer) {
 		super(sequencer);
-		// TODO Auto-generated constructor stub
 	}
 	
 	private AtomicReference<SequenceInterface> sequence = new AtomicReference<SequenceInterface>();
@@ -20,7 +22,6 @@ public class SequencePlayer extends BaseSequence implements SequencePlayerInterf
 	private long scheduledStartTicks = 0;
 	
 	private long startTicks = 0;
-	private long currentTick = 0;
 	
 	private AtomicBoolean stopSequence = new AtomicBoolean();
 	private long scheduledStopTicks = 0;
@@ -33,13 +34,13 @@ public class SequencePlayer extends BaseSequence implements SequencePlayerInterf
 	}
 
 	public void scheduleStartNext(long ticks) {
-		long lastEventTick = this.currentTick%ticks;
+		long lastEventTick = Sequencer.getCurrentGlobalTick()%ticks;
 		long nextEventTick = ticks-lastEventTick;
 		this.scheduleStart(nextEventTick);  
 	}
 	
 	public void scheduleStopNext(long ticks) {
-		long lastEventTick = this.currentTick%ticks;
+		long lastEventTick = Sequencer.getCurrentGlobalTick()%ticks;
 		long nextEventTick = ticks-lastEventTick;
 		this.scheduleStop(nextEventTick);  
 	}
@@ -98,7 +99,7 @@ public class SequencePlayer extends BaseSequence implements SequencePlayerInterf
 
 	@Override
 	public boolean eval(long tick) {
-		currentTick = 0;
+		//currentTick.set(currentTick.get()+1);
 	/*	if(tick % 100 == 0) {
 			System.out.println("player eval "+tick+" t-s "+(tick-startTicks));
 		}*/

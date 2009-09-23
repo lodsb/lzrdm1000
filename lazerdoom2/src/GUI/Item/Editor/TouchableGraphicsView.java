@@ -85,7 +85,22 @@ public class TouchableGraphicsView extends QGraphicsView implements TouchItemInt
 
 	@Override
 	public boolean processEvent(Event event) {
-		System.out.println("MEHEH");
+		
+		if(event instanceof ExtendedGestureEvent) {
+			ExtendedGestureEvent e = (ExtendedGestureEvent) event;
+			QPointF itemCoordinates = editor.mapFromScene(e.getSceneLocation());
+			e.setSceneLocation(this.mapToScene((int)itemCoordinates.x(), (int)itemCoordinates.y()));
+			/*if(e instanceof DeleteEvent) {
+				if(((DeleteEvent) e).getCrossPoint() != null) {
+					QPointF crossPoint = editor.mapFromScene(((DeleteEvent)e).getSceneCrossPoint());
+					((DeleteEvent) e).setSceneCrossPoint(this.mapToScene((int)crossPoint.x(), (int)crossPoint.y()));
+				}
+			}*/
+			
+			this.editor.getCurrentEditor().handleExtendedGestureEvent(e);
+
+		} 
+		
 		if(event instanceof TouchEvent) {
 			TouchEvent e = (TouchEvent) event;
 			QPointF itemCoordinates = editor.mapFromScene(e.getSceneLocation());
@@ -93,20 +108,6 @@ public class TouchableGraphicsView extends QGraphicsView implements TouchItemInt
 			this.editor.getCurrentEditor().handleTouchEvent(e);
 			//System.out.println("WHA?");
 		} 
-		if(event instanceof ExtendedGestureEvent) {
-			ExtendedGestureEvent e = (ExtendedGestureEvent) event;
-			QPointF itemCoordinates = editor.mapFromScene(e.getSceneLocation());
-			e.setSceneLocation(this.mapToScene((int)itemCoordinates.x(), (int)itemCoordinates.y()));
-			if(e instanceof DeleteEvent) {
-				if(((DeleteEvent) e).getCrossPoint() != null) {
-					QPointF crossPoint = editor.mapFromScene(e.getSceneLocation());
-					((DeleteEvent) e).setSceneCrossPoint(this.mapToScene((int)crossPoint.x(), (int)crossPoint.y()));
-				}
-			}
-			
-			this.editor.getCurrentEditor().handleExtendedGestureEvent(e);
-
-		}
 		/*if(event instanceof DragEvent) {
 			DragEvent de = (DragEvent) event;
 			

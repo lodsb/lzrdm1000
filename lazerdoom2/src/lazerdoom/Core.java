@@ -226,6 +226,10 @@ public class Core {
 		return (PPQbar*beat)/measure;
 	}
 	
+	public long oneBarInPPQ() {
+		return beatMeasureToPPQ(1,1);
+	}
+	
 	public SynthController getSynthController() {
 		return this.synthController;
 	}

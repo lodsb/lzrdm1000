@@ -19,8 +19,9 @@ public class Pause extends BaseSequence implements SequenceInterface {
 		this.pauseTicks.set(pauseTicks);
 	}
 	
-	void setPauseTicks(long pauseTicks) {
+	public void setPauseTicks(long pauseTicks) {
 		if(this.pauseTicks.get() != pauseTicks) {
+			this.postSequenceEvent(SequenceEventType.SET_LENGTH, SequenceEventSubtype.SIZE_IN_TICKS, pauseTicks);
 			this.postSequenceEvent(SequenceEventType.SEQUENCE_SIZE_CHANGED, SequenceEventSubtype.SIZE_IN_TICKS, pauseTicks);
 			this.pauseTicks.set(pauseTicks);
 		}
@@ -28,12 +29,13 @@ public class Pause extends BaseSequence implements SequenceInterface {
 	
 	@Override
 	public boolean eval(long tick) {
+		super.eval(tick);
 		if(tick == 0) {
 			this.postSequenceEvent(SequenceEventType.STARTED, SequenceEventSubtype.NONE, null);
 			runTicks = 0;
 		}
 		
-		if(runTicks <= pauseTicks.get()) {
+		if(runTicks < pauseTicks.get()) {
 			runTicks++;
 			isRunning = true;
 		} else {
@@ -51,7 +53,7 @@ public class Pause extends BaseSequence implements SequenceInterface {
 	public boolean isRunning() {
 		return isRunning;
 	}
-
+	
 	@Override
 	public void reset() {
 		super.reset();

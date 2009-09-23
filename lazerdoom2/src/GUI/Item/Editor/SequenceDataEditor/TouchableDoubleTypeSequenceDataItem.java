@@ -1,7 +1,12 @@
 package GUI.Item.Editor.SequenceDataEditor;
 
 import java.util.Map.Entry;
+
+import sparshui.common.Event;
+import sparshui.common.messages.events.DragEvent;
 import Control.Types.DoubleType;
+import GUI.Editor.Editor;
+import GUI.Scene.Editor.EventPointsDoubleSequenceScene;
 import GUI.Scene.Editor.SequenceDataEditorScene;
 
 import com.trolltech.qt.core.QPointF;
@@ -20,10 +25,20 @@ import edu.uci.ics.jung.graph.util.Pair;
 
 public class TouchableDoubleTypeSequenceDataItem extends TouchableSequenceDataItem<DoubleType> {
 
+	public Signal3<TouchableDoubleTypeSequenceDataItem, QPointF, Boolean> dragged = new Signal3<TouchableDoubleTypeSequenceDataItem, QPointF, Boolean>();
+	
+	public TouchableDoubleTypeSequenceDataItem(Editor editor) {
+		super(editor);
+		// TODO Auto-generated constructor stub
+		//this.scale(1.5, 1.5);
+		this.setZValue(100.0);
+		line.setParentItem(this);
+	}
+
 	private static String svgFileName = System.getProperty("user.dir")+"/src/GUI/Item/SVG/node-icons.svg";
 	private static QSvgRenderer sharedRenderer = new QSvgRenderer(svgFileName);
 	
-	private QRectF boundingRect = new QRectF(-50,-50,100,100);
+	private QRectF boundingRect = new QRectF(-40,-40,80,80);
 	
 	private class Line extends QGraphicsLineItem {
 		private TouchableDoubleTypeSequenceDataItem parent;
@@ -33,7 +48,7 @@ public class TouchableDoubleTypeSequenceDataItem extends TouchableSequenceDataIt
 		public Line(TouchableDoubleTypeSequenceDataItem parent) {
 			this.parent = parent;
 			this.updateLine();
-			linePen.setWidth(10);
+			linePen.setWidth(5);
 			this.setPen(linePen);
 			this.setZValue(-100.0);
 		}
@@ -41,14 +56,14 @@ public class TouchableDoubleTypeSequenceDataItem extends TouchableSequenceDataIt
 		public void updateLine() {
 			QPointF parentPos = parent.pos();
 			
-			line = new QLineF(0, 0, 0, parentPos.y());
+			line = new QLineF(0, 0, 0, -parentPos.y());
 			this.setLine(line);
-			this.setPos(parentPos.x(), 0);
+			//this.setPos(parentPos.x(), 0);
 			//System.out.println(line);
 		}
 	}
 	
-	@Override
+/*	@Override
 	public Object itemChange(GraphicsItemChange change, Object value) {
 		// ignore scaling
 		if(change == GraphicsItemChange.ItemMatrixChange) {
@@ -58,21 +73,15 @@ public class TouchableDoubleTypeSequenceDataItem extends TouchableSequenceDataIt
 		}
 		
 		return super.itemChange(change, value);
-	}
-	
-	boolean firstRun = true;
+	}*/
 	
 	@Override
 	public void paint(QPainter painter, QStyleOptionGraphicsItem option, QWidget widget) {
-		//FIXME: whole lot of repaints?! why?
+		//FIXME: a whole lot of repaints?! why?
 		
 	//	System.out.println("--- "+this.pos());
 		sharedRenderer.render(painter, "node", this.boundingRect());
 		line.updateLine();
-		if(firstRun) {
-			this.scene().addItem(line);
-			firstRun = false;
-		}
 	}
 	
 	private Line line = new Line(this);
@@ -80,10 +89,9 @@ public class TouchableDoubleTypeSequenceDataItem extends TouchableSequenceDataIt
 	private long currentTick = 0;
 	
 	@Override
-	public Pair<Object> getValue() {
+	public Pair<Object> getTickValuePairFromPosition() {
 		// TODO Auto-generated method stub
-		Entry<Long, DoubleType> entry;
-		
+		this.updateTickAndValueFromPosition(this.pos());
 		return new Pair<Object>(currentTick, currentValue);
 	}
 	
@@ -92,39 +100,31 @@ public class TouchableDoubleTypeSequenceDataItem extends TouchableSequenceDataIt
 		return this.boundingRect;
 	}
 	
-	@Override
-	public void setValue(long tick, DoubleType value) {
-		double x = 0;
-		double y = 0;
-		
-		double val = value.getFloatValue();
-		
-		if(tick < 0) {
-			tick = 0;
-		}
-		
-		x = SequenceDataEditorScene.tickMultiplyer*(double)tick;
-		
-		if(val < -1.0) {
-			val = -1.0;
-			value.setValue(val);
-		} else if(val > 1.0) {
-			val = 1.0;
-			value.setValue(val);
-		}
-		
-		y = SequenceDataEditorScene.valueMultiplyer*val;
-		
-		this.setPos(x, -y);
-		
-		this.line.updateLine();
-		
-		currentTick = tick;
-		currentValue = value;
+	boolean firstEvent = true;
+	
+	Pair<Object> oldTickValuePair = null;
+	public Pair<Object> getOldTickValuePair() {
+		return oldTickValuePair;
 	}
-
-	@Override
-	public void setValueFromPosition(QPointF pos) {
+	
+	public boolean processEvent(Event e) {
+		System.out.println(e);
+		if(e instanceof DragEvent) {
+			
+			this.dragged.emit(this, e.getSceneLocation(), ((DragEvent) e).isSuccessful());
+			
+			if(((DragEvent) e).isSuccessful()) {
+				firstEvent = true;
+			} else if(firstEvent) {
+				firstEvent = false;
+				oldTickValuePair = new Pair<Object>(new Long(currentTick), new DoubleType(currentValue.getValue())); 
+			}
+		}
+		
+		return true;
+	}
+	
+	private void updateTickAndValueFromPosition(QPointF pos) {
 		long tick;
 		double value;
 		
@@ -148,7 +148,13 @@ public class TouchableDoubleTypeSequenceDataItem extends TouchableSequenceDataIt
 			tick = 0;
 		}
 		
-		this.setValue(tick, val);
+		this.currentTick = tick;
+		this.currentValue = val;
+	}
+
+	@Override
+	public void setPosition(QPointF pos) {
+		this.setPos(pos);
 	}
 
 	

@@ -241,6 +241,12 @@ public class TouchableEditor extends TouchableGraphicsWidget {
 		this.show();
 	}
 	
+	public void updateViewScene() {
+		this.graphicsView.setScene(this.editor.getScene());
+		this.graphicsView.setSceneRect(this.editor.getScene().sceneRect());
+		this.graphicsView.update();
+	}
+	
 	private EditorButton closeButton;
 	
 	public TouchableEditor() {

@@ -11,6 +11,18 @@ public abstract class ExtendedGestureEvent implements Event {
 	private QPointF _pos = null;
 	private Location loc;
 	
+	private boolean isFocused = false;
+	
+	@Override
+	public boolean isFocused() {
+		return this.isFocused;
+	}
+	
+	@Override
+	public void setFocused() {
+		this.isFocused = true;
+	}
+	
 	public ExtendedGestureEvent(Location loc) {
 		this.loc = loc;
 	}

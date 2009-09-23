@@ -73,7 +73,9 @@ public class EditorCursor extends TouchableGraphicsItem {
 	private TouchableEditor editor = null;
 	
 	private void editorSceneChanged() {
-		
+		if(this.editor != null) {
+			this.editor.updateViewScene();
+		}
 	}
 	
 	public void showTouchableEditor(BaseSequencerItemEditor editor) {

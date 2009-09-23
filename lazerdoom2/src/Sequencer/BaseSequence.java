@@ -39,7 +39,7 @@ public abstract class BaseSequence extends QObject implements SequenceInterface,
 	}
 	
 	void _pumpSequenceEval(long tick) {
-		System.out.println("DFDDDDSSD");
+		//System.out.println("DFDDDDSSD");
 		for(SequenceEvalListenerInterface svali: evalListeners) {
 			svali.dispatchEvalEvent(tick);
 		}

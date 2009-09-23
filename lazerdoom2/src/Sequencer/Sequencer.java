@@ -34,6 +34,11 @@ public class Sequencer extends QObject implements Runnable, SequencerInterface {
 		return (long)(beatMeasureToMs(1, PPQPerBar, bpm)*1000000);
 	}
 	
+	private static long currentGlobalTick = 0;
+	public static long getCurrentGlobalTick() {
+		return currentGlobalTick;
+	}
+	
 	private ParallelSequenceContainer rootSequence;
 	private ControlServer controlServer;
 	private boolean isRunning  = false;
@@ -85,6 +90,7 @@ public class Sequencer extends QObject implements Runnable, SequencerInterface {
 	}*/
 	
 	public boolean processTick(long tick) {
+		currentGlobalTick = tick;
 		readLock.lock();
 		
 		if(rootSequence != null) {

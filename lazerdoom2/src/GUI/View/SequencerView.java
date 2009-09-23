@@ -12,6 +12,7 @@ import sparshui.common.Location;
 import sparshui.common.TouchState;
 import sparshui.common.messages.events.DeleteEvent;
 import sparshui.common.messages.events.DragEvent;
+import sparshui.common.messages.events.EventType;
 import sparshui.common.messages.events.ExtendedGestureEvent;
 import sparshui.common.messages.events.GroupEvent;
 import sparshui.common.messages.events.TouchEvent;
@@ -62,7 +63,6 @@ import edu.uci.ics.jung.graph.util.Pair;
 import Control.Types.DoubleType;
 import GUI.Multitouch.*;
 import GUI.Editor.Editor;
-import GUI.Editor.SequenceDataEditor.SequenceDataEditor;
 import GUI.Item.*;
 import GUI.Item.Editor.TouchableEditor;
 import GUI.Item.Editor.TouchableEditorItem;
@@ -653,21 +653,69 @@ public class SequencerView extends QGraphicsView implements Client, TouchItemInt
 		return this.mapToScene((int)x, (int)y);
 	}
 	
+	
+	HashMap<TouchItemInterface, Pair<Integer>> filteredEvents = new HashMap<TouchItemInterface, Pair<Integer>>();
+	public void focusCurrentEvent(TouchItemInterface item, Event event) {
+		if(event.isOngoing()) {
+			filteredEvents.put(item, new Pair(new Integer(event.getEventType()), new Integer(event.getTouchID())));
+		}
+	}
+	
+	private boolean filterEvent(TouchItemInterface item, Event event) {
+		Pair<Integer> p = null;
+		
+		if((p = filteredEvents.get(item)) != null) {
+			Integer type =  p.getFirst();
+			Integer id = p.getSecond();
+
+			if(event.getTouchID() == id) {
+				if(event.getEventType() != type) {
+					// filter event
+					return true;
+				} else {
+					event.setFocused();
+				}
+			} else {
+				// new id -> new event -> remove from map
+				filteredEvents.remove(item);
+			}
+		} 
+		
+		return false;
+	}
+	
 	private void processEventLocalThread(Integer id, Event event) {
 		TouchItemInterface it = null;
 		if((it  = touchItemGroupIDMap.get(id)) != null) {
-			if(event instanceof TouchEvent) {
-
-				TouchEvent e = (TouchEvent) event;
-				e.setSceneLocation(convertScreenPos(e.getX(), e.getY()));
-			} else if(event instanceof DragEvent) {
-				DragEvent e = (DragEvent) event;
-				
-				e.setSceneLocation(convertScreenPos(e.getRelX(), e.getRelY()));
-			}
 			
+			if(!filterEvent(it, event)) {
+				System.out.println(event.isFocused()+"isFocused");
+				//System.out.print("EVENt tYPE "+event.getEventType()+" eee "+event.getTouchID()+" ongoing "+event.isOngoing());
 
-			it.processEvent(event);
+				if(event instanceof TouchEvent) {
+
+					TouchEvent e = (TouchEvent) event;
+					e.setSceneLocation(convertScreenPos(e.getX(), e.getY()));
+				} else if(event instanceof DragEvent) {
+					DragEvent e = (DragEvent) event;
+					e.setSceneLocation(convertScreenPos(e.getRelX(), e.getRelY()));
+				} else if(event instanceof DeleteEvent) {
+					DeleteEvent e = (DeleteEvent) event;
+					e.setSceneLocation(convertScreenPos(e.getRelX(), e.getRelY()));
+					
+					if(e.isSuccessful()) {
+						e.setSceneCrossPoint(convertScreenPos(e.getCrossPoint().x(), e.getCrossPoint().y()));
+					}
+				}
+
+			/*	if(event instanceof ExtendedGestureEvent) {
+					ExtendedGestureEvent e = (ExtendedGestureEvent) event;
+					e.setSceneLocation(convertScreenPos(e.getRelX(), e.getRelY()));
+				}*/
+
+
+				it.processEvent(event);
+			}
 		}
 	}
 	
@@ -736,12 +784,6 @@ public class SequencerView extends QGraphicsView implements Client, TouchItemInt
 	QGraphicsEllipseItem ellipse = null;
 	@Override
 	public boolean processEvent(Event event) {
-		if(event instanceof TouchEvent) {
-			TouchEvent e = (TouchEvent) event;
-			e.setSceneLocation(convertScreenPos(e.getX(), e.getY()));
-			this.sequencerEditor.handleTouchEvent(e);
-			//System.out.println("WHA?");
-		} 
 		if(event instanceof ExtendedGestureEvent) {
 			ExtendedGestureEvent e = (ExtendedGestureEvent) event;
 			e.setSceneLocation(convertScreenPos(e.getRelX(), e.getRelY()));
@@ -753,7 +795,13 @@ public class SequencerView extends QGraphicsView implements Client, TouchItemInt
 			
 			this.sequencerEditor.handleExtendedGestureEvent(e);
 
-		}
+		} else if(event instanceof TouchEvent) {
+			System.out.println("tp ");
+			TouchEvent e = (TouchEvent) event;
+			e.setSceneLocation(convertScreenPos(e.getX(), e.getY()));
+			this.sequencerEditor.handleTouchEvent(e);
+			//System.out.println("WHA?");
+		} 
 		/*if(event instanceof DragEvent) {
 			DragEvent de = (DragEvent) event;
 			

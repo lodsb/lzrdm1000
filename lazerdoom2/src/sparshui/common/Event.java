@@ -24,6 +24,13 @@ public interface Event extends Serializable {
 	 */
 	public abstract int getEventType();
 	
+	public abstract int getTouchID();
+	
+	public abstract boolean isOngoing();
+	
+	public boolean isFocused();
+	public void setFocused();
+	
 	/**
 	 * Serializes this event for transmission over the network.
 	 * The user-defined event shall implement this method, as well

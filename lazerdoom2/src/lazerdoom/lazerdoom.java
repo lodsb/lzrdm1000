@@ -12,7 +12,6 @@ import lazerdoom.TUIOMouseEmulation.MouseCursor;
 import Control.Types.DoubleType;
 import GUI.Editor.Editor;
 import GUI.Editor.SequencerEditor;
-import GUI.Editor.SequenceDataEditor.SequenceDataEditor;
 import GUI.Item.Editor.PushButton;
 import GUI.Item.Editor.TouchableEditor;
 import GUI.Multitouch.TouchableGraphicsItemContainer;
@@ -59,7 +58,7 @@ public class lazerdoom extends QWidget {
 	private ServerConnection sparshServerConnection;
 	
 	private EditorScene scene = new EditorScene();
-	private SequencerView view = new SequencerView(new SequencerEditor(scene,true), this);
+	private SequencerView view = new SequencerView(new SequencerEditor(scene,false), this);
 	private QHBoxLayout layout = new QHBoxLayout();
 
     public static void main(String[] args) {

@@ -37,7 +37,6 @@ public class SequencerEditor extends Editor {
 		super(scene, showTouchPoints);
 	}
 
-	private QRectF crossRect = new QRectF(-10, -10, 20,20);
 	
 	public void openEditor(EditorCursor cursor, BaseSequencerItem item) {
 		BaseSequencerItemEditor editor = SequencerView.getInstance().getItemEditorController().getEditor(item);
@@ -49,7 +48,7 @@ public class SequencerEditor extends Editor {
 	public void closeEditor(EditorCursor cursor) {
 		cursor.hideTouchableEditor();
 	}
-	
+	private QRectF crossRect = new QRectF(-10, -10, 20,20);
 	@Override
 	protected void handleDeleteEvent(DeleteEvent event) {
 		super.handleDeleteEvent(event);
@@ -101,6 +100,10 @@ public class SequencerEditor extends Editor {
 	
 	@Override
 	protected void handleDragEvent(DragEvent event) {
+		if(!event.isFocused() && event.getSource() instanceof TouchableGraphicsItem) {
+			SequencerView.getInstance().focusCurrentEvent(event.getSource(), event);
+		}
+		
 		if(event.getSource() instanceof BaseSequencerItem) {
 			BaseSequencerItem item = (BaseSequencerItem) event.getSource();
 			item.setPosition(new QPointF(event.getSceneLocation().x()-item.boundingRect().width()/2, event.getSceneLocation().y()-item.boundingRect().height()/2));

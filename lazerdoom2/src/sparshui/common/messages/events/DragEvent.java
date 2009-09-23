@@ -10,6 +10,18 @@ import sparshui.common.utils.Converter;
 
 public class DragEvent extends ExtendedGestureEvent {
 
+	private boolean isFocused = false;
+	
+	@Override
+	public boolean isFocused() {
+		return this.isFocused;
+	}
+	
+	@Override
+	public void setFocused() {
+		this.isFocused = true;
+	}
+	
 	public DragEvent(Location loc, boolean isOng, boolean isSucc, int id) {
 		super(loc);
 		this.setTouchID(id);

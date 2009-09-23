@@ -6,6 +6,7 @@ import java.util.concurrent.CopyOnWriteArrayList;
 
 import Control.Types.DoubleType;
 import Sequencer.Graph.SequenceGraph;
+import Sequencer.SequenceEvent.SequenceEventSubtype;
 import Sequencer.SequencerEvent.SequencerEventSubtype;
 import Sequencer.SequencerEvent.SequencerEventType;
 
@@ -47,8 +48,10 @@ public class SequenceController extends QObject {
 			
 			if(sequence instanceof SequencePlayer) {
 				sequencer.postSequencerEvent(new SequencerEvent(SequencerEventType.SEQUENCE_PLAYER_REMOVED, SequencerEventSubtype.SEQUENCE_PLAYER, sequence));
-			} else {
+			} else if(sequence instanceof EventPointsSequence){
 				sequencer.postSequencerEvent(new SequencerEvent(SequencerEventType.EVENT_POINTS_SEQUENCE_REMOVED, SequencerEventSubtype.EVENT_POINTS_SEQUENCE, sequence));
+			} else if(sequence instanceof Pause) {
+				sequencer.postSequencerEvent(new SequencerEvent(SequencerEventType.PAUSE_REMOVED, SequencerEventSubtype.PAUSE, sequence));
 			}
 			
 			for(Pair<SequenceInterface> connection: connections) {
@@ -77,6 +80,13 @@ public class SequenceController extends QObject {
 		return sp;
 	}
 	
+	public Pause createPauseSequence(long pauseTicks) {
+		Pause p = new Pause(sequencer, pauseTicks);
+		
+		sequencer.postSequencerEvent(new SequencerEvent(SequencerEventType.PAUSE_ADDED, SequencerEventSubtype.PAUSE, p));
+		
+		return p;
+	}
 	public boolean connectSequences(SequenceInterface source, SequenceInterface target) {
 		boolean ret = false;
 		

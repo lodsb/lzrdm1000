@@ -5,7 +5,7 @@ import com.trolltech.qt.core.QPointF;
 import sparshui.common.Location;
 
 public class DeleteEvent extends ExtendedGestureEvent {
-
+	
 	private static final long serialVersionUID = 1337117117L;
 	private QPointF crossPoint = null;
 	

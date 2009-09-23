@@ -68,7 +68,7 @@ public class ParallelSequenceContainer extends BaseSequence implements SequenceC
 		readLock.lock();
 		for(SequenceInterface sequence: sequences) {
 			//System.out.print(" pp "+sequence.size()+" ");
-				if(tick < sequence.size() || sequence instanceof SequencePlayer) {
+				if(tick <= sequence.size() || sequence instanceof SequencePlayer) {
 					currentlyRunning = currentlyRunning | sequence.eval(tick);
 				}
 		}

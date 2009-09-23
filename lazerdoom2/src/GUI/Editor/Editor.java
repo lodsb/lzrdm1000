@@ -80,7 +80,7 @@ public class Editor extends QObject {
 	private HashMap<Integer, TouchPointCursor> touchPointCursors = new HashMap<Integer, TouchPointCursor>();
 	
 	public void handleTouchEvent(TouchEvent event) {
-		if(this.showTouchEvents) {
+		if(!event.isFocused() && this.showTouchEvents) {
 			//System.out.println("trueeeeeeeee");
 			
 				TouchPointCursor tc = null;
@@ -116,6 +116,7 @@ public class Editor extends QObject {
 	}
 	
 	public void handleExtendedGestureEvent(ExtendedGestureEvent event) {
+		this.updateGestureVisualization(event);
 		if(event instanceof GroupEvent) {
 			GroupEvent e = (GroupEvent) event;
 			this.handleGroupEvent(e);
@@ -168,6 +169,7 @@ public class Editor extends QObject {
 
 			if((p = gestureVisualizationsMap.get(event.getTouchID())) == null) {
 				p = new QGraphicsPathItem();
+				p.setZValue(-1000.0);
 				this.scene.addItem(p);
 				//p.setPos(point);
 				//this.scene().addEllipse(point.x(), point.y(), 100,100);
@@ -198,16 +200,12 @@ public class Editor extends QObject {
 		return ppath;
 	}
 	
-	protected void handleGroupEvent(GroupEvent event) {
-		if(event.isOngoing()) {
-			this.updateGestureVisualization(event);
-		} else {
-			QPainterPath path = updateGestureVisualization(event);
-			
+	protected void handleGroupEvent(GroupEvent event) {			
+		if(!event.isOngoing() && event.isSuccessful()) {
+			QPainterPath path = null;
 			if(path != null) {
-				if(event.isSuccessful()) {
-					this.executeCommand(new GroupCommand(path, this.scene));
-				}
+				path = updateGestureVisualization(event);
+				this.executeCommand(new GroupCommand(path, this.scene));
 			}
 		}
 	}

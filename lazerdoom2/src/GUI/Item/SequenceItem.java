@@ -48,7 +48,7 @@ public class SequenceItem extends BaseSequenceViewItem implements ConnectableSeq
 
 	private static QColor normalColor = new QColor(130,130,130); 
 	private static QColor actionColor = new QColor(211,120,0);
-	private static QColor pauseColor = new QColor(0,0,0);
+	private static QColor pauseColor = new QColor(180,180,180);
 	private static QRectF boundingRect = new QRectF(0,0,200,200);
 	private QPen pausePen;
 	
@@ -269,17 +269,20 @@ public class SequenceItem extends BaseSequenceViewItem implements ConnectableSeq
 		return null;
 	}
 
+	private long sequenceStartOffset = 0;
 	@Override
 	public void dispatchSequenceEvent(SequenceEvent se) {
 		if(se.getSequenceEventType() == SequenceEventType.EVALUATED_LOW_FREQ) {
 			if(this.sequenceLength > 0) {
 				long tick = (Long) se.getArgument();
-				this.currentSequencePlayhead = (int)((float)((float)tick/(float)sequenceLength)*360.0*16.0);
+				this.currentSequencePlayhead = (int)((float)((float)(tick-sequenceStartOffset)/(float)sequenceLength)*360.0*16.0);
 			}
-		} else if(se.getSequenceEventType() == SequenceEvent.SequenceEventType.SET_LENGTH) {
+		} else if(se.getSequenceEventType() == SequenceEvent.SequenceEventType.SEQUENCE_SIZE_CHANGED) {
 			this.sequenceLength = (Long)se.getArgument();
-
+			System.out.println(this.sequenceStartOffset+" "+this.sequenceLength);
 			this.update();
+		} else if(se.getSequenceEventType() == SequenceEvent.SequenceEventType.SET_START) {
+			this.sequenceStartOffset = (Long) se.getArgument();
 		} else if(se.getSequenceEventType() == SequenceEvent.SequenceEventType.STARTED) {
 			this.isPlaying = true;
 		} else if(se.getSequenceEventType() == SequenceEvent.SequenceEventType.STOPPED) {

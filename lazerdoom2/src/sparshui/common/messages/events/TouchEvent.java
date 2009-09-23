@@ -19,6 +19,18 @@ public class TouchEvent implements Event {
 	private float _y;
 	private TouchState _state;
 	
+	private boolean isFocused = false;
+	
+	@Override
+	public boolean isFocused() {
+		return this.isFocused;
+	}
+	
+	@Override
+	public void setFocused() {
+		this.isFocused = true;
+	}
+	
 	private QPointF _pos = null;
 	@Override
 	public void setSceneLocation(QPointF pos) {
@@ -74,6 +86,10 @@ public class TouchEvent implements Event {
 	public TouchState getState() {
 		return _state;
 	} 
+	
+	public boolean isOngoing() {
+		return (this._state != TouchState.DEATH);
+	}
 
 	/**
 	 *  Constructs a new TouchEvent from a serialized version

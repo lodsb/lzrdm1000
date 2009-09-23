@@ -302,7 +302,7 @@ public class SequencePlayerItem extends BaseSequenceViewItem implements Connecta
 			this.stopButton.setState(ButtonState.OFF);
 		}
 		
-		if(se.getSequenceEventType() == SequenceEventType.SEQUENCE_PLAYER_STARTING) {
+		if(se.getSequenceEventType() == SequenceEventType.SEQUENCE_PLAYER_STOPPING) {
 			this.playButton.setState(ButtonState.OFF);
 			this.stopButton.setState(ButtonState.BLINKING);
 		} 

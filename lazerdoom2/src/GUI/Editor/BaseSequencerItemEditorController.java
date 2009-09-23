@@ -1,4 +1,5 @@
 package GUI.Editor;
+import GUI.Editor.SequenceEditor;
 import GUI.Item.*;
 import GUI.Item.Editor.TouchableEditor;
 
@@ -22,6 +23,11 @@ public class BaseSequencerItemEditorController extends QObject {
 			
 			if(item instanceof SequencePlayerItem) {
 				editor = new SequencePlayerEditor();
+				editor.setItem(item);
+			}
+			
+			if(item instanceof SequenceItem) {
+				editor = new SequenceEditor();
 				editor.setItem(item);
 			}
 			

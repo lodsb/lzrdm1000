@@ -133,10 +133,10 @@ public class EventPointsSequence<EventType extends BaseType> extends BaseSequenc
 			this.postSequenceEvent(SequenceEventType.STARTED, SequenceEventSubtype.NONE, null);
 		} 
 		
-		if(tick > this.sequenceLength+1) {
+		if(tick > (this.sequenceLength-this.startOffset)+1) {
 			this.isRunning = false;
 			return false;
-		} else if(tick == this.sequenceLength-1) {
+		} else if(tick == (this.sequenceLength-this.startOffset)-1) {
 			this.isRunning = false;
 			this.postSequenceEvent(SequenceEventType.STOPPED, SequenceEventSubtype.NONE, null);
 			return false;
@@ -171,7 +171,7 @@ public class EventPointsSequence<EventType extends BaseType> extends BaseSequenc
 	
 	@Override
 	public long size() {
-		return this.sequenceLength;
+		return this.getCompleteSize();
 	}
 
 	@Override
@@ -203,20 +203,24 @@ public class EventPointsSequence<EventType extends BaseType> extends BaseSequenc
 	public void setStartOffset(long ticks) {
 		this.startOffset = ticks;
 		
-		this.postSequenceEvent(SequenceEventType.SET_START, SequenceEventSubtype.SIZE_IN_TICKS, ticks);
-		this.postSequenceEvent(SequenceEventType.SEQUENCE_SIZE_CHANGED, SequenceEventSubtype.SIZE_IN_TICKS, ticks);
+		this.postSequenceEvent(SequenceEventType.SET_START, SequenceEventSubtype.SIZE_IN_TICKS, this.startOffset);
+		this.postSequenceEvent(SequenceEventType.SEQUENCE_SIZE_CHANGED, SequenceEventSubtype.SIZE_IN_TICKS, this.getCompleteSize());
 	}
 
 	@Override
 	public long getLength() {
 		return this.sequenceLength;
 	}
+	
+	private long getCompleteSize() {
+		return this.sequenceLength-this.startOffset;
+	}
 
 	@Override
 	public void setLength(long length) {
 		this.sequenceLength = length;
-		this.postSequenceEvent(SequenceEventType.SET_LENGTH, SequenceEventSubtype.SIZE_IN_TICKS, length);
-		this.postSequenceEvent(SequenceEventType.SEQUENCE_SIZE_CHANGED, SequenceEventSubtype.SIZE_IN_TICKS, length);
+		this.postSequenceEvent(SequenceEventType.SET_LENGTH, SequenceEventSubtype.SIZE_IN_TICKS, this.getLength());
+		this.postSequenceEvent(SequenceEventType.SEQUENCE_SIZE_CHANGED, SequenceEventSubtype.SIZE_IN_TICKS, this.getCompleteSize());
 	}
 	
 	EventType _testingGetValueOfTick(long tick) {

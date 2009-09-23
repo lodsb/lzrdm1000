@@ -2,7 +2,7 @@ package GUI.Scene.Editor;
 
 import GUI.Editor.SequencePlayerEditor;
 import GUI.Editor.SynthesizerEditor;
-import GUI.Editor.Commands.SequenceEditor;
+import GUI.Editor.SequenceEditor;
 import GUI.Item.Editor.PushButton;
 import GUI.Item.Editor.Slider;
 import GUI.Item.Editor.TextLabel;
@@ -31,6 +31,7 @@ public class SequenceInitScene extends EditorScene {
 	
 	public Signal0 prevPressed = new Signal0();
 	public Signal0 nextPressed = new Signal0();
+	public Signal0 createSequencePressed = new Signal0();
 	
 	
 	public void setCurrentSequenceType(String name) {
@@ -61,6 +62,7 @@ public class SequenceInitScene extends EditorScene {
 		
 		this.previousSequenceTypeButton.buttonPressed.connect(this.prevPressed);
 		this.nextSequenceTypeButton.buttonPressed.connect(this.nextPressed);
+		this.createSequenceButton.buttonPressed.connect(this.createSequencePressed);
 		
 		
 		//this.setSceneRect(new QRectF(0,0,1000,1000));		

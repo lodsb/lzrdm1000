@@ -85,7 +85,8 @@ public class EditorCursor extends TouchableGraphicsItem {
 			this.editor.closeEditor.connect(this, "hideTouchableEditor()");
 			this.editor.setCurrentEditor(editor);
 			this.editor.setPos(this.pos());
-			
+			Random random = new Random();
+			this.editor.rotate(random.nextDouble()*360);
 			this.scene().addItem(this.editor);
 			
 			SequencerView.getInstance().registerEditor(this.editor);

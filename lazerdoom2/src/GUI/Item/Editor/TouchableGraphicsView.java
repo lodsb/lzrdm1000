@@ -50,8 +50,8 @@ public class TouchableGraphicsView extends QGraphicsView implements TouchItemInt
 		allowedGestures.add(sparshui.gestures.GestureType.DELETE_GESTURE.ordinal());*/
 		//this.setScene(new QGraphicsScene());
 		this.setupViewport(new QGLWidget((QWidget)null, (QGLWidget)SequencerView.sharedGlWidget));
-		//this.setCacheMode(CacheModeFlag.CacheBackground);
-		//this.setRenderHint(RenderHint.HighQualityAntialiasing);
+		this.setCacheMode(CacheModeFlag.CacheBackground);
+		//this.setRenderHint(RenderHint.Antialiasing);
 		//this.setViewportUpdateMode(ViewportUpdateMode.FullViewportUpdate);
 		this.editor = editor;
 	}
@@ -90,16 +90,16 @@ public class TouchableGraphicsView extends QGraphicsView implements TouchItemInt
 			ExtendedGestureEvent e = (ExtendedGestureEvent) event;
 			QPointF itemCoordinates = editor.mapFromScene(e.getSceneLocation());
 			e.setSceneLocation(this.mapToScene((int)itemCoordinates.x(), (int)itemCoordinates.y()));
-			/*if(e instanceof DeleteEvent) {
+			if(e instanceof DeleteEvent) {
 				if(((DeleteEvent) e).getCrossPoint() != null) {
 					QPointF crossPoint = editor.mapFromScene(((DeleteEvent)e).getSceneCrossPoint());
 					((DeleteEvent) e).setSceneCrossPoint(this.mapToScene((int)crossPoint.x(), (int)crossPoint.y()));
 				}
-			}*/
+			}
 			
 			this.editor.getCurrentEditor().handleExtendedGestureEvent(e);
 
-		} 
+		}  
 		
 		if(event instanceof TouchEvent) {
 			TouchEvent e = (TouchEvent) event;

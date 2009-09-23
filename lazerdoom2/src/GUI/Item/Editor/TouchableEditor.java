@@ -301,6 +301,7 @@ public class TouchableEditor extends TouchableGraphicsWidget {
 	}
 
 	QPointF dragOffset = null;
+	QPointF start = null;
 	@Override
 	public boolean processEvent(Event event) {
 		if(event instanceof TouchEvent) {
@@ -313,9 +314,11 @@ public class TouchableEditor extends TouchableGraphicsWidget {
 				
 				if(e.isOngoing()) {
 					if(dragOffset == null) {
-						dragOffset = this.mapFromScene(e.getSceneLocation());
+						dragOffset = e.getSceneLocation();
+						start = this.pos();
 					} else {
-						this.setPos(((DragEvent)event).getSceneLocation().x()-dragOffset.x(), ((DragEvent)event).getSceneLocation().y()-dragOffset.y());
+						QPointF p = new QPointF(dragOffset.x()-e.getSceneLocation().x(),e.getSceneLocation().y()-dragOffset.y());
+						this.setPos(start.x()+(e.getSceneLocation().x()-dragOffset.x()), start.y()+(e.getSceneLocation().y()-dragOffset.y()));
 					}
 					
 				} else {

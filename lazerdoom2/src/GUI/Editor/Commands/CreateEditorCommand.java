@@ -1,5 +1,7 @@
 package GUI.Editor.Commands;
 
+import java.util.Random;
+
 import GUI.Editor.BaseEditorCommand;
 import GUI.Editor.SequencerEditor;
 import GUI.Item.EditorCursor;

@@ -8,6 +8,7 @@ import lazerdoom.Core;
 
 import com.trolltech.qt.core.QPointF;
 import com.trolltech.qt.core.QRectF;
+import com.trolltech.qt.core.QTimer;
 import com.trolltech.qt.gui.QGraphicsItemInterface;
 
 import edu.uci.ics.jung.graph.util.Pair;
@@ -27,6 +28,7 @@ import GUI.Editor.Commands.DeleteSynthConnectionCommand;
 import GUI.Editor.Commands.DeleteSynthItemCommand;
 import GUI.Editor.Commands.SequenceEditor.CreateDoublePointSequenceItem;
 import GUI.Editor.Commands.SequenceEditor.MoveDoublePointSequenceItem;
+import GUI.Editor.Commands.SequenceEditor.RemoveDoublePointSequenceItem;
 import GUI.Item.BaseSequencerItem;
 import GUI.Item.EditorCursor;
 import GUI.Item.SequenceConnection;
@@ -172,40 +174,37 @@ public class SequenceEditor extends BaseSequencerItemEditor {
 	private abstract class SequenceEditModeForSequences extends SequenceEditMode implements SequenceEventListenerInterface {
 		
 		// ugly but needed to filter events for the handling touchpoints and gestures
-		HashMap<Object, Pair<Integer>> filteredEvents = new HashMap<Object, Pair<Integer>>();
-		public void focusCurrentEvent(Object item, Event event) {
-			if(event.isOngoing()) {
-				filteredEvents.put(item, new Pair(new Integer(event.getEventType()), new Integer(event.getTouchID())));
-			}
+		QTimer clearTableTimer = new QTimer();
+		HashMap<Integer, Integer> filteredEvents = new HashMap<Integer, Integer>();
+		public void focusCurrentEvent(Event event) {
+			clearTableTimer.start(2000);
+			filteredEvents.put(event.getTouchID(), event.getEventType());
 		}
 		
-		protected boolean filterEvent(Object item, Event event) {
-			Pair<Integer> p = null;
+		protected boolean filterEvent(Event event) {
+			Integer type = null;
 			
-			if((p = filteredEvents.get(item)) != null) {
-				Integer type =  p.getFirst();
-				Integer id = p.getSecond();
-
-				if(event.getTouchID() == id) {
-					if(event.getEventType() != type) {
-						// filter event
-						return true;
-					} else {
-						event.setFocused();
-					}
-				} else {
-					// new id -> new event -> remove from map
-					filteredEvents.remove(item);
+			clearTableTimer.start(2000);
+			if((type = filteredEvents.get(event.getTouchID())) != null) {
+				if(type != event.getEventType()) {
+					return true;
 				}
-			} 
+			}	
 			
 			return false;
+		}
+		
+		private void clearFEMap() {
+			filteredEvents.clear();
 		}
 		
 		private BaseSequence sequence;
 		public SequenceEditModeForSequences(SequenceEditor editor, BaseSequence baseSequence) {
 			super(editor);
 			this.sequence = baseSequence;
+			
+			clearTableTimer.timeout.connect(this, "clearFEMap()");
+			
 		}
 		
 		public BaseSequence getBaseSequence() {
@@ -265,7 +264,7 @@ public class SequenceEditor extends BaseSequencerItemEditor {
 			TouchableGraphicsItem target;
 			if(dragStartPoints.containsKey(e.getTouchID())) {
 				if((target = dragStartPoints.get(e.getTouchID())) != null) {
-					if(!this.filterEvent(this, e)) {
+					if(!this.filterEvent(e)) {
 						target.processEvent(e);
 					}
 				}
@@ -273,7 +272,7 @@ public class SequenceEditor extends BaseSequencerItemEditor {
 				QGraphicsItemInterface item = null;
 				if((item = this.scene.itemAt(e.getSceneLocation())) instanceof TouchableGraphicsItem) {
 					
-					this.focusCurrentEvent(this, e);
+					this.focusCurrentEvent(e);
 					
 					dragStartPoints.put(e.getTouchID(), (TouchableGraphicsItem) item);
 				} else {
@@ -313,7 +312,6 @@ public class SequenceEditor extends BaseSequencerItemEditor {
 		}
 		
 		private void lengthMoved(Long tick, Boolean successful) {
-			System.out.println("wh l "+((EventPointsSequence)this.getBaseSequence()).getStartOffset()+" l "+((EventPointsSequence)this.getBaseSequence()).size());
 			if(((EventPointsSequence)this.getBaseSequence()).getStartOffset() < tick && tick > 0) {
 				((BaseSequenceScene)this.getScene()).setLengthCursor(tick);
 				if(successful) {
@@ -331,7 +329,6 @@ public class SequenceEditor extends BaseSequencerItemEditor {
 		}
 		
 		private void startMoved(Long tick, Boolean successful) {
-			System.out.println("wh s");
 			if(((EventPointsSequence)this.getBaseSequence()).getLength() > tick) {
 				if(tick < 0) {
 					tick = (long)0;
@@ -348,7 +345,8 @@ public class SequenceEditor extends BaseSequencerItemEditor {
 		public boolean handleTouchEvent(TouchEvent e) {
 			QPointF pos = e.getSceneLocation();
 			
-			if(!this.filterEvent(this, e) && pos.x() > 0 && !(this.getScene().itemAt(pos) instanceof TouchableGraphicsItem) && !e.isOngoing()) {
+			if(!this.filterEvent(e) && !e.isFocused() && pos.x() > 0 && !(this.getScene().itemAt(pos) instanceof TouchableGraphicsItem) && !e.isOngoing()) {
+				System.out.println("touched "+e.getTouchID());
 				executeCommand(new CreateDoublePointSequenceItem<DoubleType>((EventPointsSequence)this.getBaseSequence(), pos,this.getEditor(), this.getEditor().getScene(), this, "eventPointDragged(TouchableDoubleTypeSequenceDataItem, QPointF, Boolean)"));				
 			}
 			return true;
@@ -358,18 +356,23 @@ public class SequenceEditor extends BaseSequencerItemEditor {
 		@Override
 		public boolean handleDeleteEvent(DeleteEvent event) {
 			System.out.println("DELETE");
-			if(!event.isFocused()) {
+			if(!filterEvent(event)) {
 				if(event.isSuccessful()) {
+					this.focusCurrentEvent(event);
+					System.out.println("SUCCessFuL"+event.getTouchID()+" "+event.isFocused());
 					QPointF crossPoint = event.getSceneCrossPoint();
 
+					System.out.println(crossPoint+" -- "+event.getSceneLocation());
 					crossRect.setX(crossPoint.x()-10.0);
 					crossRect.setY(crossPoint.y()-10.0);
 					crossRect.setWidth(20);
 					crossRect.setHeight(20);
-					List<QGraphicsItemInterface> items = this.getScene().items(crossRect);
-
+					List<QGraphicsItemInterface> items = this.getEditor().getScene().items(crossRect);
+					System.out.println(items);
 					for(QGraphicsItemInterface item: items) {
-
+						if(item instanceof TouchableDoubleTypeSequenceDataItem) {
+							executeCommand(new RemoveDoublePointSequenceItem<DoubleType>((EventPointsSequence<DoubleType>) this.getBaseSequence(), (TouchableDoubleTypeSequenceDataItem) item, this.getEditor().getScene()));
+						}
 					}
 				}	
 				return true;
@@ -390,9 +393,9 @@ public class SequenceEditor extends BaseSequencerItemEditor {
 	public SequenceEditor() {
 		super();
 		
-		allowedGestures.add(sparshui.gestures.GestureType.TOUCH_GESTURE.ordinal());
 		allowedGestures.add(sparshui.gestures.GestureType.DRAG_GESTURE.ordinal());
 		allowedGestures.add(sparshui.gestures.GestureType.DELETE_GESTURE.ordinal());
+		allowedGestures.add(sparshui.gestures.GestureType.TOUCH_GESTURE.ordinal());
 		
 		this.setCurrentMode(new SequenceInitMode(this));
 	

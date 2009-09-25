@@ -54,7 +54,7 @@ public class ControlServer {
 	}
 	
 	public void appendMessage(BaseSequence si, long localTick, OSCMessage message) {
-		//System.out.println("Appending: "+message.getName()+" "+message.getArgCount()+" "+message.getArg(0)+" "+message.getArg(1)+" "+message.getArg(2));
+		System.out.println("Appending: "+message.getName()+" "+message.getArgCount()+" "+message.getArg(0)+" "+message.getArg(1)+" "+message.getArg(2));
 		SentMessage sm = new SentMessage();
 		sm.localTick = localTick;
 		sm.sequence = si;

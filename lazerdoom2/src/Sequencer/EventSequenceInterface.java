@@ -6,8 +6,8 @@ import Control.Types.BaseType;
 public interface EventSequenceInterface<EventType extends BaseType> extends SequenceInterface {
 	//package
 	void insert(EventType t, long tick);
-	void remove(long tick);
-	void remove(EventType t);
+	void remove(long tick, EventType t);
+	//void remove(EventType t);
 	void shift(long tick, long offset);
 	
 	void setLength(long length);

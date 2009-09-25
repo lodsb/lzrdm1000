@@ -5,6 +5,7 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
+import java.util.LinkedList;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.concurrent.ConcurrentHashMap;
@@ -41,18 +42,18 @@ public class EventPointsSequence<EventType extends BaseType> extends BaseSequenc
 	
 	CopyOnWriteArrayList<ControlBusInterface<EventType>> controlBuses;
 	
-	Map<Long, EventType> events;
+	Map<Long, CopyOnWriteArrayList<EventType>> events;
 	
 	long startOffset = 0;
 	long sequenceLength = 0;
 	
 	boolean isRunning = false;
 	
-	public Iterator<Entry<Long, EventType>> getIterator() {
+	public Iterator<Entry<Long, CopyOnWriteArrayList<EventType>>> getIterator() {
 		return this.events.entrySet().iterator();
 	}
 	
-	private EventPointsSequence(SequencerInterface seq, Map<Long, EventType> events, CopyOnWriteArrayList<ControlBusInterface<EventType>> controlBuses, long startOffset, long sequenceLength) {
+	private EventPointsSequence(SequencerInterface seq, Map<Long, CopyOnWriteArrayList<EventType>> events, CopyOnWriteArrayList<ControlBusInterface<EventType>> controlBuses, long startOffset, long sequenceLength) {
 		super(seq);
 		this.events = events;
 		this.controlBuses = controlBuses;
@@ -62,24 +63,42 @@ public class EventPointsSequence<EventType extends BaseType> extends BaseSequenc
 	
 	public EventPointsSequence(SequencerInterface seq) {
 		super(seq);
-		this.events =  new ConcurrentHashMap<Long, EventType>(); 
+		this.events =  new ConcurrentHashMap<Long, CopyOnWriteArrayList<EventType>>(); 
 		this.controlBuses = new CopyOnWriteArrayList<ControlBusInterface<EventType>>();
 	} 
 	
 	
 	@Override
 	public void insert(EventType t, long tick) {
-		this.events.put(tick, t);
+		CopyOnWriteArrayList<EventType> list;
+		if((list = this.events.get(tick)) != null) {
+			list.add(t);
+		} else {
+			list = new CopyOnWriteArrayList<EventType>();
+			list.add(t);
+			this.events.put(tick, list);
+		}
 		this.postSequenceEvent(SequenceEventType.INSERT, SequenceEventSubtype.TICK, tick);
 	}
 
 	@Override
-	public void remove(long tick) {
-		this.events.remove(tick);
+	public void remove(long tick, EventType t) {
+		CopyOnWriteArrayList<EventType> list;
+		
+		if((list = this.events.get(tick)) != null) {
+			System.out.println(list);
+			list.remove(t);
+			System.out.println("WHAT "+list);
+			
+			if(list.size() == 0) {
+				this.events.remove(tick);
+			}
+		}
+
 		this.postSequenceEvent(SequenceEventType.REMOVE, SequenceEventSubtype.TICK, tick);
 	}
 
-	@Override
+	/*@Override
 	public void remove(EventType t) {
 
 		long tick = -1;
@@ -95,13 +114,14 @@ public class EventPointsSequence<EventType extends BaseType> extends BaseSequenc
 		}
 		
 		this.postSequenceEvent(SequenceEventType.REMOVE, SequenceEventSubtype.EVENT, t);
-	}
+	}*/
 
 	@Override
 	public void addControlBus(ControlBusInterface<EventType> cb) {
-		this.controlBuses.add(cb);
-		
-		this.postSequenceEvent(SequenceEventType.ADD_CTRL_BUS, SequenceEventSubtype.CTRL_BUS, cb);
+		if(!this.controlBuses.contains(cb)) {
+			this.controlBuses.add(cb);
+			this.postSequenceEvent(SequenceEventType.ADD_CTRL_BUS, SequenceEventSubtype.CTRL_BUS, cb);
+		}
 	}
 
 	public void removeControlBus(ControlBusInterface<EventType> cb) {
@@ -118,14 +138,25 @@ public class EventPointsSequence<EventType extends BaseType> extends BaseSequenc
 		for(ControlBusInterface<EventType> bus: controlBuses) {
 			controlBusList.add(bus);
 		}
-
-		copy = new EventPointsSequence<EventType>(this.getSequencer(),  new ConcurrentHashMap<Long, EventType>(events), controlBusList, this.startOffset, this.sequenceLength);
+		
+		Iterator<Entry<Long, CopyOnWriteArrayList<EventType>>> it = this.getIterator();
+		ConcurrentHashMap<Long, CopyOnWriteArrayList<EventType>> map = new ConcurrentHashMap<Long, CopyOnWriteArrayList<EventType>>();
+		
+		while(it.hasNext()) {
+			Entry<Long, CopyOnWriteArrayList<EventType>> entry;
+			entry = it.next();
+	
+			map.put(entry.getKey(), entry.getValue());
+		}
+		
+		copy = new EventPointsSequence<EventType>(this.getSequencer(),  map , controlBusList, this.startOffset, this.sequenceLength);
 		
 		this.postSequenceEvent(SequenceEventType.CLONED_SEQUENCE, SequenceEventSubtype.SEQUENCE, copy);
 		
 		return copy;
 	}
 	
+	private CopyOnWriteArrayList<EventType> eventList;
 	@Override
 	public boolean eval(long tick) {
 		//System.out.println("eval "+tick);
@@ -143,12 +174,14 @@ public class EventPointsSequence<EventType extends BaseType> extends BaseSequenc
 		}
 	
 		tick = tick+this.startOffset;
-		EventType event;
 		// random
 		super.eval(tick);
-		if((event = events.get(tick)) != null) {
+		if((eventList = events.get(tick)) != null) {
 			for(ControlBusInterface<EventType> bus: this.controlBuses) {
-				bus.setValue(this, tick, event);
+				for(EventType event: eventList) {
+					System.out.println("@tick "+tick);
+					bus.setValue(this, tick, event);
+				}
 			}
 		}
 		
@@ -224,7 +257,7 @@ public class EventPointsSequence<EventType extends BaseType> extends BaseSequenc
 	}
 	
 	EventType _testingGetValueOfTick(long tick) {
-		return this.events.get(tick);
+		return null; //this.events.get(tick);
 	}
 	
 	public String toString() {

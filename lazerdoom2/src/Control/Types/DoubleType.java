@@ -33,7 +33,13 @@ public class DoubleType implements BaseType<Double> {
 	}
 	
 	public String toString() {
-		return getFloatValue()+"";
+		return "("+getFloatValue()+" , "+getFloatValue2()+")";
+	}
+
+	@Override
+	public float getFloatValue2() {
+		// TODO Auto-generated method stub
+		return 1;
 	}
 
 }

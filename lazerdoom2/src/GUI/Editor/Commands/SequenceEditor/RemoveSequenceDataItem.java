@@ -7,15 +7,16 @@ import edu.uci.ics.jung.graph.util.Pair;
 import Control.Types.BaseType;
 import GUI.Editor.BaseEditorCommand;
 import GUI.Item.Editor.SequenceDataEditor.TouchableDoubleTypeSequenceDataItem;
+import GUI.Item.Editor.SequenceDataEditor.TouchableSequenceDataItem;
 import Sequencer.EventPointsSequence;
 
-public class RemoveDoublePointSequenceItem<T extends BaseType> extends BaseEditorCommand {
+public class RemoveSequenceDataItem<T extends BaseType> extends BaseEditorCommand {
 
 	private QGraphicsScene scene;
 	private EventPointsSequence<T> sequence;
-	private TouchableDoubleTypeSequenceDataItem item;
+	private TouchableSequenceDataItem item;
 	
-	public RemoveDoublePointSequenceItem(EventPointsSequence<T> sequence, TouchableDoubleTypeSequenceDataItem item, QGraphicsScene scene) {
+	public RemoveSequenceDataItem(EventPointsSequence<T> sequence, TouchableSequenceDataItem item, QGraphicsScene scene) {
 		this.scene = scene;
 		this.sequence = sequence;
 		this.item = item;
@@ -24,7 +25,7 @@ public class RemoveDoublePointSequenceItem<T extends BaseType> extends BaseEdito
 	public boolean execute() {
 		
 		Pair<Object> p = item.getTickValuePairFromPosition();
-		sequence.remove((Long)p.getFirst());
+		sequence.remove((Long)p.getFirst(), (T)p.getSecond());
 		scene.removeItem(item);
 		
 		return true;

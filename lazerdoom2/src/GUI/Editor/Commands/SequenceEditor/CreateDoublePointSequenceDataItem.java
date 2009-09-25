@@ -11,7 +11,7 @@ import com.trolltech.qt.core.QPointF;
 
 import edu.uci.ics.jung.graph.util.Pair;
 
-public class CreateDoublePointSequenceItem<T extends BaseType> extends BaseEditorCommand {
+public class CreateDoublePointSequenceDataItem<T extends BaseType> extends BaseEditorCommand {
 
 	private EventPointsSequence<T> sequence;
 	private QPointF pos;
@@ -20,7 +20,7 @@ public class CreateDoublePointSequenceItem<T extends BaseType> extends BaseEdito
 	private Object object;
 	private String slot;
 	
-	public CreateDoublePointSequenceItem(EventPointsSequence<T> sequence, QPointF pos, Editor editor, QGraphicsScene scene, Object object, String slot) {
+	public CreateDoublePointSequenceDataItem(EventPointsSequence<T> sequence, QPointF pos, Editor editor, QGraphicsScene scene, Object object, String slot) {
 		this.sequence = sequence;
 		this.pos = pos;
 		this.scene = scene;
@@ -33,7 +33,9 @@ public class CreateDoublePointSequenceItem<T extends BaseType> extends BaseEdito
 		TouchableDoubleTypeSequenceDataItem item = new TouchableDoubleTypeSequenceDataItem(this.editor);
 		this.scene.addItem(item);
 		item.setPosition(pos);
+		item.updateTickAndValueFromPosition(pos);
 		Pair<Object> p = item.getTickValuePairFromPosition();
+		
 		
 		(this.sequence).insert((T)p.getSecond(), (Long)p.getFirst());
 		item.dragged.connect(this.object, this.slot);

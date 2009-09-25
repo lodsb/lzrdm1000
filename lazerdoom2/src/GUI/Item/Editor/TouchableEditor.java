@@ -226,6 +226,10 @@ public class TouchableEditor extends TouchableGraphicsWidget {
 	
 	private LinkedList<Integer> allowedGestures = new LinkedList<Integer>();
 	
+	public void shit() {
+		this.baseLayout.removeItem(graphicsViewContainer);
+	}
+	
 	private BaseSequencerItemEditor editor  = null;
 	
 	public BaseSequencerItemEditor getCurrentEditor() {
@@ -235,16 +239,12 @@ public class TouchableEditor extends TouchableGraphicsWidget {
 	public void setCurrentEditor(BaseSequencerItemEditor editor) {
 		this.editor = editor;
 		EditorScene scene = editor.getScene();
-		this.graphicsView.setScene(scene);
-		this.graphicsView.setSceneRect(scene.sceneRect());
-		this.graphicsView.update();
+		this.graphicsView.setEditorScene(scene);
 		this.show();
 	}
 	
 	public void updateViewScene() {
-		this.graphicsView.setScene(this.editor.getScene());
-		this.graphicsView.setSceneRect(this.editor.getScene().sceneRect());
-		this.graphicsView.update();
+		this.graphicsView.setEditorScene(this.editor.getScene());
 	}
 	
 	private EditorButton closeButton;

@@ -62,7 +62,7 @@ public class DeleteSequenceItemCommand extends BaseEditorCommand {
 					}
 					
 				}
-			} else if(!this.sequenceItem.isInitialized()) {
+			} else /*if(!this.sequenceItem.isInitialized()) */{
 				this.scene.removeItem(this.sequenceItem);
 				this.sequenceItem.undockAllCursors();
 			} 

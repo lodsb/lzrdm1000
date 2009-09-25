@@ -5,8 +5,10 @@ import java.util.Map.Entry;
 import sparshui.common.Event;
 import sparshui.common.messages.events.DragEvent;
 import Control.Types.DoubleType;
+import Control.Types.NoteType;
 import GUI.Editor.Editor;
 import GUI.Scene.Editor.EventPointsDoubleSequenceScene;
+import GUI.Scene.Editor.NoteEventScene;
 import GUI.Scene.Editor.SequenceDataEditorScene;
 
 import com.trolltech.qt.core.QPointF;
@@ -27,18 +29,58 @@ import com.trolltech.qt.svg.QSvgRenderer;
 
 import edu.uci.ics.jung.graph.util.Pair;
 
-public class TouchableDoubleTypeSequenceDataItem extends TouchableSequenceDataItem<DoubleType> {
+public class TouchableNoteTypeSequenceDataItem extends TouchableSequenceDataItem<DoubleType> {
 
 	public Signal3<TouchableSequenceDataItem, QPointF, Boolean> dragged = new Signal3<TouchableSequenceDataItem, QPointF, Boolean>();
+	private boolean isNoteOff = false;
+	private TouchableNoteTypeSequenceDataItem parent = null;
+	private TouchableNoteTypeSequenceDataItem child = null;
+	private QPen linePen = new QPen(QColor.red);
 	
-	public TouchableDoubleTypeSequenceDataItem(Editor editor) {
+	public TouchableNoteTypeSequenceDataItem(Editor editor, TouchableNoteTypeSequenceDataItem parentItem) {
+		
 		super(editor);
 		// TODO Auto-generated constructor stub
 		//this.scale(1.5, 1.5);
 		this.setZValue(100.0);
+		
+		linePen.setWidth(5);
 		//line.setParentItem(this);
 		this.setFlag(GraphicsItemFlag.ItemIgnoresTransformations, true);
-		//line.setFlag(GraphicsItemFlag.ItemIgnoresTransformations, true);
+		if(parentItem != null) {
+			this.isNoteOff = true;
+			this.parent = parentItem;
+			this.child = this;
+			this.parent.setNoteOff(this);
+			this.line = new Line();
+			this.line.setPos(this.pos());
+		} else {
+			this.parent = this;
+		}
+		
+		//this.line.setParentItem(this);
+	}
+	
+	@Override
+	public void destroy() {
+		System.out.println(this.scene());
+		this.scene().removeItem(line);
+	}
+	
+	public boolean isNoteOff() {
+		return this.isNoteOff;
+	}
+	
+	private void setNoteOff(TouchableNoteTypeSequenceDataItem child) {
+		this.child = child;
+	}
+	
+	public TouchableNoteTypeSequenceDataItem noteOn() {
+		return this.parent;
+	}
+	
+	public TouchableNoteTypeSequenceDataItem noteOff() {
+		return this.child;
 	}
 
 	private static String svgFileName = System.getProperty("user.dir")+"/src/GUI/Item/SVG/node-icons.svg";
@@ -46,54 +88,50 @@ public class TouchableDoubleTypeSequenceDataItem extends TouchableSequenceDataIt
 	
 	private QRectF boundingRect = new QRectF(-30,-30,80,80);
 	private QRectF SVGboundingRect = new QRectF(-20,-20,40,40);
+	private Line line = null; 
 	
 	private class Line extends QGraphicsLineItem {
 		private TouchableDoubleTypeSequenceDataItem parent;
 		private QLineF line;
 		private QPen linePen = new QPen(QColor.red);
 		
-		public Line(TouchableDoubleTypeSequenceDataItem parent) {
-			this.parent = parent;
-			this.updateLine();
-			//linePen.setWidth(5);
+		public Line() {
+			linePen.setWidth(4);
 			this.setPen(linePen);
 			this.setZValue(-100.0);
 		}
 		
-		public void updateLine() {
-			QPointF parentPos = parent.pos();
-			
-			line = new QLineF(0, 0, 0, -parentPos.y());
-			this.setLine(line);
+		QPointF op1 = null;
+		QPointF op2 = null;
+		public void updateLine(QPointF p1, QPointF p2) {
+			if(!p1.equals(op1) || ! p2.equals(p2)) {
+				line = new QLineF(p1, p2);
+				this.setLine(line);
+			}
 			//this.setPos(parentPos.x(), 0);
 			//System.out.println(line);
 		}
 	}
 	
-/*	@Override
-	public Object itemChange(GraphicsItemChange change, Object value) {
-		// ignore scaling
-		if(change == GraphicsItemChange.ItemMatrixChange) {
-			QMatrix matrix = (QMatrix) value;
-			matrix.setMatrix(matrix.m11(), matrix.m12(), 1.0, 1.0, matrix.dx(), matrix.dy());
-			value = matrix;
-		}
-		
-		return super.itemChange(change, value);
-	}*/
-	
+	// ugly as hell, but ignoretransform-flag makes it impossible to recalculate the inverse transform for the line
+	boolean firstRun = true;
 	@Override
 	public void paint(QPainter painter, QStyleOptionGraphicsItem option, QWidget widget) {
-		//FIXME: a whole lot of repaints?! why?
-		
-	//	System.out.println("--- "+this.pos());
 		sharedRenderer.render(painter, "node", this.SVGboundingRect);
-		if(this.currentValue != null) {
+		if(!this.isNoteOff && this.currentValue != null) {
 			painter.setPen(QColor.black);
 			//painter.scale(0.7, 0.7);
-			painter.drawText(-70, -50, 100, 100, Qt.AlignmentFlag.AlignHCenter.ordinal(), ""+this.getDoubleValFromPos(this.pos()));
+			painter.drawText(-50, -50, 62, 100, Qt.AlignmentFlag.AlignHCenter.ordinal(), ""+NoteType.noteNameArray[this.getNoteIndexFromPos(this.pos())]);
+		} else if(this.isNoteOff && this.parent != null) {
+			//painter.setPen(this.linePen);
+			//painter.drawLine(-16, 0,0,0);
+			if(firstRun) {
+				this.scene().addItem(line);
+				firstRun = false;
+			}
+			
+			line.updateLine(this.pos(),this.parent.pos());
 		}
-		//line.updateLine();
 	}
 	
 	//private Line line = new Line(this);
@@ -115,7 +153,6 @@ public class TouchableDoubleTypeSequenceDataItem extends TouchableSequenceDataIt
 	boolean firstEvent = true;
 	
 	Pair<Object> oldTickValuePair = null;
-	@Override
 	public Pair<Object> getOldTickValuePair() {
 		return oldTickValuePair;
 	}
@@ -136,34 +173,30 @@ public class TouchableDoubleTypeSequenceDataItem extends TouchableSequenceDataIt
 		return true;
 	}
 	
-	private double getDoubleValFromPos(QPointF pos) {
-		double value = 0.0;
+	private int getNoteIndexFromPos(QPointF pos) {
+		int value = 0;
 		
-		value = pos.y()/SequenceDataEditorScene.valueMultiplyer;
+		value = NoteType.noteScaleSize - ((int)(pos.y()-NoteEventScene.hSceneStart))/NoteEventScene.hGridSize;
 		
-		if(value > 1.0) {
-			value = 1.0;
-		}
-		
-		if(value < -1.0) {
-			value = 1.0;
-		}
-		
-		return -value;
+		return value;
 	}
 	
 	public void updateTickAndValueFromPosition(QPointF pos) {
+		System.out.println("POS "+pos);
 		long tick;
-		double value;
+		int value;
 		
 		DoubleType val;
 		
-		value = this.getDoubleValFromPos(pos);
+		value = this.getNoteIndexFromPos(pos);
 		
 		tick = (long) (pos.x()/SequenceDataEditorScene.tickMultiplyer);
 		
-		// ugh...	
-		val = new DoubleType(value);
+		if(this.isNoteOff) {
+			val = new NoteType(value, 0.0f);
+		} else {
+			val = new NoteType(value, 0.8f);
+		}
 		
 		if(tick < 0) {
 			tick = 0;
@@ -171,11 +204,15 @@ public class TouchableDoubleTypeSequenceDataItem extends TouchableSequenceDataIt
 		
 		this.currentTick = tick;
 		this.currentValue = val;
+		
+		if(this.isNoteOff && this.oldTickValuePair == null) {
+			this.oldTickValuePair = new Pair<Object>(new Long(currentTick), currentValue);
+		}
 	}
 
 	@Override
 	public void setPosition(QPointF pos) {
-		this.setPos(pos);
+		this.setPos(pos);		
 	}
 
 	

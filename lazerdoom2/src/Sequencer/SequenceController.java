@@ -5,6 +5,7 @@ import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
 
 import Control.Types.DoubleType;
+import Control.Types.NoteType;
 import Sequencer.Graph.SequenceGraph;
 import Sequencer.SequenceEvent.SequenceEventSubtype;
 import Sequencer.SequencerEvent.SequencerEventSubtype;
@@ -66,6 +67,14 @@ public class SequenceController extends QObject {
 	
 	public EventPointsSequence<DoubleType> createDoubleTypeEventPointsSequence() {
 		EventPointsSequence<DoubleType> e = new EventPointsSequence<DoubleType>(sequencer);
+		
+		sequencer.postSequencerEvent(new SequencerEvent(SequencerEventType.EVENT_POINTS_SEQUENCE_ADDED, SequencerEventSubtype.EVENT_POINTS_SEQUENCE, e));
+		
+		return e;
+	}
+	
+	public EventPointsSequence<NoteType> createNoteTypeEventPointsSequence() {
+		EventPointsSequence<NoteType> e = new EventPointsSequence<NoteType>(sequencer);
 		
 		sequencer.postSequencerEvent(new SequencerEvent(SequencerEventType.EVENT_POINTS_SEQUENCE_ADDED, SequencerEventSubtype.EVENT_POINTS_SEQUENCE, e));
 		

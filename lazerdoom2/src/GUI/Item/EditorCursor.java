@@ -21,6 +21,7 @@ import com.trolltech.qt.gui.QPen;
 import com.trolltech.qt.gui.QPolygonF;
 import com.trolltech.qt.gui.QStyleOptionGraphicsItem;
 import com.trolltech.qt.gui.QWidget;
+import com.trolltech.qt.gui.QGraphicsScene.ItemIndexMethod;
 import com.trolltech.qt.svg.QSvgRenderer;
 
 import GUI.Editor.BaseSequencerItemEditor;
@@ -78,6 +79,10 @@ public class EditorCursor extends TouchableGraphicsItem {
 		}
 	}
 	
+	// position of the invisible editor has to be changed since the item still is indexed, even upon removal
+	// from the scene - qtbug?!
+	
+	QPointF oldEditorPosition;
 	public void showTouchableEditor(BaseSequencerItemEditor editor) {
 		if(this.editor == null) {
 			this.editor = new TouchableEditor();
@@ -85,8 +90,8 @@ public class EditorCursor extends TouchableGraphicsItem {
 			this.editor.closeEditor.connect(this, "hideTouchableEditor()");
 			this.editor.setCurrentEditor(editor);
 			this.editor.setPos(this.pos());
-			Random random = new Random();
-			this.editor.rotate(random.nextDouble()*360);
+			//Random random = new Random();
+			//this.editor.rotate(random.nextDouble()*360);
 			this.scene().addItem(this.editor);
 			
 			SequencerView.getInstance().registerEditor(this.editor);
@@ -94,8 +99,8 @@ public class EditorCursor extends TouchableGraphicsItem {
 		} else {
 			this.editor.getCurrentEditor().sceneChanged.disconnect(this);
 			this.editor.setCurrentEditor(editor);
-			
 			this.editor.setVisible(true);
+			this.editor.setPos(oldEditorPosition);
 		}
 		
 		this.editor.getCurrentEditor().sceneChanged.connect(this, "editorSceneChanged()");
@@ -105,7 +110,11 @@ public class EditorCursor extends TouchableGraphicsItem {
 	// how to destroy it?!?
 	public void hideTouchableEditor() {
 		if(this.editor != null) {
+			if(this.editor.isVisible()) {
+				this.oldEditorPosition = this.editor.pos();
+			}
 			this.editor.setVisible(false);
+			this.editor.setPos(-10000,-10000);
 		}
 	}
 	

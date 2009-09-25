@@ -16,9 +16,12 @@ import edu.uci.ics.jung.graph.util.Pair;
 import sparshui.common.Event;
 import sparshui.common.messages.events.DeleteEvent;
 import sparshui.common.messages.events.DragEvent;
+import sparshui.common.messages.events.ExtendedGestureEvent;
+import sparshui.common.messages.events.GroupEvent;
 import sparshui.common.messages.events.TouchEvent;
 
 import Control.Types.DoubleType;
+import Control.Types.NoteType;
 import GUI.Editor.BaseSequencerItemEditor;
 import GUI.Editor.Commands.DeleteEditorCursor;
 import GUI.Editor.Commands.DeleteSequenceConnectionCommand;
@@ -26,9 +29,12 @@ import GUI.Editor.Commands.DeleteSequenceItemCommand;
 import GUI.Editor.Commands.DeleteSequencePlayerCommand;
 import GUI.Editor.Commands.DeleteSynthConnectionCommand;
 import GUI.Editor.Commands.DeleteSynthItemCommand;
-import GUI.Editor.Commands.SequenceEditor.CreateDoublePointSequenceItem;
-import GUI.Editor.Commands.SequenceEditor.MoveDoublePointSequenceItem;
-import GUI.Editor.Commands.SequenceEditor.RemoveDoublePointSequenceItem;
+import GUI.Editor.Commands.SequenceEditor.CreateDoublePointSequenceDataItem;
+import GUI.Editor.Commands.SequenceEditor.CreateNoteTypeSequenceDataItem;
+import GUI.Editor.Commands.SequenceEditor.MoveNoteTypeSequenceDataItem;
+import GUI.Editor.Commands.SequenceEditor.MoveSequenceDataItem;
+import GUI.Editor.Commands.SequenceEditor.RemoveNoteTypeSequenceDataItem;
+import GUI.Editor.Commands.SequenceEditor.RemoveSequenceDataItem;
 import GUI.Item.BaseSequencerItem;
 import GUI.Item.EditorCursor;
 import GUI.Item.SequenceConnection;
@@ -37,11 +43,14 @@ import GUI.Item.SequencePlayerItem;
 import GUI.Item.SynthConnection;
 import GUI.Item.SynthesizerItem;
 import GUI.Item.Editor.SequenceDataEditor.TouchableDoubleTypeSequenceDataItem;
+import GUI.Item.Editor.SequenceDataEditor.TouchableNoteTypeSequenceDataItem;
+import GUI.Item.Editor.SequenceDataEditor.TouchableSequenceDataItem;
 import GUI.Multitouch.TouchItemInterface;
 import GUI.Multitouch.TouchableGraphicsItem;
 import GUI.Scene.Editor.BaseSequenceScene;
 import GUI.Scene.Editor.EditorScene;
 import GUI.Scene.Editor.EventPointsDoubleSequenceScene;
+import GUI.Scene.Editor.NoteEventScene;
 import GUI.Scene.Editor.PauseScene;
 import GUI.Scene.Editor.SequenceInitScene;
 import GUI.Scene.Editor.SequencePlayerScene;
@@ -69,9 +78,24 @@ public class SequenceEditor extends BaseSequencerItemEditor {
 		
 		public abstract EditorScene getScene();
 		public abstract boolean allowViewportChange();
-		public abstract boolean handleTouchEvent(TouchEvent e);
-		public abstract boolean handleDragEvent(DragEvent e);
-		public abstract boolean handleDeleteEvent(DeleteEvent e);
+		
+		public boolean handleTouchEvent(TouchEvent e, int vGridSnap, int hGridSnap) {
+			return this.handleTouchEvent(e);
+		}
+		
+		public boolean handleTouchEvent(TouchEvent e){return false;}
+		
+		public boolean handleDragEvent(DragEvent e, int vGridSnap, int hGridSnap) {
+			return this.handleDragEvent(e);
+		}
+		
+		public boolean handleDragEvent(DragEvent e){return false;}
+		
+		public boolean handleDeleteEvent(DeleteEvent e, int vGridSnap, int hGridSnap) {
+			return this.handleDeleteEvent(e);
+		}
+		
+		public boolean handleDeleteEvent(DeleteEvent e){return false;}
 	}
 	
 	private class SequenceInitMode extends SequenceEditMode {
@@ -81,6 +105,7 @@ public class SequenceEditor extends BaseSequencerItemEditor {
 		private String[] sequenceTypeArray = new String[] {
 				"Pause",
 				"EventPoints",
+				"Note"
 		};
 		
 		public SequenceInitMode(SequenceEditor editor) {
@@ -112,6 +137,13 @@ public class SequenceEditor extends BaseSequencerItemEditor {
 					setItemType(sequence);
 					setCurrentMode(new EventPointsMode(this.getEditor(), sequence));
 
+				break;
+				case 2:
+					System.out.println("NoteEvents");
+					sequence = Core.getInstance().getSequenceController().createDoubleTypeEventPointsSequence();
+					((EventPointsSequence)sequence).setLength(Core.getInstance().oneBarInPPQ());
+					setItemType(sequence);
+					setCurrentMode(new NoteEventsMode(this.getEditor(), sequence));
 				break;
 			}
 		}
@@ -259,12 +291,33 @@ public class SequenceEditor extends BaseSequencerItemEditor {
 		}
 		
 		private HashMap<Integer, TouchableGraphicsItem> dragStartPoints = new HashMap<Integer, TouchableGraphicsItem>();
+		
+		protected double snapPosition(double pos, int snap) {
+			return pos - ((int) pos % snap);
+		}
+		
 		@Override
-		public boolean handleDragEvent(DragEvent e) {
+		public boolean handleDragEvent(DragEvent e, int vSnap, int hSnap) {
 			TouchableGraphicsItem target;
 			if(dragStartPoints.containsKey(e.getTouchID())) {
 				if((target = dragStartPoints.get(e.getTouchID())) != null) {
 					if(!this.filterEvent(e)) {
+						
+						if(vSnap != -1 || hSnap != -1) {
+							double xPos = e.getSceneLocation().x();
+							double yPos = e.getSceneLocation().y();
+
+							if(vSnap != -1) {
+								xPos = this.snapPosition(xPos, vSnap);
+							}
+
+							if(hSnap != -1) {
+								yPos = this.snapPosition(yPos, hSnap);
+							}
+							
+							e.setSceneLocation(new QPointF(xPos, yPos));
+						}
+						
 						target.processEvent(e);
 					}
 				}
@@ -279,7 +332,6 @@ public class SequenceEditor extends BaseSequencerItemEditor {
 					dragStartPoints.put(e.getTouchID(), null);
 				}
 				
-				System.out.println(item);
 			}
 			if(!e.isOngoing()) {
 				dragStartPoints.remove(e.getTouchID());
@@ -311,6 +363,12 @@ public class SequenceEditor extends BaseSequencerItemEditor {
 			((BaseSequenceScene)this.getScene()).setStartOffsetCursor(((EventPointsSequence)baseSequence).getStartOffset());
 		}
 		
+		public EventPointsMode(SequenceEditor editor, BaseSequence baseSequence, BaseSequenceScene scene) {
+			super(editor, baseSequence, scene);
+			((BaseSequenceScene)this.getScene()).startMoved.connect(this, "startMoved(Long, Boolean)");
+			((BaseSequenceScene)this.getScene()).setStartOffsetCursor(((EventPointsSequence)baseSequence).getStartOffset());
+		}
+		
 		private void lengthMoved(Long tick, Boolean successful) {
 			if(((EventPointsSequence)this.getBaseSequence()).getStartOffset() < tick && tick > 0) {
 				((BaseSequenceScene)this.getScene()).setLengthCursor(tick);
@@ -320,11 +378,11 @@ public class SequenceEditor extends BaseSequencerItemEditor {
 			}
 		}
 		
-		private void eventPointDragged(TouchableDoubleTypeSequenceDataItem item, QPointF position, Boolean successful) {
+		protected void itemDragged(TouchableSequenceDataItem item, QPointF position, Boolean successful) {
 			if(!successful) {
 				item.setPosition(position);
 			} else {
-				executeCommand(new MoveDoublePointSequenceItem<DoubleType>((EventPointsSequence<DoubleType>)this.getBaseSequence(), item, position));
+				executeCommand(new MoveSequenceDataItem<DoubleType>((EventPointsSequence<DoubleType>)this.getBaseSequence(), (TouchableSequenceDataItem)item, position));
 			}
 		}
 		
@@ -342,24 +400,45 @@ public class SequenceEditor extends BaseSequencerItemEditor {
 		}
 		
 		@Override
-		public boolean handleTouchEvent(TouchEvent e) {
+		public boolean handleTouchEvent(TouchEvent e, int vSnap, int hSnap) {
 			QPointF pos = e.getSceneLocation();
 			
 			if(!this.filterEvent(e) && !e.isFocused() && pos.x() > 0 && !(this.getScene().itemAt(pos) instanceof TouchableGraphicsItem) && !e.isOngoing()) {
 				System.out.println("touched "+e.getTouchID());
-				executeCommand(new CreateDoublePointSequenceItem<DoubleType>((EventPointsSequence)this.getBaseSequence(), pos,this.getEditor(), this.getEditor().getScene(), this, "eventPointDragged(TouchableDoubleTypeSequenceDataItem, QPointF, Boolean)"));				
+				
+				if(vSnap != -1 || hSnap != -1) {
+					double xPos = e.getSceneLocation().x();
+					double yPos = e.getSceneLocation().y();
+
+					if(vSnap != -1) {
+						xPos = this.snapPosition(xPos, vSnap);
+					}
+
+					if(hSnap != -1) {
+						yPos = this.snapPosition(yPos, hSnap);
+					}
+					pos = new QPointF(xPos, yPos);
+				}
+				
+				this.createItem(pos, vSnap, hSnap);
 			}
 			return true;
+		}
+		
+		protected void createItem(QPointF pos, int vSnap, int hSnap) {
+			executeCommand(new CreateDoublePointSequenceDataItem<DoubleType>((EventPointsSequence)this.getBaseSequence(), pos,this.getEditor(), this.getEditor().getScene(), this, "itemDragged(TouchableSequenceDataItem, QPointF, Boolean)"));
+		}
+		
+		protected void deleteItem(TouchableSequenceDataItem item) {
+			executeCommand(new RemoveSequenceDataItem<DoubleType>((EventPointsSequence<DoubleType>) this.getBaseSequence(), (TouchableSequenceDataItem) item, this.getEditor().getScene()));
 		}
 		
 		QRectF crossRect = new QRectF(0,0,20,20);
 		@Override
 		public boolean handleDeleteEvent(DeleteEvent event) {
-			System.out.println("DELETE");
 			if(!filterEvent(event)) {
 				if(event.isSuccessful()) {
 					this.focusCurrentEvent(event);
-					System.out.println("SUCCessFuL"+event.getTouchID()+" "+event.isFocused());
 					QPointF crossPoint = event.getSceneCrossPoint();
 
 					System.out.println(crossPoint+" -- "+event.getSceneLocation());
@@ -370,8 +449,9 @@ public class SequenceEditor extends BaseSequencerItemEditor {
 					List<QGraphicsItemInterface> items = this.getEditor().getScene().items(crossRect);
 					System.out.println(items);
 					for(QGraphicsItemInterface item: items) {
-						if(item instanceof TouchableDoubleTypeSequenceDataItem) {
-							executeCommand(new RemoveDoublePointSequenceItem<DoubleType>((EventPointsSequence<DoubleType>) this.getBaseSequence(), (TouchableDoubleTypeSequenceDataItem) item, this.getEditor().getScene()));
+						if(item instanceof TouchableSequenceDataItem) {
+							this.deleteItem((TouchableSequenceDataItem)item);
+							break;
 						}
 					}
 				}	
@@ -383,6 +463,52 @@ public class SequenceEditor extends BaseSequencerItemEditor {
 		
 	}
 	
+	private class NoteEventsMode extends EventPointsMode {
+
+		NoteEventScene scene;
+		public NoteEventsMode(SequenceEditor editor, BaseSequence baseSequence) {
+			super(editor, baseSequence, new NoteEventScene());
+		}
+		
+		protected void createItem(QPointF pos, int vSnap, int hSnap) {
+			executeCommand(new CreateNoteTypeSequenceDataItem<DoubleType>((EventPointsSequence)this.getBaseSequence(), pos,this.getEditor(), vSnap, this.getEditor().getScene(), this, "itemDragged(TouchableSequenceDataItem, QPointF, Boolean)"));
+		}
+		
+		protected void deleteItem(TouchableSequenceDataItem item) {
+			executeCommand(new RemoveNoteTypeSequenceDataItem<DoubleType>((EventPointsSequence<DoubleType>) this.getBaseSequence(), (TouchableNoteTypeSequenceDataItem) item, this.getEditor().getScene()));
+		}
+		
+		protected void itemDragged(TouchableSequenceDataItem item, QPointF position, Boolean successful) {
+				TouchableNoteTypeSequenceDataItem note = (TouchableNoteTypeSequenceDataItem) item;
+				
+				if(note.isNoteOff()) {
+					if(note.noteOn().pos().x() < position.x()) {
+						QPointF newPos = new QPointF(position.x(), note.noteOn().y());
+						if(!successful) {
+							item.setPosition(newPos);
+						} else {
+							executeCommand(new MoveNoteTypeSequenceDataItem<DoubleType>((EventPointsSequence<DoubleType>)this.getBaseSequence(), note, newPos));
+						}
+					}
+				} else {
+					TouchableNoteTypeSequenceDataItem noteOff = note.noteOff();
+					double noteOffOffset = noteOff.pos().x() - note.x();
+					QPointF noteOffPos = new QPointF(position.x() +noteOffOffset, position.y());
+					
+					if(!successful) {
+						note.setPosition(position);
+						noteOff.setPosition(noteOffPos);
+					} else {
+						executeCommand(new MoveNoteTypeSequenceDataItem<DoubleType>((EventPointsSequence<DoubleType>)this.getBaseSequence(), note, position));
+						//executeCommand(new MoveSequenceDataItem<DoubleType>((EventPointsSequence<DoubleType>)this.getBaseSequence(), (TouchableSequenceDataItem)noteOff, noteOffPos));
+					}
+				}
+//			} else {
+//				executeCommand(new MoveSequenceDataItem<DoubleType>((EventPointsSequence<DoubleType>)this.getBaseSequence(), (TouchableSequenceDataItem)item, position));
+//			}
+		}
+		
+	}
 	
 	private int id = Util.getGroupID();
 	private SequenceEditMode currentMode;
@@ -445,20 +571,25 @@ public class SequenceEditor extends BaseSequencerItemEditor {
 
 	}
 	
-	@Override
-	public void handleDeleteEvent(DeleteEvent e) {
-		if(currentMode.handleDeleteEvent(e)) {
-			super.handleDeleteEvent(e);
+	public void handleExtendedGestureEvent(ExtendedGestureEvent event, int vSnap, int hSnap) {
+		this.updateGestureVisualization(event);
+		if(event instanceof GroupEvent) {
+			GroupEvent e = (GroupEvent) event;
+			this.handleGroupEvent(e);
+		} else if(event instanceof DeleteEvent) {
+			DeleteEvent e = (DeleteEvent) event;
+			if(currentMode.handleDeleteEvent(e, vSnap, hSnap)) {
+				super.handleDeleteEvent(e);
+			}
+			
+		} else if(event instanceof DragEvent) {
+			DragEvent e = (DragEvent) event;
+			currentMode.handleDragEvent(e, vSnap, hSnap);
 		}
 	}
 	
 	@Override
-	public void handleTouchEvent(TouchEvent e) {
-		currentMode.handleTouchEvent(e);
-	}
-	
-	
-	public void handleDragEvent(DragEvent e) {
-		currentMode.handleDragEvent(e);
+	public void handleTouchEvent(TouchEvent e, int vSnap, int hSnap) {
+		currentMode.handleTouchEvent(e, vSnap, hSnap);
 	}
 }

@@ -18,6 +18,8 @@ import com.trolltech.qt.gui.QGraphicsItem.GraphicsItemChange;
 public class SequenceDataEditorScene<T extends BaseType> extends EditorScene {
 
 	public static final double valueMultiplyer = 1000;
+	public static final int valueRange = 2000;
+	public static final int sceneValueCenter = 0;
 	public static final double tickMultiplyer = 1.0;
 	
 	QGraphicsLineItem cursor = new QGraphicsLineItem() {
@@ -43,32 +45,32 @@ public class SequenceDataEditorScene<T extends BaseType> extends EditorScene {
 		this.cursor.setPen(this.cursorPen);
 	}
 	
-	protected TouchableSequenceDataItem<T> createNewItem(long tick, T value) {
+	/*protected TouchableSequenceDataItem<T> createNewItem(long tick, T value) {
 		TouchableDoubleTypeSequenceDataItem item = new TouchableDoubleTypeSequenceDataItem();
 		item.setValue(tick, (DoubleType) value);
 		
 		return (TouchableSequenceDataItem<T>) item;
-	}
+	}*/
 
-	public TouchableSequenceDataItem<T> addNewEditorItem(long tick, T value) {
+	/*public TouchableSequenceDataItem<T> addNewEditorItem(long tick, T value) {
 		TouchableSequenceDataItem<T> item = createNewItem(tick, value);
 		System.out.println("§ "+item);
 		this.addItem(item);
 		return item;
-	}
+	}*/
 	
 	public void removeEditorItem(TouchableEditorItem item) {
 		this.removeItem(item);
 	}
 
 
-	public void updateEditorItem(TouchableSequenceDataItem<T> item, long tick, T value) {
+	/*public void updateEditorItem(TouchableSequenceDataItem<T> item, long tick, T value) {
 		item.setValue(tick, value);
 	}
 
 	public void updateEditorItem(TouchableSequenceDataItem<T> item, QPointF pos) {
 		item.setValueFromPosition(pos);
-	}
+	}*/
 	
 	
 	public void setPlayCursor(long tick) {

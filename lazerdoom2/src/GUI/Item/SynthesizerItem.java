@@ -70,6 +70,7 @@ public class SynthesizerItem extends BaseSynthesizerItem implements ConnectableS
 		}
 		
 		int numberOfIns = busses.length;
+		System.out.println("blen "+numberOfIns);
 
 		SynthInConnector connector;
 
@@ -89,7 +90,7 @@ public class SynthesizerItem extends BaseSynthesizerItem implements ConnectableS
 
 
 		for(double i = alignment; i < 1.0; i+=increment) {
-			if(i <= 0.0) continue;
+			if(i < 0.0) continue;
 			QPointF p = path.pointAtPercent(1.0-i);
 			ptList.add(p);
 			rotList.add(path.angleAtPercent(1.0-i));
@@ -98,6 +99,7 @@ public class SynthesizerItem extends BaseSynthesizerItem implements ConnectableS
 
 		int i = 0;
 		for(QPointF p: ptList) {
+			System.out.println("new connector " + busses[i].getControlDesc().getName());
 			connector = new SynthInConnector(busses[i].getControlDesc().getName(), busses[i], this.synth);
 			//connector.scale(2.0, 2.0);
 			connector.setParent(this);

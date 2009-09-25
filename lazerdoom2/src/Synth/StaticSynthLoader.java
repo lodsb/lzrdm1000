@@ -42,17 +42,20 @@ public class StaticSynthLoader implements SynthLoaderInterface {
 		} 
 		
 		// TestSynth1
-        Control ck = Control.kr( new String[] {"freq"}, new float[] { 0.0f});
-        synthDef = new SynthDef( "SimpleSineSynth", UGen.ar( "Out", UGen.ir( 0 ), UGen.ar( "SinOsc", ck.getChannel(0))));
+        Control ck = Control.kr( new String[] {"freq","gate"}, new float[] { 0.0f, 0.0f});
+        synthDef = new SynthDef( "SimpleSineSynth", UGen.ar( "Out", UGen.ir( 0 ), UGen.ar("Pan2",UGen.ar("*", ck.getChannel(1), UGen.ar( "SinOsc", ck.getChannel(0))))));
         ControlDesc ckd = ck.getDesc(0);
-		synthInfo = new SynthInfo(synthDef.getName(), "A simple Sine-Synth", new ControlDesc[]{ckd});
+        ControlDesc ckd1 = ck.getDesc(1);
+		synthInfo = new SynthInfo(synthDef.getName(), "A simple Sine-Synth", new ControlDesc[]{ckd, ckd1});
 		synthInfoMap.put(synthInfo, synthDef);
 		
 		// TestSynth2
-        Control ck2 = Control.kr( new String[] {"freq"}, new float[] { 0.0f});
-        synthDef = new SynthDef( "SimpleSawSynth", UGen.ar( "Out", UGen.ir( 0 ), UGen.ar( "Saw", ck2.getChannel(0))));
-        ControlDesc ckd2 = ck.getDesc(0);
-		synthInfo = new SynthInfo(synthDef.getName(), "A simple Saw-Synth", new ControlDesc[]{ckd2});
+        Control ck2 = Control.kr( new String[] {"freq","gate", "filter_freq"}, new float[] { 0.0f, 0.0f, 0.0f});
+        synthDef = new SynthDef( "SimpleSawSynth", UGen.ar( "Out", UGen.ir( 0 ), UGen.ar("Pan2", UGen.ar("*", ck2.getChannel(1), UGen.ar("RLPF", UGen.ar("Saw", ck2.getChannel(0)), ck2.getChannel(2)) ))));
+        ControlDesc ckd2 = ck2.getDesc(0);
+        ControlDesc ckd3 = ck2.getDesc(1);
+        ControlDesc ckd4 = ck2.getDesc(2);
+		synthInfo = new SynthInfo(synthDef.getName(), "A simple Saw-Synth", new ControlDesc[]{ckd2, ckd3, ckd4});
 		synthInfoMap.put(synthInfo, synthDef);
 		
        /* Control ck = Control.kr( new String[] { "freq", "out" }, new float

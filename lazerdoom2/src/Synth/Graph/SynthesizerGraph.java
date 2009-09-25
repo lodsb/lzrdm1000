@@ -21,10 +21,12 @@ public class SynthesizerGraph {
 		
 		if((src = synthesizerNodes.get(seq)) == null) {
 			src = new SynthesizerNode(seq, null);
+			synthesizerNodes.put(seq, src);
 		}
 		
 		if((dst = synthesizerNodes.get(synth)) == null) {
 			dst = new SynthesizerNode(null, synth);
+			synthesizerNodes.put(synth, dst);
 		}
 		
 		if(!graph.containsVertex(src)) {
@@ -82,11 +84,9 @@ public class SynthesizerGraph {
 	public boolean disconnect(EventSequenceInterface sequence, SynthInstance synth) {
 		boolean ret = false;
 		SynthesizerNode synNode = this.synthesizerNodes.get(synth);
-		SynthesizerNode seqNode = this.synthesizerNodes.get(synth);
-		
+		SynthesizerNode seqNode = this.synthesizerNodes.get(sequence);
 		if(synNode != null && seqNode != null) {
 			ParameterControlBusEdge edge = graph.findEdge(seqNode, synNode);
-			
 			if(edge != null) {
 				graph.removeEdge(edge);
 				seqNode.getEventSequence().removeControlBus(edge.getParameterControlBus());

@@ -689,7 +689,7 @@ public class SequencerView extends QGraphicsView implements Client, TouchItemInt
 		if((it  = touchItemGroupIDMap.get(id)) != null) {
 			
 			if(!filterEvent(it, event)) {
-				System.out.println(event.isFocused()+"isFocused");
+				//System.out.println(event.isFocused()+"isFocused");
 				//System.out.print("EVENt tYPE "+event.getEventType()+" eee "+event.getTouchID()+" ongoing "+event.isOngoing());
 
 				if(event instanceof TouchEvent) {
@@ -713,7 +713,7 @@ public class SequencerView extends QGraphicsView implements Client, TouchItemInt
 					e.setSceneLocation(convertScreenPos(e.getRelX(), e.getRelY()));
 				}*/
 
-
+				//System.out.println(it);
 				it.processEvent(event);
 			}
 		}
@@ -796,7 +796,7 @@ public class SequencerView extends QGraphicsView implements Client, TouchItemInt
 			this.sequencerEditor.handleExtendedGestureEvent(e);
 
 		} else if(event instanceof TouchEvent) {
-			System.out.println("tp ");
+			//System.out.println("tp ");
 			TouchEvent e = (TouchEvent) event;
 			e.setSceneLocation(convertScreenPos(e.getX(), e.getY()));
 			this.sequencerEditor.handleTouchEvent(e);

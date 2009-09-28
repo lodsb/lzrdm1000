@@ -6,18 +6,18 @@ import lazerdoom.LzrDmObjectInterface;
 import de.sciss.jcollider.ControlDesc;
 import de.sciss.jcollider.Synth;
 import Control.ControlServer;
+import Control.MultiplexParameterControlBus;
 import Control.ParameterControlBus;
+import Control.PolyphonicTwoParameterControlBus;
 import Control.TwoParameterControlBus;
 import Control.Types.*;
 
-public class SynthInstance implements LzrDmObjectInterface {
+public class PolyphonicSynthInstance extends SynthInstance {
 	
 	private SynthInfo info;
 	private ParameterControlBus[] controlBusses;
 	
-	public SynthInstance() {}
-	
-	public SynthInstance(ControlServer server, SynthInfo info, Synth synth) {
+	public PolyphonicSynthInstance(ControlServer server, SynthInfo info, Synth[] synths) {
 		this.info = info;
 		
 		int numberOfControlBusses = info.getControlParameters().length;
@@ -47,7 +47,7 @@ public class SynthInstance implements LzrDmObjectInterface {
 		if(freq != null && gate != null) {
 			numberOfControlBusses--;
 			busIdx++;
-			groupBusses.add(new TwoParameterControlBus<DoubleType>(server, freq, gate, synth));
+			groupBusses.add(new PolyphonicTwoParameterControlBus<DoubleType>(server, freq, gate, synths));
 		}
 		
 		controlBusses = new ParameterControlBus[numberOfControlBusses];
@@ -60,7 +60,7 @@ public class SynthInstance implements LzrDmObjectInterface {
 		
 		for(ControlDesc desc: info.getControlParameters()) {
 			if(!(desc.getName().equals("freq") || desc.getName().equals("gate"))) {
-				controlBusses[busIdx] = new ParameterControlBus<DoubleType>(server, desc, synth);
+				controlBusses[busIdx] = new MultiplexParameterControlBus<DoubleType>(server, desc, synths);
 				System.out.println(desc.getName());
 			}
 		}

@@ -1,5 +1,6 @@
 package Synth;
 
+import Control.ControlServer;
 import de.sciss.jcollider.ControlDesc;
 
 public class SynthInfo {
@@ -11,6 +12,20 @@ public class SynthInfo {
 		this.name = name;
 		this.description = description;
 		this.parameters = controlParameters;
+	}
+	
+	private boolean isHidden = false;
+	public boolean isHidden() {
+		return isHidden;
+	}
+	
+	public void setHidden() {
+		this.isHidden = true;
+	}
+	
+		
+	public SynthInstance createNewInstance(ControlServer cs){
+		return null;
 	}
 	
 	public String getName() {

@@ -1,0 +1,52 @@
+(
+SynthDef(\kick, {|out = 0, gate = 0|
+
+var env, bass, bassOut;
+
+env = EnvGen.kr(Env.perc(0.001, 0.2, 1, -4), gate);
+bass = SinOsc.ar(80) + Crackle.ar(1, 0.5);	
+bassOut = Pan2.ar(bass*env, 0, 0.9);
+Out.ar(out, bassOut);
+}).store
+)
+
+(
+SynthDef(\snare, {|out = 0, gate = 0|
+
+var env, snare, snareOut;
+
+env = EnvGen.kr(Env.perc(0.001, 0.2, 1, -4), gate);
+snare = SinOsc.ar(40) - WhiteNoise.ar(0.5, 0.5);
+snareOut = Pan2.ar(snare*env, 0.0, 0.9);    
+Out.ar(out, snareOut);
+}).store
+)
+
+(
+SynthDef(\tom, {|out = 0, gate = 0|
+
+var env, tom, tomOut;
+
+env = EnvGen.kr(Env.perc(0.001, 0.1, 1, -5), gate);
+tom = SinOsc.ar(440);
+tomOut = Pan2.ar(tom*env, 0.0, 0.9); 
+Out.ar(out, tomOut);
+}).store
+)
+
+(
+SynthDef(\hihat, {|out = 0, gate = 0|
+
+var env, hat, hatOut;
+
+env = EnvGen.kr(Env.perc(0.002, 0.3, 1, -2), gate);
+hat = Klank.ar(`[ [ 6563, 9875 ],
+               [ 0.61, 0.55046827363918 ],
+               [ 0.0024, 0.0036 ] ], PinkNoise.ar(1));    
+hatOut = Pan2.ar(hat*env, 0.0, 0.9); 
+Out.ar(out, hatOut);
+}).store
+)
+
+
+

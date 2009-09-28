@@ -170,6 +170,9 @@ public class EventPointsSequence<EventType extends BaseType> extends BaseSequenc
 		} else if(tick == (this.sequenceLength-this.startOffset)-1) {
 			this.isRunning = false;
 			this.postSequenceEvent(SequenceEventType.STOPPED, SequenceEventSubtype.NONE, null);
+			for(ControlBusInterface<EventType> bus: this.controlBuses) {
+				bus.setDefaultValue(this, tick);
+			}
 			return false;
 		}
 	

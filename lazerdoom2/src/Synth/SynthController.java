@@ -16,9 +16,9 @@ public class SynthController {
 	
 	private LinkedList<SynthLoaderInterface> synthLoaderList = new LinkedList<SynthLoaderInterface>();
 	private LinkedList<SynthInfo> availableSynths = new LinkedList<SynthInfo>();
-	private LinkedList<Synth> loadedSynths = new LinkedList<Synth>();
+	//private LinkedList<Synth> loadedSynths = new LinkedList<Synth>();
 	private HashMap<SynthInfo, SynthLoaderInterface> synthLoaderMap = new HashMap<SynthInfo, SynthLoaderInterface>();
-	private HashMap<Synth, SynthInfo> synthInfoMap = new HashMap<Synth, SynthInfo>();
+	//private HashMap<Synth, SynthInfo> synthInfoMap = new HashMap<Synth, SynthInfo>();
 	
 	private SynthesizerGraph graph = new SynthesizerGraph();
 	
@@ -46,9 +46,9 @@ public class SynthController {
 		return (List<SynthInfo>) availableSynths.clone();
 	}
 	
-	public List<Synth> getLoadedSynths() {
+	/*public List<Synth> getLoadedSynths() {
 		return (List<Synth>) loadedSynths.clone();
-	}
+	}*/
 	
 	public boolean connect(EventSequenceInterface seq, SynthInstance synth, ParameterControlBus controlBus) {
 		return this.graph.connect(seq, synth, controlBus);
@@ -74,28 +74,32 @@ public class SynthController {
 	public SynthInstance createSynthInstance(SynthInfo info) {
 		Synth synth = null;
 		
-		SynthLoaderInterface sli = synthLoaderMap.get(info);
+		//SynthLoaderInterface sli = synthLoaderMap.get(info);
 		
-		if(info != null) {
-			synth = sli.instantiateSynth(info);
-			if(synth != null) {
-				loadedSynths.add(synth);
-				synthInfoMap.put(synth, info);
-			}
-		}
+		/*if(info != null) {
+			
+			//for(int j = 0; j < info.getPolyphony(); j++) {
+				//synth = sli.instantiateSynth(info);
+		/*		if(synth != null) {
+					loadedSynths.add(synth);
+					synthInfoMap.put(synth, info);
+				}*/
+			//}
+		//}
 		
 		SynthInstance synthInstance = null;
 		
 		if(info != null) {
-			synthInstance = new SynthInstance(this.controlServer, info, synth);
+			synthInstance = info.createNewInstance(this.controlServer);
+			//synthInstance = new SynthInstance(this.controlServer, info, synth);
 		}
 			
 		return synthInstance;
 	}
-	
+	/*
 	public SynthInfo getSynthInfo(Synth synth) {
 		return synthInfoMap.get(synth);
-	}
+	}*/
 	
 	private void addSynthLoader(SynthLoaderInterface synthLoader) {
 		List<SynthInfo> synthList = (synthLoader.getAvailableSynths());

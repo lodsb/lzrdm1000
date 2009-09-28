@@ -198,7 +198,7 @@ public class Core {
 			e.printStackTrace();
 		}
 		
-		controlServer = new ControlServer(superColliderServer, 50);
+		controlServer = new ControlServer(superColliderServer, 1000);
 		sequencer = new Sequencer(controlServer);
 		
 		this.sequenceGraph = new SequenceGraph();

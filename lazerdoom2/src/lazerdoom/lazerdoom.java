@@ -200,7 +200,7 @@ public class lazerdoom extends QWidget {
 			e.printStackTrace();
 		}
 		
-		System.out.println(oscPortOut);
+		//System.out.println(oscPortOut);
         
         /*System.out.println("Starting Sparsh-GestureServer");
         sparshGestureServer = new GestureServer();

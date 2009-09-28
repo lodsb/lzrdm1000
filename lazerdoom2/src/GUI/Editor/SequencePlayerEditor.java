@@ -54,6 +54,7 @@ public class SequencePlayerEditor extends BaseSequencerItemEditor {
 		
 		this.editorScene.nextPressed.connect(this, "nextPressed()");
 		this.editorScene.prevPressed.connect(this, "prevPressed()");
+		this.editorScene.loopEnablePressed.connect(this, "enableLoopPressed()");
 		
 		this.editorScene.enableNextButton(false);
 	
@@ -81,6 +82,13 @@ public class SequencePlayerEditor extends BaseSequencerItemEditor {
 			}
 		}
 		this.editorScene.enableNextButton(true);
+	}
+	
+	private boolean loopEnabled = false;
+	private void enableLoopPressed() {
+		loopEnabled = loopEnabled^true;
+		this.player.setLoopingEnabled(loopEnabled);
+		this.editorScene.setLoopModeEnabled(loopEnabled);
 	}
 	
 	private int currentQuantizationIndex;

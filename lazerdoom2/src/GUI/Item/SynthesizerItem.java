@@ -113,8 +113,10 @@ public class SynthesizerItem extends BaseSynthesizerItem implements ConnectableS
 	
 	
 	
-	public void setCurrentControlValue(double controlValue) {
-		this.currentControlValue = 0.5;
+	public void setCurrentControlValue(float controlValue) {
+		controlValue = Math.abs(controlValue);
+		if(controlValue > 1) {controlValue = 1;}
+		this.currentControlValue = controlValue;
 		this.update();
 	}
 	

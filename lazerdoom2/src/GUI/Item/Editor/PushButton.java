@@ -38,6 +38,12 @@ public class PushButton extends TouchableEditorItem {
 	
 	private boolean pressed = false;
 	
+	private String enabledText;
+	private String disabledText;
+	private QBrush enabledBrush = new QBrush(QColor.darkGreen);
+	private QBrush disabledBrush = new QBrush(QColor.darkRed);
+	private boolean stateEnabled = false;
+	
 	public Signal1<TouchableGraphicsItem> buttonPressed = new Signal1<TouchableGraphicsItem>();
 	
 	public PushButton(Editor editor, String labelText) {
@@ -47,6 +53,28 @@ public class PushButton extends TouchableEditorItem {
 		
 		this.updateSize();
 
+	}
+	
+	public PushButton(Editor editor, String enabledText, String disabledText, boolean stateEnabled) {
+		super(editor);
+		allowedGestures.add(GestureType.TOUCH_GESTURE.ordinal());
+		
+		this.enabledText = enabledText;
+		this.disabledText = disabledText;
+		this.setStateEnabled(stateEnabled);
+	}
+	
+	public void setStateEnabled(boolean enabled) {
+		if(enabled) {
+			this.normalBrush = enabledBrush;
+			this.labelText = enabledText;
+		} else {
+			this.normalBrush = disabledBrush;
+			this.labelText = disabledText;
+		}
+		this.stateEnabled = enabled;
+		
+		this.updateSize();
 	}
 	
 	private void updateSize() {

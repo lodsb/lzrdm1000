@@ -26,10 +26,12 @@ public class SequencePlayerScene extends EditorScene {
 	private TextLabel descriptionLabel;
 	private PushButton previousQuantButton;
 	private PushButton nextQuantButton;
+	private PushButton enableLoopingButton;
 	private TextLabel currentQuantizationLabel;
 	
 	public Signal0 prevPressed = new Signal0();
 	public Signal0 nextPressed = new Signal0();
+	public Signal0 loopEnablePressed = new Signal0();
 	
 	
 	public void setCurrentQuantization(int beat, int measure) {
@@ -48,6 +50,10 @@ public class SequencePlayerScene extends EditorScene {
 		this.nextQuantButton.setButtonEnabled(enabled);
 	}
 	
+	public void setLoopModeEnabled(boolean enabled) {
+		this.enableLoopingButton.setStateEnabled(enabled);
+	}
+	
     protected void drawBackground(QPainter painter, QRectF rect) {
         // Fill
         //QRadialGradient gradient = new QRadialGradient(0,0,rect.width());
@@ -61,10 +67,12 @@ public class SequencePlayerScene extends EditorScene {
 		descriptionLabel = new TextLabel(editor, "Player quantization:");
 		previousQuantButton = new PushButton(editor, "<");
 		nextQuantButton = new PushButton(editor, ">");
+		enableLoopingButton = new PushButton(editor, "loop: on", "loop: off", false);
 		currentQuantizationLabel = new TextLabel(editor, "NONE");
 		
 		this.previousQuantButton.buttonPressed.connect(this.prevPressed);
 		this.nextQuantButton.buttonPressed.connect(this.nextPressed);
+		this.enableLoopingButton.buttonPressed.connect(this.loopEnablePressed);
 		
 		
 		//this.setSceneRect(new QRectF(0,0,1000,1000));
@@ -90,6 +98,12 @@ public class SequencePlayerScene extends EditorScene {
 		container.setItem(nextQuantButton);
 		midLayout.addItem(container);
 
+		
+		QGraphicsLinearLayout bottomLayout = new QGraphicsLinearLayout();
+		bottomLayout.setOrientation(com.trolltech.qt.core.Qt.Orientation.Horizontal);
+		container = new TouchableGraphicsItemContainer();
+		container.setItem(enableLoopingButton);
+		bottomLayout.addItem(container);
 	
 		
 		QGraphicsLinearLayout layout = new QGraphicsLinearLayout();
@@ -97,6 +111,7 @@ public class SequencePlayerScene extends EditorScene {
 		
 		layout.addItem(topLayout);
 		layout.addItem(midLayout);
+		layout.addItem(bottomLayout);
 		layout.setMinimumWidth(400.0);
 		
 		QGraphicsWidget w = new QGraphicsWidget();

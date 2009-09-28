@@ -195,6 +195,10 @@ public class SequencePlayerItem extends BaseSequenceViewItem implements Connecta
 	private long startTicks = 0;
 	private long stopTicks = 0;
 	
+	public void setLoopingEnabled(boolean enabled) {
+		this.sequencePlayer.setLoopSequence(enabled);
+	}
+	
 	public void setScheduleTicks(long ticks) {
 		startTicks = ticks;
 		stopTicks = ticks;

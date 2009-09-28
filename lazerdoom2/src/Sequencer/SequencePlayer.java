@@ -14,11 +14,13 @@ public class SequencePlayer extends BaseSequence implements SequencePlayerInterf
 	
 	public SequencePlayer(SequencerInterface sequencer) {
 		super(sequencer);
+		this.loopSequence.set(false);
 	}
 	
 	private AtomicReference<SequenceInterface> sequence = new AtomicReference<SequenceInterface>();
 	
 	private AtomicBoolean startSequence = new AtomicBoolean();
+	private AtomicBoolean loopSequence = new AtomicBoolean();
 	private long scheduledStartTicks = 0;
 	
 	private long startTicks = 0;
@@ -40,9 +42,15 @@ public class SequencePlayer extends BaseSequence implements SequencePlayerInterf
 	}
 	
 	public void scheduleStopNext(long ticks) {
-		long lastEventTick = Sequencer.getCurrentGlobalTick()%ticks;
-		long nextEventTick = ticks-lastEventTick;
-		this.scheduleStop(nextEventTick);  
+		if(isRunning.get()) {
+			long lastEventTick = Sequencer.getCurrentGlobalTick()%ticks;
+			long nextEventTick = ticks-lastEventTick;
+			this.scheduleStop(nextEventTick);
+		}
+	}
+	
+	public void setLoopSequence(boolean loop) {
+		this.loopSequence.set(loop);
 	}
 	
 	@Override
@@ -81,9 +89,11 @@ public class SequencePlayer extends BaseSequence implements SequencePlayerInterf
 
 	@Override
 	public void stopSequenceImmidiately() {
-		isRunning.set(false);
-		stopSequence.set(true);
-		scheduledStopTicks = 0;
+		if(isRunning.get()) {
+			isRunning.set(false);
+			stopSequence.set(true);
+			scheduledStopTicks = 0;
+		}
 	}
 
 	@Override
@@ -106,14 +116,19 @@ public class SequencePlayer extends BaseSequence implements SequencePlayerInterf
 //		System.out.print(" sp "+tick+" ");
 		if(sequence.get() != null) {
 			if(isRunning.get()) {
-					if(tick % 100 == 0) {
+			/*		if(tick % 100 == 0) {
 				System.out.println("player eval "+tick+" t-s "+(tick-startTicks));
-			}
+			}*/
 				
 					this.isRunning.set(sequence.get().eval(tick-startTicks));
 					
 					if(!this.isRunning.get()) {
-						this.postSequenceEvent(SequenceEventType.SEQUENCE_PLAYER_STOPPED, SequenceEventSubtype.NONE, null);
+						if(this.loopSequence.get() && !this.stopSequence.get()) {
+							this.startTicks = tick+1;
+							this.isRunning.set(true);
+						} else {
+							this.postSequenceEvent(SequenceEventType.SEQUENCE_PLAYER_STOPPED, SequenceEventSubtype.NONE, null);
+						}
 					}
 			} else {
 				if(startSequence.get()) {

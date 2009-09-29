@@ -174,8 +174,9 @@ public class TouchableDoubleTypeSequenceDataItem extends TouchableSequenceDataIt
 	}
 
 	@Override
-	public void setPosition(QPointF pos) {
+	public boolean setPosition(QPointF pos) {
 		this.setPos(pos);
+		return true;
 	}
 
 	

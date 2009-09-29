@@ -6,9 +6,11 @@ import java.util.List;
 import com.trolltech.qt.core.QPointF;
 import com.trolltech.qt.core.QRectF;
 import com.trolltech.qt.gui.QGraphicsItemInterface;
+import com.trolltech.qt.gui.QPainterPath;
 
 import sparshui.common.messages.events.DeleteEvent;
 import sparshui.common.messages.events.DragEvent;
+import sparshui.common.messages.events.GroupEvent;
 import GUI.Editor.Commands.*;
 import GUI.Item.BaseSequenceViewItem;
 import GUI.Item.BaseSequencerItem;
@@ -26,6 +28,7 @@ import GUI.Item.SynthInConnector;
 import GUI.Item.SynthOutConnector;
 import GUI.Item.SynthesizerItem;
 import GUI.Item.Editor.TouchableEditor;
+import GUI.Item.Editor.TouchableItemGroupItem;
 import GUI.Multitouch.TouchableGraphicsItem;
 import GUI.Scene.Editor.EditorScene;
 import GUI.View.SequencerView;
@@ -37,6 +40,14 @@ public class SequencerEditor extends Editor {
 		super(scene, showTouchPoints);
 	}
 
+	@Override
+	protected void handleGroupEvent(GroupEvent event) {
+		if(event.isSuccessful()) {
+			System.out.println("GROUP IT BABY "+event);
+			QPainterPath groupGesturePath = event.getPath();
+			this.executeCommand(new GroupCommand(groupGesturePath, this.getScene()));
+		}
+	}
 	
 	public void openEditor(EditorCursor cursor, BaseSequencerItem item) {
 		BaseSequencerItemEditor editor = SequencerView.getInstance().getItemEditorController().getEditor(item);
@@ -64,6 +75,10 @@ public class SequencerEditor extends Editor {
 			
 			for(QGraphicsItemInterface item: items) {
 				if(item instanceof TouchableGraphicsItem) {
+					if(item instanceof TouchableItemGroupItem) {
+						this.executeCommand(new UnGroupCommand((TouchableItemGroupItem)item));
+						System.out.println("UNGROUP SOUP SOUP");
+					}
 					if(item instanceof SequenceItem) {
 						System.out.println("delete item!");
 						this.executeCommand(new DeleteSequenceItemCommand((SequenceItem)item, this.getScene()));
@@ -72,6 +87,7 @@ public class SequencerEditor extends Editor {
 					
 					if(item instanceof SequencePlayerItem) {
 						this.executeCommand(new DeleteSequencePlayerCommand((SequencePlayerItem)item, this.getScene()));
+						break;
 					}
 					
 					if(item instanceof SequenceConnection) {
@@ -100,6 +116,12 @@ public class SequencerEditor extends Editor {
 	
 	@Override
 	protected void handleDragEvent(DragEvent event) {
+		if(event.getSource() instanceof TouchableGraphicsItem) {
+			if(((TouchableGraphicsItem)event.getSource()).belongsToGroup() != null) {
+				return;
+			}
+		}
+		
 		if(!event.isFocused() && event.getSource() instanceof TouchableGraphicsItem) {
 			SequencerView.getInstance().focusCurrentEvent(event.getSource(), event);
 		}
@@ -110,7 +132,10 @@ public class SequencerEditor extends Editor {
 		} else if(event.getSource() instanceof EditorCursor) {
 			EditorCursor cursor = (EditorCursor) event.getSource();
 			cursor.setPosition(new QPointF(event.getSceneLocation().x()-cursor.boundingRect().width()/2, event.getSceneLocation().y()-cursor.boundingRect().height()/2));
-		} 
+		} else if(event.getSource() instanceof TouchableItemGroupItem) {
+			TouchableItemGroupItem group = (TouchableItemGroupItem) event.getSource();
+			group.setPosition(event.getSceneLocation());
+		}
 		
 		if(event.isSuccessful()) {
 			if(event.getSource() instanceof SequencerMenuButton) {

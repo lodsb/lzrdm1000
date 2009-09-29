@@ -20,11 +20,14 @@ public class UnGroupCommand extends BaseEditorCommand {
 			// fix the update of the group in the item, for now leave it as it to circumvent cloning the list 
 			// so the original one won't be modified concurrently
 			this.groupItem.removeFromGroup(item);
+			this.groupItem.scene().addItem(item);
+			System.out.println(item+"#######################");
+			item.setPos(200, 200);
 		}
 		
 		QGraphicsScene scene = this.groupItem.scene();
 		if(scene != null) {
-			scene.removeItem(this.groupItem);
+			//scene.removeItem(this.groupItem);
 		}
 		
 		return true;

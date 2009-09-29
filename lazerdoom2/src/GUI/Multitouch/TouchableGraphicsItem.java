@@ -7,6 +7,7 @@ import sparshui.common.Event;
 
 import SceneItems.Util;
 
+import com.trolltech.qt.core.QPointF;
 import com.trolltech.qt.core.QRectF;
 import com.trolltech.qt.core.QSizeF;
 import com.trolltech.qt.gui.QGraphicsItem;
@@ -14,6 +15,8 @@ import com.trolltech.qt.gui.QGraphicsItemInterface;
 import com.trolltech.qt.gui.QPainter;
 import com.trolltech.qt.gui.QStyleOptionGraphicsItem;
 import com.trolltech.qt.gui.QWidget;
+
+import GUI.Item.Editor.TouchableItemGroupItem;
 import GUI.Multitouch.*;
 
 public abstract class TouchableGraphicsItem extends QGraphicsItem implements TouchItemInterface , GeometryInterface {
@@ -29,6 +32,14 @@ public abstract class TouchableGraphicsItem extends QGraphicsItem implements Tou
 		if(parent instanceof QGraphicsItemInterface) {
 			this.setParentItem((QGraphicsItemInterface)parent);
 		}
+	}
+	private TouchableItemGroupItem group = null;
+	public TouchableItemGroupItem belongsToGroup() {
+		return group;
+	}
+	
+	public void setBelongsToGroup(TouchableItemGroupItem group) {
+		this.group = group;
 	}
 	
 	public TouchItemInterface getParent() {
@@ -69,6 +80,11 @@ public abstract class TouchableGraphicsItem extends QGraphicsItem implements Tou
 		} 
 		
 		return false;
+	}
+	
+	public boolean setPosition(QPointF pos) {
+		this.setPos(pos);
+		return true;
 	}
 
 }

@@ -3,6 +3,7 @@ package sparshui.common.messages.events;
 import GUI.Multitouch.*;
 
 import com.trolltech.qt.core.QPointF;
+import com.trolltech.qt.gui.QPainterPath;
 
 import sparshui.common.Event;
 import sparshui.common.Location;
@@ -30,6 +31,14 @@ public class GroupEvent extends ExtendedGestureEvent {
 		return _pos;
 	}
 
+	QPainterPath path = null;
+	public void setPath(QPainterPath path) {
+		this.path = path;
+	}
+	
+	public QPainterPath getPath() {
+		return path;
+	}
 
 	@Override
 	public int getEventType() {

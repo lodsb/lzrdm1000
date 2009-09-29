@@ -47,7 +47,7 @@ abstract public class BaseSequencerItem extends TouchableGraphicsItem {
 		super.setPos(pos);
 	}*/
 	
-	public void setPosition(QPointF pos) {
+	public boolean setPosition(QPointF pos) {
 		if(cursors.size() != 0) {
 			//QPointF currentPos = this.pos();
 			QPointF offset = new QPointF(this.pos().x()-pos.x(), this.pos().y()-pos.y());
@@ -59,6 +59,8 @@ abstract public class BaseSequencerItem extends TouchableGraphicsItem {
 		}
 		
 		this.setPos(pos);
+		
+		return true;
 	}
 	
 	public void dockCursor(EditorCursor cursor) {

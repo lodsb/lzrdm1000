@@ -53,6 +53,7 @@ public class GroupGesture implements Gesture {
 				double distance = Math.sqrt((double)(x-startLocation.getX())*(x-startLocation.getX())+(y-startLocation.getY())*(y-startLocation.getY()));
 				//System.out.println("################## "+((distance <= maxDeviance) && (movedOutOfStartRegion.get(changedTouchPoint.getID())))+ " distance "+distance + " startloc "+startLocation+ " "+(x-startLocation.getX())*(x-startLocation.getX())+(y-startLocation.getY())*(y-startLocation.getY())+" region "+movedOutOfStartRegion.get(changedTouchPoint.getID()));
 				events.add(new GroupEvent(changedTouchPoint.getLocation(), false,((distance <= maxDeviance) && movedOutOfStartRegion.get(changedTouchPoint.getID())) , changedTouchPoint.getID()));
+				System.out.println(events);
 				startPoints.remove(changedTouchPoint.getID());
 				movedOutOfStartRegion.remove(changedTouchPoint.getID());
 			}

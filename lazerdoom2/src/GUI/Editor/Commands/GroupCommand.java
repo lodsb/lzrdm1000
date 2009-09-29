@@ -13,14 +13,16 @@ import com.trolltech.qt.gui.QPainterPath;
 import GUI.Editor.BaseEditorCommand;
 import GUI.Item.EditorCursor;
 import GUI.Item.SequenceConnection;
+import GUI.Item.SequenceItem;
 import GUI.Item.SynthConnection;
+import GUI.Item.SynthesizerItem;
 import GUI.Item.Editor.TouchableItemGroupItem;
 import GUI.Multitouch.TouchItemInterface;
+import GUI.Multitouch.TouchableGraphicsItem;
 
 public class GroupCommand extends BaseEditorCommand {
-	private double frameSize = 20.0;
 
-	List<QGraphicsItemInterface> items;
+	List<TouchableGraphicsItem> items;
 	QGraphicsScene scene;
 	QPainterPath path;
 	TouchableItemGroupItem group = null;
@@ -38,21 +40,14 @@ public class GroupCommand extends BaseEditorCommand {
 
 	@Override
 	public boolean execute() {
-		this.items = scene.items(this.path, ItemSelectionMode.ContainsItemBoundingRect);
-		if(items.size() > 1) {
-			QRectF boundingRect;
+		List<QGraphicsItemInterface> groupedItems = scene.items(this.path, ItemSelectionMode.ContainsItemBoundingRect);
+		if(groupedItems.size() > 1) {
 
-			LinkedList<QGraphicsItemInterface> itemsToAdd = new LinkedList<QGraphicsItemInterface>();
+			LinkedList<TouchableGraphicsItem> itemsToAdd = new LinkedList<TouchableGraphicsItem>();
 
-			double minX = Double.MAX_VALUE;
-			double minY = Double.MAX_VALUE;
-
-			double maxX = Double.MIN_VALUE;
-			double maxY = Double.MIN_VALUE;
-
-			for(QGraphicsItemInterface item: items) {
+			for(QGraphicsItemInterface item: groupedItems) {
 				// filter everything that does not belong to the group. maybe something like this should be handled in a more general way
-				if(!(item instanceof TouchItemInterface) || 
+				/*if(!(item instanceof TouchItemInterface) || 
 						item instanceof GUI.Item.TouchPointCursor ||
 						item instanceof EditorCursor || 
 						item instanceof SequenceConnection || 
@@ -62,42 +57,20 @@ public class GroupCommand extends BaseEditorCommand {
 
 				for(QGraphicsItemInterface child :item.childItems()) {
 					itemsToAdd.add(child);
+				}*/
+				
+				if(item instanceof SequenceItem || item instanceof SynthesizerItem) {
+					itemsToAdd.add((TouchableGraphicsItem) item);
 				}
-				itemsToAdd.add(item);
 			}
 
 			if(itemsToAdd.size() > 1) {
-				for(QGraphicsItemInterface item: itemsToAdd) {				
-					QPointF topLeft = item.mapToScene(item.boundingRect()).boundingRect().topLeft();
-					QPointF bottomRight = item.mapToScene(item.boundingRect()).boundingRect().bottomRight();
-					if(minX > topLeft.x()) {
-						minX = topLeft.x();
-					}
-					if(minY > topLeft.y()) {
-						minY = topLeft.y();
-					}
-
-					if(maxX < bottomRight.x()) {
-						maxX = bottomRight.x();
-					}
-					if(maxY < bottomRight.y()) {
-						maxY = bottomRight.y();
-					}
-				}
-
-				double width = maxX - minX + 2*frameSize;
-				double height = maxY - minY + 2*frameSize;
-
-				boundingRect = new QRectF(minX-this.frameSize,minY-this.frameSize, width, height);
-
-				group = new TouchableItemGroupItem(boundingRect);
+				this.group = new TouchableItemGroupItem(itemsToAdd);
 
 				System.out.println("To group:");
 				for(QGraphicsItemInterface item: itemsToAdd) {
-					group.addToGroup(item);
 					System.out.println(item);
 				}
-				System.out.println(boundingRect);
 				this.scene.addItem(group);
 				this.scene.update();
 

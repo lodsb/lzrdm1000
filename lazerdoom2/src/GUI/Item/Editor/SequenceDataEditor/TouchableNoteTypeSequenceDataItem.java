@@ -211,8 +211,10 @@ public class TouchableNoteTypeSequenceDataItem extends TouchableSequenceDataItem
 	}
 
 	@Override
-	public void setPosition(QPointF pos) {
-		this.setPos(pos);		
+	public boolean setPosition(QPointF pos) {
+		this.setPos(pos);
+		
+		return true;
 	}
 
 	

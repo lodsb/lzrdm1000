@@ -190,6 +190,10 @@ public class Editor extends QObject {
 			if((p = gestureVisualizationsMap.get(event.getTouchID())) != null) {
 				this.scene.removeItem(gestureVisualizationsMap.get(event.getTouchID()));
 				this.gestureVisualizationsMap.remove(event.getTouchID());
+				if(event instanceof GroupEvent) {
+					System.out.println(event+" "+p);
+					((GroupEvent)event).setPath(p.path());
+				}
 			}
 		}
 		
@@ -201,13 +205,13 @@ public class Editor extends QObject {
 	}
 	
 	protected void handleGroupEvent(GroupEvent event) {			
-		if(!event.isOngoing() && event.isSuccessful()) {
+	/*	if(!event.isOngoing() && event.isSuccessful()) {
 			QPainterPath path = null;
-			if(path != null) {
+//			if(path != null) {
 				path = updateGestureVisualization(event);
 				this.executeCommand(new GroupCommand(path, this.scene));
-			}
-		}
+	//		}
+		}*/
 	}
 	
 	protected void handleDragEvent(DragEvent event) {

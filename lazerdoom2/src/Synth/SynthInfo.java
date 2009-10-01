@@ -1,9 +1,10 @@
 package Synth;
 
+import lazerdoom.LzrDmObjectInterface;
 import Control.ControlServer;
 import de.sciss.jcollider.ControlDesc;
 
-public class SynthInfo {
+public class SynthInfo implements LzrDmObjectInterface {
 	private String name;
 	private String description;
 	private ControlDesc[] parameters;
@@ -42,5 +43,9 @@ public class SynthInfo {
 	
 	public String toString() {
 		return "Name: "+this.name+"\nDescription: "+this.description+"\nParameters: "+this.parameters;
+	}
+	
+	public String getUniqueIDString() {
+		return this.name+this.description;
 	}
 }

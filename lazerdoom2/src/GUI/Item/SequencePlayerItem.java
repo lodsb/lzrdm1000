@@ -28,7 +28,7 @@ import Sequencer.SequenceEventListenerInterface;
 import Sequencer.SequencePlayer;
 import Sequencer.SequenceEvent.SequenceEventType;
 
-public class SequencePlayerItem extends BaseSequenceViewItem implements ConnectableSequenceInterface, SequenceEventListenerInterface {
+public class SequencePlayerItem extends BaseSequenceViewItem implements ConnectableSequenceInterface, SequenceEventListenerInterface, LzrDmObjectInterface {
 	
 	private static QRectF boundingRect = new QRectF(0,0,200,200);
 	private QRectF centerRect = new QRectF(39.5,39.5, 121, 121);

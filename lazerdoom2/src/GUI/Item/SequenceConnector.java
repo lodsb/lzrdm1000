@@ -3,6 +3,8 @@ package GUI.Item;
 import java.util.LinkedList;
 import java.util.List;
 
+import lazerdoom.LzrDmObjectInterface;
+
 import sparshui.common.Event;
 import GUI.Multitouch.*;
 import com.trolltech.qt.core.QPointF;
@@ -16,7 +18,7 @@ import com.trolltech.qt.gui.QStyleOptionGraphicsItem;
 import com.trolltech.qt.gui.QTransform;
 import com.trolltech.qt.gui.QWidget;
 
-public class SequenceConnector extends TouchableGraphicsItem {
+public class SequenceConnector extends TouchableGraphicsItem implements LzrDmObjectInterface  {
 
 	private static QColor normalColor = new QColor(130,130,130); 
 	private static QColor selectionColor = new QColor(255,2,104);

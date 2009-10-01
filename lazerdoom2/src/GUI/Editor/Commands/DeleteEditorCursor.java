@@ -1,23 +1,26 @@
 package GUI.Editor.Commands;
 
+import lazerdoom.LzrDmObjectInterface;
+
 import com.trolltech.qt.gui.QGraphicsScene;
 
 import GUI.Editor.BaseEditorCommand;
 import GUI.Item.EditorCursor;
+import GUI.Scene.Editor.EditorScene;
 
 public class DeleteEditorCursor extends BaseEditorCommand {
-	QGraphicsScene scene;
-	EditorCursor cursor;
+	LzrDmObjectInterface scene;
+	LzrDmObjectInterface cursor;
 
-	public DeleteEditorCursor(EditorCursor cursor, QGraphicsScene scene) {
+	public DeleteEditorCursor(EditorCursor cursor, EditorScene scene) {
 		this.scene = scene;
 		this.cursor = cursor;
 	} 
 	
 	@Override
 	public boolean execute() {
-		cursor.destroyEditor();
-		this.scene.removeItem(cursor);
+		((EditorCursor) cursor).destroyEditor();
+		((EditorScene) this.scene).removeItem((EditorCursor)cursor);
 		
 		return true;
 	}

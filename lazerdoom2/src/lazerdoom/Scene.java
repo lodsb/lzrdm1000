@@ -16,7 +16,6 @@ import sparshui.common.messages.events.RotateEvent;
 import sparshui.common.messages.events.TouchEvent;
 import sparshui.gestures.GestureType;
 
-import GUI.Item.SequenceButton;
 import GUI.Item.Editor.PushButton;
 import GUI.Item.Editor.Slider;
 import SceneItems.ContextMenu;

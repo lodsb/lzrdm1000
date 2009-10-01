@@ -2,6 +2,8 @@ package GUI.Editor.Commands;
 
 import java.util.Random;
 
+import lazerdoom.LzrDmObjectInterface;
+
 import GUI.Editor.BaseEditorCommand;
 import GUI.Editor.SequencerEditor;
 import GUI.Item.EditorCursor;
@@ -12,10 +14,10 @@ import com.trolltech.qt.gui.QGraphicsScene;
 
 public class CreateEditorCommand extends BaseEditorCommand {
 	private QPointF sceneLocation;
-	private QGraphicsScene scene;
-	private SequencerEditor editor;
+	private LzrDmObjectInterface scene;
+	private LzrDmObjectInterface editor;
 
-	public CreateEditorCommand(QPointF sceneLocation, QGraphicsScene scene, SequencerEditor editor) {
+	public CreateEditorCommand(QPointF sceneLocation, EditorScene scene, SequencerEditor editor) {
 		this.scene = scene;
 		this.sceneLocation = sceneLocation;
 		this.editor = editor;
@@ -25,7 +27,7 @@ public class CreateEditorCommand extends BaseEditorCommand {
 	public boolean execute() {
 		EditorCursor cursor = new EditorCursor();
 		System.out.println("new editor cursor: "+cursor);
-		this.scene.addItem(cursor);
+		((EditorScene)this.scene).addItem(cursor);
 		cursor.setPos(this.sceneLocation);
 		cursor.openEditor.connect(this.editor, "openEditor(EditorCursor, BaseSequencerItem)");
 		cursor.closeEditor.connect(this.editor, "closeEditor(EditorCursor)");

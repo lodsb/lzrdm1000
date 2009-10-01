@@ -2,6 +2,8 @@ package Synth;
 
 import java.util.LinkedList;
 
+import Session.SessionHandler;
+
 import lazerdoom.LzrDmObjectInterface;
 import de.sciss.jcollider.ControlDesc;
 import de.sciss.jcollider.Synth;
@@ -12,12 +14,13 @@ import Control.PolyphonicTwoParameterControlBus;
 import Control.TwoParameterControlBus;
 import Control.Types.*;
 
-public class PolyphonicSynthInstance extends SynthInstance {
+public class PolyphonicSynthInstance extends SynthInstance implements LzrDmObjectInterface {
 	
 	private SynthInfo info;
 	private ParameterControlBus[] controlBusses;
 	
 	public PolyphonicSynthInstance(ControlServer server, SynthInfo info, Synth[] synths) {
+		SessionHandler.getInstance().registerObject(this);
 		this.info = info;
 		
 		int numberOfControlBusses = info.getControlParameters().length;

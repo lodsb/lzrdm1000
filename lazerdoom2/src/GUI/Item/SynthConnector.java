@@ -3,6 +3,8 @@ package GUI.Item;
 import java.util.LinkedList;
 import java.util.List;
 
+import lazerdoom.LzrDmObjectInterface;
+
 import com.trolltech.qt.core.QPointF;
 import com.trolltech.qt.core.QRectF;
 import com.trolltech.qt.core.QSizeF;
@@ -15,7 +17,7 @@ import com.trolltech.qt.gui.QTransform;
 import com.trolltech.qt.gui.QWidget;
 import GUI.Multitouch.*;
 
-public class SynthConnector extends TouchableGraphicsItem {
+public class SynthConnector extends TouchableGraphicsItem implements LzrDmObjectInterface {
 	private static QColor normalColor = new QColor(255,2,104);
 	private static QColor selectionColor = new QColor(255,255,255);
 

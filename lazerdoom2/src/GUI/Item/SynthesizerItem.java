@@ -26,7 +26,7 @@ import GUI.View.SequencerView;
 import Sequencer.BaseSequence;
 import Synth.SynthInstance;
 
-public class SynthesizerItem extends BaseSynthesizerItem implements ConnectableSynthInterface {
+public class SynthesizerItem extends BaseSynthesizerItem implements ConnectableSynthInterface, LzrDmObjectInterface {
 	private QRectF contentsRect = new QRectF(39.5,39.5, 121, 121);
 	private static QColor normalColor = new QColor(130,130,130); 
 	private static QColor actionColor = new QColor(211,120,0);

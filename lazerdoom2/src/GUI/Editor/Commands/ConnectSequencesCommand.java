@@ -1,6 +1,7 @@
 package GUI.Editor.Commands;
 
 import lazerdoom.Core;
+import lazerdoom.LzrDmObjectInterface;
 
 import com.trolltech.qt.gui.QGraphicsScene;
 
@@ -9,13 +10,14 @@ import GUI.Item.BaseSequenceViewItem;
 import GUI.Item.ConnectableSequenceInterface;
 import GUI.Item.SequenceConnection;
 import GUI.Item.SequenceItem;
+import GUI.Scene.Editor.EditorScene;
 
 public class ConnectSequencesCommand extends BaseEditorCommand {
-	private QGraphicsScene scene;
-	private ConnectableSequenceInterface src;
-	private ConnectableSequenceInterface dst;
+	private LzrDmObjectInterface scene;
+	private LzrDmObjectInterface src;
+	private LzrDmObjectInterface dst;
 	
-	public ConnectSequencesCommand(ConnectableSequenceInterface src, ConnectableSequenceInterface dst, QGraphicsScene scene) {
+	public ConnectSequencesCommand(ConnectableSequenceInterface src, ConnectableSequenceInterface dst, EditorScene scene) {
 		this.src = src;
 		this.dst = dst;
 		this.scene = scene;
@@ -23,10 +25,10 @@ public class ConnectSequencesCommand extends BaseEditorCommand {
 	
 	@Override
 	public boolean execute() {
-		boolean ret = Core.getInstance().getSequenceController().connectSequences(src.getBaseSequence(), dst.getBaseSequence());
+		boolean ret = Core.getInstance().getSequenceController().connectSequences(((ConnectableSequenceInterface)src).getBaseSequence(), ((ConnectableSequenceInterface)dst).getBaseSequence());
 		
 		if(ret) {
-			this.scene.addItem(new SequenceConnection(src.getSequenceOutConnector(), dst.getSequenceInConnector()));
+			((EditorScene)this.scene).addItem(new SequenceConnection(((ConnectableSequenceInterface)src).getSequenceOutConnector(), ((ConnectableSequenceInterface)dst).getSequenceInConnector()));
 		}
 		
 		return ret;

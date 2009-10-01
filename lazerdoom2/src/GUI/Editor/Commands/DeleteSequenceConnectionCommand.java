@@ -1,6 +1,7 @@
 package GUI.Editor.Commands;
 
 import lazerdoom.Core;
+import lazerdoom.LzrDmObjectInterface;
 
 import com.trolltech.qt.gui.QGraphicsScene;
 
@@ -11,10 +12,10 @@ import GUI.Scene.Editor.EditorScene;
 
 public class DeleteSequenceConnectionCommand extends BaseEditorCommand {
 
-	private QGraphicsScene scene;
-	private SequenceConnection connection;
+	private LzrDmObjectInterface scene;
+	private LzrDmObjectInterface connection;
 	
-	public DeleteSequenceConnectionCommand(SequenceConnection item, QGraphicsScene scene) {
+	public DeleteSequenceConnectionCommand(SequenceConnection item, EditorScene scene) {
 		this.scene = scene;
 		this.connection = item;
 	}
@@ -23,11 +24,11 @@ public class DeleteSequenceConnectionCommand extends BaseEditorCommand {
 	public boolean execute() {
 		boolean ret = false;
 		
-		ret = Core.getInstance().getSequenceController().disconnectSequences(((BaseSequenceViewItem)this.connection.getSource().getParent()).getBaseSequence(), ((BaseSequenceViewItem)this.connection.getDestination().getParent()).getBaseSequence());
+		ret = Core.getInstance().getSequenceController().disconnectSequences(((BaseSequenceViewItem)((SequenceConnection)this.connection).getSource().getParent()).getBaseSequence(), ((BaseSequenceViewItem)((SequenceConnection)this.connection).getDestination().getParent()).getBaseSequence());
 		
 		if(ret) {
-			this.scene.removeItem(this.connection);
-			this.connection.remove();
+			((EditorScene)this.scene).removeItem((SequenceConnection)this.connection);
+			((SequenceConnection)this.connection).remove();
 		}
 			
 		return ret;

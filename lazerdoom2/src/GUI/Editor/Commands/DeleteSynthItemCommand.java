@@ -3,6 +3,7 @@ package GUI.Editor.Commands;
 import java.util.LinkedList;
 
 import lazerdoom.Core;
+import lazerdoom.LzrDmObjectInterface;
 
 import com.trolltech.qt.gui.QGraphicsScene;
 
@@ -13,28 +14,31 @@ import GUI.Item.SynthesizerItem;
 import GUI.Scene.Editor.EditorScene;
 
 public class DeleteSynthItemCommand extends BaseEditorCommand {
-	private SynthesizerItem item;
-	private QGraphicsScene scene;
+	private LzrDmObjectInterface it;
+	private LzrDmObjectInterface scn;
 
-	public DeleteSynthItemCommand(SynthesizerItem item, QGraphicsScene scene) {
-		this.item = item;
-		this.scene = scene;
+	public DeleteSynthItemCommand(SynthesizerItem item, EditorScene scene) {
+		this.it = item;
+		this.scn = scene;
 	}
 
 	@Override
 	public boolean execute() {
 		boolean ret = false;
 		
+		SynthesizerItem item = (SynthesizerItem) this.it;
+		EditorScene scene = (EditorScene) this.scn;
+		
 		if(item.isInitialized()) {
-			System.out.println(item.getSynthesizer());
+			//System.out.println(item.getSynthesizer());
 			ret = Core.getInstance().getSynthController().remove(item.getSynthesizer());
-			System.out.println(ret);
+			//System.out.println(ret);
 			if(ret) {
 				for(SynthInConnector inConnector :item.getSynthInConnectors()) {
 
 					LinkedList<SynthConnection> synConnections = new LinkedList<SynthConnection>();
 					for(SynthConnection connection: inConnector.getConnections()) {
-						this.scene.removeItem(connection);
+						scene.removeItem(connection);
 						synConnections.add(connection);
 					}
 
@@ -43,11 +47,11 @@ public class DeleteSynthItemCommand extends BaseEditorCommand {
 					}
 				}
 
-				this.scene.removeItem(item);
+				scene.removeItem(item);
 				item.undockAllCursors();
 			}
 		} else {
-			this.scene.removeItem(item);
+			scene.removeItem(item);
 			item.undockAllCursors();
 		}
 		return ret;

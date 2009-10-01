@@ -1,5 +1,6 @@
 package GUI.Scene.Editor;
 
+import lazerdoom.LzrDmObjectInterface;
 import sparshui.common.Event;
 import sparshui.common.messages.events.EventType;
 import Control.Types.BaseType;
@@ -11,7 +12,7 @@ import com.trolltech.qt.core.QRectF;
 import com.trolltech.qt.gui.QGraphicsScene;
 import com.trolltech.qt.gui.QPainter;
 
-public class EditorScene extends QGraphicsScene {
+public class EditorScene extends QGraphicsScene implements LzrDmObjectInterface {
 	public void drawVerticalGrid(QPainter painter, QRectF rect, double verticalScale) {
 		
 	}

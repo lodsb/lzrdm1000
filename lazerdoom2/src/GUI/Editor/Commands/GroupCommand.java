@@ -3,6 +3,8 @@ package GUI.Editor.Commands;
 import java.util.LinkedList;
 import java.util.List;
 
+import lazerdoom.LzrDmObjectInterface;
+
 import com.trolltech.qt.core.QPointF;
 import com.trolltech.qt.core.QRectF;
 import com.trolltech.qt.core.Qt.ItemSelectionMode;
@@ -19,27 +21,31 @@ import GUI.Item.SynthesizerItem;
 import GUI.Item.Editor.TouchableItemGroupItem;
 import GUI.Multitouch.TouchItemInterface;
 import GUI.Multitouch.TouchableGraphicsItem;
+import GUI.Scene.Editor.EditorScene;
 
 public class GroupCommand extends BaseEditorCommand {
 
-	List<TouchableGraphicsItem> items;
-	QGraphicsScene scene;
+	//List<TouchableGraphicsItem> items;
+	private LzrDmObjectInterface scn;
 	QPainterPath path;
-	TouchableItemGroupItem group = null;
+	
+	/*TouchableItemGroupItem group = null;
 
 	TouchableItemGroupItem getGroup() {
 		return this.group;
-	}
+	}*/
 	
-	public GroupCommand(QPainterPath path, QGraphicsScene scene) {
+	public GroupCommand(QPainterPath path, EditorScene scene) {
 		this.path = path;
-		this.scene = scene;
+		this.scn = scene;
 	}
 	
 	
 
 	@Override
 	public boolean execute() {
+		QGraphicsScene scene = (QGraphicsScene) scn;
+		
 		List<QGraphicsItemInterface> groupedItems = scene.items(this.path, ItemSelectionMode.ContainsItemBoundingRect);
 		if(groupedItems.size() > 1) {
 
@@ -65,16 +71,16 @@ public class GroupCommand extends BaseEditorCommand {
 			}
 
 			if(itemsToAdd.size() > 1) {
-				this.group = new TouchableItemGroupItem(itemsToAdd);
+				TouchableItemGroupItem group = new TouchableItemGroupItem(itemsToAdd);
 
 				System.out.println("To group:");
 				for(QGraphicsItemInterface item: itemsToAdd) {
 					System.out.println(item);
 				}
-				this.scene.addItem(group);
-				this.scene.update();
+				scene.addItem(group);
+				scene.update();
 
-				this.items = itemsToAdd;
+				//this.items = itemsToAdd;
 				
 				return true;
 			} else {

@@ -18,6 +18,8 @@ public class SynthController {
 	private LinkedList<SynthInfo> availableSynths = new LinkedList<SynthInfo>();
 	//private LinkedList<Synth> loadedSynths = new LinkedList<Synth>();
 	private HashMap<SynthInfo, SynthLoaderInterface> synthLoaderMap = new HashMap<SynthInfo, SynthLoaderInterface>();
+	private HashMap<String, SynthInfo> uniqueIDMap = new HashMap<String, SynthInfo>();
+	
 	//private HashMap<Synth, SynthInfo> synthInfoMap = new HashMap<Synth, SynthInfo>();
 	
 	private SynthesizerGraph graph = new SynthesizerGraph();
@@ -71,6 +73,17 @@ public class SynthController {
 		System.out.println("unload synth not yet implemented");
 	}
 	
+	public SynthInstance createSynthInstance(String uniqueID) {
+		SynthInfo info;
+		SynthInstance synthInstance = null;
+		
+		if((info = this.uniqueIDMap.get(uniqueID)) != null) {
+			synthInstance = info.createNewInstance(this.controlServer);
+		}
+			
+		return synthInstance;
+	}
+	
 	public SynthInstance createSynthInstance(SynthInfo info) {
 		Synth synth = null;
 		
@@ -109,6 +122,7 @@ public class SynthController {
 		
 		for(SynthInfo si: synthList) {
 			synthLoaderMap.put(si, synthLoader);
+			uniqueIDMap.put(si.getUniqueIDString(), si);
 		}
 	}
 

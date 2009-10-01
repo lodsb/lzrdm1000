@@ -1,6 +1,7 @@
 package GUI.Editor.Commands;
 
 import lazerdoom.Core;
+import lazerdoom.LzrDmObjectInterface;
 
 import com.trolltech.qt.gui.QGraphicsScene;
 
@@ -15,12 +16,12 @@ import Synth.SynthInstance;
 
 public class DeleteSynthConnectionCommand extends BaseEditorCommand {
 
-	private QGraphicsScene scene;
-	private SynthConnection connection;
+	private LzrDmObjectInterface scn;
+	private LzrDmObjectInterface cnn;
 	
-	public DeleteSynthConnectionCommand(SynthConnection item, QGraphicsScene scene) {
-		this.scene = scene;
-		this.connection = item;
+	public DeleteSynthConnectionCommand(SynthConnection item, EditorScene scene) {
+		this.scn = scene;
+		this.cnn = item;
 	}
 
 	@Override
@@ -28,6 +29,9 @@ public class DeleteSynthConnectionCommand extends BaseEditorCommand {
 		boolean ret = false;
 		BaseSequence seq = null;
 		SynthInstance synth = null;
+		
+		SynthConnection connection = (SynthConnection) this.cnn;
+		EditorScene scene = (EditorScene) this.scn;
 		
 		if(connection.getSource().getParent() instanceof SynthesizerItem) {
 			synth = ((SynthesizerItem)connection.getSource().getParent()).getSynthesizer();
@@ -48,8 +52,8 @@ public class DeleteSynthConnectionCommand extends BaseEditorCommand {
 				EventSequenceInterface eseq = (EventSequenceInterface) seq;
 				ret = Core.getInstance().getSynthController().disconnect(eseq, synth);
 				
-				this.scene.removeItem(this.connection);
-				this.connection.remove();
+				scene.removeItem(connection);
+				connection.remove();
 			}
 		}
 		

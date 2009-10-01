@@ -2,6 +2,8 @@ package Synth;
 
 import java.util.LinkedList;
 
+import Session.SessionHandler;
+
 import lazerdoom.LzrDmObjectInterface;
 import de.sciss.jcollider.ControlDesc;
 import de.sciss.jcollider.Synth;
@@ -18,6 +20,7 @@ public class SynthInstance implements LzrDmObjectInterface {
 	public SynthInstance() {}
 	
 	public SynthInstance(ControlServer server, SynthInfo info, Synth synth) {
+		SessionHandler.getInstance().registerObject(this);
 		this.info = info;
 		
 		int numberOfControlBusses = info.getControlParameters().length;

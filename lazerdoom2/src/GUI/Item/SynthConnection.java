@@ -1,5 +1,7 @@
 package GUI.Item;
 
+import lazerdoom.LzrDmObjectInterface;
+
 import com.trolltech.qt.core.QPointF;
 import com.trolltech.qt.core.QRectF;
 import com.trolltech.qt.core.QSizeF;

@@ -3,6 +3,8 @@ package GUI.Editor;
 import java.util.LinkedList;
 import java.util.List;
 
+import lazerdoom.LzrDmObjectInterface;
+
 import com.trolltech.qt.core.QPointF;
 import com.trolltech.qt.core.QRectF;
 import com.trolltech.qt.gui.QGraphicsItemInterface;
@@ -33,17 +35,19 @@ import GUI.Multitouch.TouchableGraphicsItem;
 import GUI.Scene.Editor.EditorScene;
 import GUI.View.SequencerView;
 import Sequencer.SequencerInterface;
+import Session.SessionHandler;
 
-public class SequencerEditor extends Editor {
+public class SequencerEditor extends Editor implements LzrDmObjectInterface {
 
 	public SequencerEditor(EditorScene scene, boolean showTouchPoints) {
 		super(scene, showTouchPoints);
+		SessionHandler.getInstance().registerObject(this);
+		SessionHandler.getInstance().registerObject(scene);
 	}
 
 	@Override
 	protected void handleGroupEvent(GroupEvent event) {
 		if(event.isSuccessful()) {
-			System.out.println("GROUP IT BABY "+event);
 			QPainterPath groupGesturePath = event.getPath();
 			this.executeCommand(new GroupCommand(groupGesturePath, this.getScene()));
 		}
@@ -118,6 +122,7 @@ public class SequencerEditor extends Editor {
 	protected void handleDragEvent(DragEvent event) {
 		if(event.getSource() instanceof TouchableGraphicsItem) {
 			if(((TouchableGraphicsItem)event.getSource()).belongsToGroup() != null) {
+				//System.out.println("BELONGS TO GROUP");
 				return;
 			}
 		}
@@ -128,13 +133,25 @@ public class SequencerEditor extends Editor {
 		
 		if(event.getSource() instanceof BaseSequencerItem) {
 			BaseSequencerItem item = (BaseSequencerItem) event.getSource();
-			item.setPosition(new QPointF(event.getSceneLocation().x()-item.boundingRect().width()/2, event.getSceneLocation().y()-item.boundingRect().height()/2));
+			if(event.isSuccessful()) {
+				this.executeCommand(new MoveTouchableGraphicsItemCommand(new QPointF(event.getSceneLocation().x()-item.boundingRect().width()/2, event.getSceneLocation().y()-item.boundingRect().height()/2), item));
+			} else {
+				item.setPosition(new QPointF(event.getSceneLocation().x()-item.boundingRect().width()/2, event.getSceneLocation().y()-item.boundingRect().height()/2));
+			}
 		} else if(event.getSource() instanceof EditorCursor) {
 			EditorCursor cursor = (EditorCursor) event.getSource();
-			cursor.setPosition(new QPointF(event.getSceneLocation().x()-cursor.boundingRect().width()/2, event.getSceneLocation().y()-cursor.boundingRect().height()/2));
+			if(event.isSuccessful()) {
+				this.executeCommand(new MoveTouchableGraphicsItemCommand(new QPointF(event.getSceneLocation().x()-cursor.boundingRect().width()/2, event.getSceneLocation().y()-cursor.boundingRect().height()/2), cursor));
+			} else {
+				cursor.setPosition(new QPointF(event.getSceneLocation().x()-cursor.boundingRect().width()/2, event.getSceneLocation().y()-cursor.boundingRect().height()/2));
+			}
 		} else if(event.getSource() instanceof TouchableItemGroupItem) {
 			TouchableItemGroupItem group = (TouchableItemGroupItem) event.getSource();
-			group.setPosition(event.getSceneLocation());
+			if(event.isSuccessful()) {
+				this.executeCommand(new MoveTouchableGraphicsItemCommand(event.getSceneLocation(), group));
+			} else {
+				group.setPosition(event.getSceneLocation());
+			}
 		}
 		
 		if(event.isSuccessful()) {

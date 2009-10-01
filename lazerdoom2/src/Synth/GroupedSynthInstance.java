@@ -3,6 +3,8 @@ package Synth;
 import java.util.ArrayList;
 import java.util.LinkedList;
 
+import Session.SessionHandler;
+
 import lazerdoom.LzrDmObjectInterface;
 import de.sciss.jcollider.ControlDesc;
 import de.sciss.jcollider.Synth;
@@ -14,12 +16,13 @@ import Control.PolyphonicTwoParameterControlBus;
 import Control.TwoParameterControlBus;
 import Control.Types.*;
 
-public class GroupedSynthInstance extends SynthInstance {
+public class GroupedSynthInstance extends SynthInstance implements LzrDmObjectInterface {
 	
 	private SynthInfo info;
 	private ParameterControlBus[] controlBusses;
 	
 	public GroupedSynthInstance(ControlServer server, SynthInfo info, float[] switchingFreqs, Synth[] synths, boolean triggerOnly) {
+		SessionHandler.getInstance().registerObject(this);
 		this.info = info;
 		
 		// quick hack... should check for different parameter-types

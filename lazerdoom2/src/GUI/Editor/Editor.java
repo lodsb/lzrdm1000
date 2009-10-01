@@ -8,6 +8,7 @@ import GUI.Editor.Commands.GroupCommand;
 import GUI.Item.TouchPointCursor;
 import GUI.Multitouch.TouchItemInterface;
 import GUI.Scene.Editor.EditorScene;
+import Session.SessionHandler;
 
 import com.trolltech.qt.core.QObject;
 import com.trolltech.qt.core.QPointF;
@@ -26,7 +27,9 @@ import sparshui.common.TouchState;
 import sparshui.common.messages.events.*;
 
 public class Editor extends QObject {
-	private QUndoStack undoStack = new QUndoStack();
+	//private QUndoStack undoStack = new QUndoStack();
+	
+	private LinkedList<BaseEditorCommand> undoStack = SessionHandler.getInstance().getCommandStack(this);
 	private EditorScene scene;
 	
 	public Signal0 executedCommand = new Signal0();
@@ -44,6 +47,7 @@ public class Editor extends QObject {
 	} 
 	
 	protected Editor() {
+		//SessionHandler.getInstance().registerObject(this);
 	}
 	
 	protected void setScene(EditorScene scene) {
@@ -66,15 +70,15 @@ public class Editor extends QObject {
 	}
 	
 	public void undo() {
-		if(undoStack.canUndo()) {
+/*		if(undoStack.canUndo()) {
 			undoStack.undo();
-		}
+		}*/
 	}
 	
 	public void redo() {
-		if(undoStack.canRedo()) {
+/*		if(undoStack.canRedo()) {
 			undoStack.redo();
-		}
+		}*/
 	}
 	
 	private HashMap<Integer, TouchPointCursor> touchPointCursors = new HashMap<Integer, TouchPointCursor>();
@@ -222,6 +226,8 @@ public class Editor extends QObject {
 		boolean ret = false;
 		if(command.execute()) {
 			undoStack.push(command);
+			System.out.println("WHAT?");
+			SessionHandler.getInstance().dumpSession();
 		}
 		return ret;
 	}

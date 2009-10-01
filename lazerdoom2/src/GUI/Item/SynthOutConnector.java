@@ -1,6 +1,8 @@
 package GUI.Item;
 
-public class SynthOutConnector extends SynthConnector {
+import lazerdoom.LzrDmObjectInterface;
+
+public class SynthOutConnector extends SynthConnector implements LzrDmObjectInterface {
 
 	private String parameterName; 
 

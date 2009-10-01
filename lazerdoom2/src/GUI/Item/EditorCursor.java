@@ -4,6 +4,8 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Random;
 
+import lazerdoom.LzrDmObjectInterface;
+
 import com.trolltech.qt.core.QEvent;
 import com.trolltech.qt.core.QPointF;
 import com.trolltech.qt.core.QRectF;
@@ -29,7 +31,7 @@ import GUI.Item.Editor.TouchableEditor;
 import GUI.Multitouch.TouchableGraphicsItem;
 import GUI.View.SequencerView;
 
-public class EditorCursor extends TouchableGraphicsItem {
+public class EditorCursor extends TouchableGraphicsItem implements LzrDmObjectInterface {
 	private static QRectF boundingRect = new QRectF(-35, -50, 70, 100);
 	private QPainterPath cursorPath;
 	

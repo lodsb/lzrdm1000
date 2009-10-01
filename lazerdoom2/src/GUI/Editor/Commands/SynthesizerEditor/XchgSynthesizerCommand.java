@@ -2,6 +2,9 @@ package GUI.Editor.Commands.SynthesizerEditor;
 
 import java.util.LinkedList;
 
+import lazerdoom.Core;
+import lazerdoom.LzrDmObjectInterface;
+
 import edu.uci.ics.jung.graph.util.Pair;
 
 import GUI.Editor.BaseEditorCommand;
@@ -17,19 +20,19 @@ import Synth.SynthInstance;
 
 public class XchgSynthesizerCommand extends BaseEditorCommand {
 
-	SynthesizerItem synthItem;
-	SynthInstance oldSynth;
-	SynthInstance newSynth;
-	SequencerEditor editor;
-	SynthesizerEditor synthEditor;
+	LzrDmObjectInterface synthItem;
+	LzrDmObjectInterface oldSynth;
+	String newSynthID;
+	LzrDmObjectInterface editor;
+	LzrDmObjectInterface synthEditor;
 	
 	public XchgSynthesizerCommand(SynthesizerItem synthesizerItem,
-			SynthInstance currentSynth, SynthInstance synth, SynthesizerEditor synthEditor,
+			SynthInstance currentSynth, String  uniqueID, SynthesizerEditor synthEditor,
 			SequencerEditor sequencerEditor) {
 		
 		this.synthItem = synthesizerItem;
 		this.oldSynth = currentSynth;
-		this.newSynth = synth;
+		this.newSynthID = uniqueID;
 		this.editor = sequencerEditor;
 		this.synthEditor = synthEditor;
 	}
@@ -39,7 +42,9 @@ public class XchgSynthesizerCommand extends BaseEditorCommand {
 		LinkedList<Pair<Object>> oldInConnections = new LinkedList<Pair<Object>>();
 		LinkedList<SynthConnection> toDeleteConnections = new LinkedList<SynthConnection>();
 		
-		for(SynthInConnector inC : synthItem.getSynthInConnectors()) {
+		SynthInstance newSynth = Core.getInstance().getSynthController().createSynthInstance(this.newSynthID);
+		
+		for(SynthInConnector inC : ((SynthesizerItem)synthItem).getSynthInConnectors()) {
 			String name = inC.getParameterName();
 			for(SynthConnection con: inC.getConnections()) {
 				toDeleteConnections.add(con);
@@ -52,18 +57,18 @@ public class XchgSynthesizerCommand extends BaseEditorCommand {
 		}
 		
 		for(SynthConnection delCon: toDeleteConnections) {
-			this.editor.executeCommand(new DeleteSynthConnectionCommand(delCon, this.editor.getScene()));
+			((SequencerEditor)this.editor).executeCommand(new DeleteSynthConnectionCommand(delCon, ((SequencerEditor)this.editor).getScene()));
 		}
 		
 		// changes synthItem's ports
-		this.synthEditor.setCurrentSynth(newSynth);
+		((SynthesizerEditor)this.synthEditor).setCurrentSynth((SynthInstance)newSynth);
 		
 		for(Pair<Object> obj: oldInConnections) {
 			String name = (String) obj.getFirst();
 			
-			for(SynthInConnector inC: synthItem.getSynthInConnectors()) {
+			for(SynthInConnector inC: ((SynthesizerItem)synthItem).getSynthInConnectors()) {
 				if(inC.getParameterName().equals(name)) {
-					this.editor.executeCommand(new ConnectSynthCommand((SynthOutConnector)obj.getSecond(), inC, this.editor.getScene()));
+					((SequencerEditor)this.editor).executeCommand(new ConnectSynthCommand((SynthOutConnector)obj.getSecond(), inC, ((SequencerEditor)this.editor).getScene()));
 				}
 			}
 		}

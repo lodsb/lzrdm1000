@@ -3,9 +3,12 @@ package GUI.Multitouch;
 import java.util.LinkedList;
 import java.util.List;
 
+import lazerdoom.LzrDmObjectInterface;
+
 import sparshui.common.Event;
 
 import SceneItems.Util;
+import Session.SessionHandler;
 
 import com.trolltech.qt.core.QPointF;
 import com.trolltech.qt.core.QRectF;
@@ -19,12 +22,14 @@ import com.trolltech.qt.gui.QWidget;
 import GUI.Item.Editor.TouchableItemGroupItem;
 import GUI.Multitouch.*;
 
-public abstract class TouchableGraphicsItem extends QGraphicsItem implements TouchItemInterface , GeometryInterface {
+public abstract class TouchableGraphicsItem extends QGraphicsItem implements TouchItemInterface , GeometryInterface, LzrDmObjectInterface {
 
 	private TouchItemInterface parent = null;
 	private int id = Util.getGroupID();
 	private LinkedList<Integer> allowedGestures = new LinkedList<Integer>();
 	private boolean enableTouchEvents = true;
+	
+	public final long sessionID = SessionHandler.getInstance().registerObject(this);
 	
 	public void setParent(TouchItemInterface parent) {
 		this.parent = parent;

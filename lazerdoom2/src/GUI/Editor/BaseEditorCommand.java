@@ -1,7 +1,5 @@
 package GUI.Editor;
 
-import com.trolltech.qt.gui.QUndoCommand;
-
-public abstract class BaseEditorCommand extends QUndoCommand {
+public abstract class BaseEditorCommand {
 	public abstract boolean execute();
 }

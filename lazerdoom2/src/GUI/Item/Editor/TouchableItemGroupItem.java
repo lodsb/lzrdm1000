@@ -3,6 +3,8 @@ package GUI.Item.Editor;
 import java.util.LinkedList;
 import java.util.List;
 
+import lazerdoom.LzrDmObjectInterface;
+
 import sparshui.common.Event;
 import sparshui.common.messages.events.DragEvent;
 import GUI.Multitouch.TouchItemInterface;
@@ -22,7 +24,7 @@ import com.trolltech.qt.gui.QPen;
 import com.trolltech.qt.gui.QStyleOptionGraphicsItem;
 import com.trolltech.qt.gui.QWidget;
 
-public class TouchableItemGroupItem extends TouchableGraphicsItem {
+public class TouchableItemGroupItem extends TouchableGraphicsItem implements LzrDmObjectInterface {
 	private int id = Util.getGroupID();
 	private LinkedList<Integer> allowedGestures = new LinkedList<Integer>();
 	private static QBrush brush = new QBrush(new QColor(255,255,0,120));
@@ -170,18 +172,27 @@ public class TouchableItemGroupItem extends TouchableGraphicsItem {
 		QPointF mapPos = this.mapFromScene(pos);
 		QPointF newNodePosition = new QPointF(mapPos.x(), mapPos.x()*this.sideRatio);
 		
+		QPointF p1; // topLeft
+		QPointF p2; // bottomRight
+		
 		if(node == this.zoomNode1) {
-			this.boundingRect.setTopLeft(newNodePosition);
+			p1 = newNodePosition;
+			p2 = boundingRect.bottomRight();
 		} else {
-			this.boundingRect.setBottomRight(newNodePosition);
+			p1 = boundingRect.topLeft();
+			p2 = newNodePosition;
 		}
-		
-		this.zoomNode1.setPos(this.boundingRect.topLeft());
-		this.zoomNode2.setPos(this.boundingRect.bottomRight());
-		
-		distance = (((zoomNode1.pos().x() - zoomNode2.pos().x())) * ((zoomNode1.pos().x() - zoomNode2.pos().x()))) + (((zoomNode1.pos().y() - zoomNode2.pos().y()))*((zoomNode1.pos().y() - zoomNode2.pos().y())));
+				
+		distance = (((p1.x() - p2.x())) * ((p1.x() - p2.x()))) + (((p1.y() - p2.y()))*((p1.y() - p2.y())));
 		double scale = distance/this.zoomNodeDistance;
-		if(scale < 1.0 && scale > 0.3) {
+		if(scale < 1.0 && scale > 0.02) {
+			this.boundingRect.setTopLeft(p1);
+			this.boundingRect.setBottomRight(p2);
+			
+			this.zoomNode1.setPos(p1);
+			this.zoomNode2.setPos(p2);
+
+			
 			this.scaleContent(distance/this.zoomNodeDistance);
 			this.update();
 		}
@@ -201,6 +212,16 @@ public class TouchableItemGroupItem extends TouchableGraphicsItem {
 		return this.boundingRect;
 	}
 
+	public void ungroupItems() {
+		this.currentScale = 1.0;
+		this.setContentPositions(this.pos());
+		for(TouchableGraphicsItem item: this.items) {
+			item.setBelongsToGroup(null);
+		}
+		
+		this.items.clear();
+	}
+	
 	@Override
 	public void paint(QPainter painter, QStyleOptionGraphicsItem option,QWidget widget) {
 		painter.setPen(pen);

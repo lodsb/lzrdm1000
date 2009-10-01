@@ -22,6 +22,7 @@ import GUI.View.SequencerView;
 import GUI.View.SynthesizerView;
 import Sequencer.EventPointsSequence;
 import Sequencer.TestingSequencer;
+import Session.SessionHandler;
 
 import com.illposed.osc.OSCBundle;
 import com.illposed.osc.OSCMessage;
@@ -57,6 +58,8 @@ public class lazerdoom extends QWidget {
 	private Thread sparshGestureServerThread;
 	private ServerConnection sparshServerConnection;
 	
+	private SessionHandler sessionHandler = new SessionHandler("/home/lodsb/session.lzrdm");
+	
 	private EditorScene scene = new EditorScene();
 	private SequencerView view = new SequencerView(new SequencerEditor(scene,false), this);
 	private QHBoxLayout layout = new QHBoxLayout();
@@ -67,7 +70,14 @@ public class lazerdoom extends QWidget {
         lazerdoom lazerdoomApp = new lazerdoom(null);
         lazerdoomApp.show();
 
+        QShortcut shortcut = new QShortcut(new QKeySequence("Ctrl+Q"),lazerdoomApp);
+        shortcut.activated.connect(QApplication.instance(), "quit()");
+        lazerdoomApp.loadSession();
         QApplication.exec();
+        
+        SessionHandler.getInstance().safeSession("/home/lodsb/session.lzrdm");
+        
+        System.exit(0);
     }
 
     private QCursor cursor = new QCursor(Qt.CursorShape.PointingHandCursor);
@@ -184,6 +194,9 @@ public class lazerdoom extends QWidget {
     }
  
 
+    public void loadSession() {
+    	SessionHandler.getInstance().loadSession();
+    }
     
     public lazerdoom(QWidget parent){
         super(parent);

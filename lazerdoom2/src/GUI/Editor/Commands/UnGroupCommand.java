@@ -1,5 +1,7 @@
 package GUI.Editor.Commands;
 
+import lazerdoom.LzrDmObjectInterface;
+
 import com.trolltech.qt.gui.QGraphicsItem;
 import com.trolltech.qt.gui.QGraphicsItemInterface;
 import com.trolltech.qt.gui.QGraphicsScene;
@@ -9,26 +11,16 @@ import GUI.Item.Editor.TouchableItemGroupItem;
 import GUI.Multitouch.TouchableGraphicsItem;
 
 public class UnGroupCommand extends BaseEditorCommand {
-	TouchableItemGroupItem groupItem;
+	private LzrDmObjectInterface groupItem;
 	
 	public UnGroupCommand(TouchableItemGroupItem item) {
 		this.groupItem = item;
 	}
 	@Override
 	public boolean execute() {
-		for(QGraphicsItemInterface item: this.groupItem.getItemGroup()) {
-			// fix the update of the group in the item, for now leave it as it to circumvent cloning the list 
-			// so the original one won't be modified concurrently
-			this.groupItem.removeFromGroup(item);
-			this.groupItem.scene().addItem(item);
-			System.out.println(item+"#######################");
-			item.setPos(200, 200);
-		}
-		
-		QGraphicsScene scene = this.groupItem.scene();
-		if(scene != null) {
-			//scene.removeItem(this.groupItem);
-		}
+
+		((TouchableItemGroupItem)this.groupItem).ungroupItems();
+		((TouchableItemGroupItem)groupItem).scene().removeItem((TouchableItemGroupItem)groupItem);
 		
 		return true;
 	}

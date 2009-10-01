@@ -7,6 +7,7 @@ import Sequencer.SequenceEvalListenerInterface;
 import Sequencer.SequenceEvent;
 import Sequencer.SequenceEventListenerInterface;
 import Sequencer.SequenceEvent.SequenceEventType;
+import Session.SessionHandler;
 
 import com.trolltech.qt.core.QRectF;
 import com.trolltech.qt.core.QSizeF;
@@ -44,7 +45,7 @@ import com.trolltech.qt.gui.QStyleOptionGraphicsItem;
 import com.trolltech.qt.gui.QWidget;
 import com.trolltech.qt.gui.QPainter.RenderHint;
 
-public class SequenceItem extends BaseSequenceViewItem implements ConnectableSequenceInterface, ConnectableSynthInterface, SequenceEventListenerInterface {
+public class SequenceItem extends BaseSequenceViewItem implements ConnectableSequenceInterface, ConnectableSynthInterface, SequenceEventListenerInterface, LzrDmObjectInterface {
 
 	private static QColor normalColor = new QColor(130,130,130); 
 	private static QColor actionColor = new QColor(211,120,0);
@@ -112,7 +113,6 @@ public class SequenceItem extends BaseSequenceViewItem implements ConnectableSeq
 	public SequenceItem() {
 	//	this.setFlag(GraphicsItemFlag.ItemIsMovable, true);
 	//	this.setFlag(GraphicsItemFlag.ItemIsSelectable, true);
-
 		this.setBrushes();
 
 		//Core.getInstance().getSequenceController().connectToSequenceLocalEval(sequence, this);

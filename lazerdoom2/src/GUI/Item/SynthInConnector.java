@@ -1,9 +1,10 @@
 package GUI.Item;
 
+import lazerdoom.LzrDmObjectInterface;
 import Synth.SynthInstance;
 import Control.ParameterControlBus;
 
-public class SynthInConnector extends SynthConnector {
+public class SynthInConnector extends SynthConnector implements LzrDmObjectInterface {
 	private String parameterName;
 	private ParameterControlBus parameterControlBus;
 	private SynthInstance synthInstance;

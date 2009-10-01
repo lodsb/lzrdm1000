@@ -4,6 +4,7 @@ import java.util.LinkedList;
 import java.util.List;
 
 import lazerdoom.Core;
+import lazerdoom.LzrDmObjectInterface;
 
 import com.trolltech.qt.gui.QGraphicsItemInterface;
 
@@ -17,10 +18,11 @@ import GUI.Scene.Editor.EditorScene;
 import GUI.Scene.Editor.SynthesizerScene;
 import GUI.View.SequencerView;
 import SceneItems.Util;
+import Session.SessionHandler;
 import Synth.SynthInfo;
 import Synth.SynthInstance;
 
-public class SynthesizerEditor extends BaseSequencerItemEditor {
+public class SynthesizerEditor extends BaseSequencerItemEditor implements LzrDmObjectInterface {
 
 	private int id = Util.getGroupID();
 	
@@ -34,6 +36,9 @@ public class SynthesizerEditor extends BaseSequencerItemEditor {
 	
 	public SynthesizerEditor() {
 		super();
+		
+		SessionHandler.getInstance().registerObject(this);
+		
 		this.setScene(editorScene);
 		allowedGestures.add(sparshui.gestures.GestureType.TOUCH_GESTURE.ordinal());
 		
@@ -56,11 +61,11 @@ public class SynthesizerEditor extends BaseSequencerItemEditor {
 		
 	}
 	
-	private void pSetCurrentSynth(SynthInstance synth) {
+	private void pSetCurrentSynth(String uniqueID) {
 			if(currentSynth == null) {
-				this.executeCommand(new SetCurrentSynthCommand(synth, this));
+				this.executeCommand(new SetCurrentSynthCommand(uniqueID, this));
 			} else {
-				this.executeCommand(new XchgSynthesizerCommand(synthesizerItem, currentSynth, synth, this,  SequencerView.getInstance().getSequencerEditor()));
+				this.executeCommand(new XchgSynthesizerCommand(synthesizerItem, currentSynth, uniqueID, this,  SequencerView.getInstance().getSequencerEditor()));
 			}
 	}
 	
@@ -112,7 +117,8 @@ public class SynthesizerEditor extends BaseSequencerItemEditor {
 	private void loadPressed() {
 //		this.currentSynth = Core.getInstance().getSynthController().createSynthInstance(this.availableSynths.get(currentSynthIndex));
 //		this.editorScene.setCurrentSynth(this.currentSynth.getSynthInfo().getName());
-		this.pSetCurrentSynth(Core.getInstance().getSynthController().createSynthInstance(this.availableSynths.get(currentSynthIndex)));
+		//SynthInstance newSynth = null;
+		this.pSetCurrentSynth(this.availableSynths.get(currentSynthIndex).getUniqueIDString());
 	}
 	
 	@Override

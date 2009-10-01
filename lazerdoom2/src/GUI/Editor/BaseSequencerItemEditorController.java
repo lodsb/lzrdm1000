@@ -12,6 +12,14 @@ public class BaseSequencerItemEditorController extends QObject {
 	
 	public Signal1<Editor> editorDestroyed = new Signal1<Editor>();
 	
+	public boolean editorExists(BaseSequencerItem item) {
+		return this.sequencerItemEditors.containsKey(item);
+	}
+	
+	public void registerEditor(BaseSequencerItem item, BaseSequencerItemEditor editor) {
+		this.sequencerItemEditors.put(item, editor);
+	}
+	
 	public BaseSequencerItemEditor getEditor(BaseSequencerItem item) {
 		BaseSequencerItemEditor editor = null;
 		

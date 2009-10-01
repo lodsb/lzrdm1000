@@ -49,7 +49,9 @@ public class SessionHandler {
 					LinkedList<String> cmdListXml = (LinkedList<String>) xstream.fromXML(reader);
 					
 					for(String cmd: cmdListXml) {
+						System.out.println("-----");
 						BaseEditorCommand command = (BaseEditorCommand) xstream.fromXML(cmd);
+						System.out.println("EXEC COMMAND: "+command);
 						command.execute();
 						this.commandStack.push(command);
 					}

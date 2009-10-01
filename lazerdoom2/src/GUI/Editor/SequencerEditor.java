@@ -54,6 +54,10 @@ public class SequencerEditor extends Editor implements LzrDmObjectInterface {
 	}
 	
 	public void openEditor(EditorCursor cursor, BaseSequencerItem item) {
+		if(!SequencerView.getInstance().getItemEditorController().editorExists(item)) {
+			this.executeCommand(new CreateBaseSequencerItemEditor(item));
+		}
+		
 		BaseSequencerItemEditor editor = SequencerView.getInstance().getItemEditorController().getEditor(item);
 		if(editor != null) {
 			cursor.showTouchableEditor(editor);

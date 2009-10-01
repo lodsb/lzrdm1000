@@ -15,11 +15,11 @@ public class LzrDmObjectConverter implements Converter {
 	@Override
 	public void marshal(Object obj, HierarchicalStreamWriter writer,
 			MarshallingContext arg2) {
-		System.out.println("LZRDM°!!");
 		Long id = SessionHandler.getInstance().getRegisteredObjectID((LzrDmObjectInterface)obj);
 
 		if(id != null) {
 			writer.startNode("lzrdmobjID");
+			System.out.println("ID: "+id+" obj "+obj);
 			writer.setValue(id.toString());
 			writer.endNode();
 		} else {

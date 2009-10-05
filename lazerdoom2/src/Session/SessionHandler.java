@@ -151,6 +151,8 @@ public class SessionHandler {
 		
 		try {
 			
+			// TODO: save to string first so the old session wont be corrupted on exception!
+			// IDEA: make some fancy journaling for tagged items+subtrees
 			System.out.println(this.commandStack);
 			sessionFileWriter = new FileWriter(sessionFile);
 			System.out.print("Dumping session....");

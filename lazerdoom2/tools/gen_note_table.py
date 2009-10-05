@@ -33,7 +33,7 @@ for i in range(0,127):
 	else:
 		print "        ", noteArray[i%12]+str(j)
 
-print "}";
+print "};";
 
 
 

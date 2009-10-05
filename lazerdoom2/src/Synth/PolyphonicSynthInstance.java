@@ -20,7 +20,7 @@ public class PolyphonicSynthInstance extends SynthInstance implements LzrDmObjec
 	private ParameterControlBus[] controlBusses;
 	
 	public PolyphonicSynthInstance(ControlServer server, SynthInfo info, Synth[] synths) {
-		SessionHandler.getInstance().registerObject(this);
+		//SessionHandler.getInstance().registerObject(this);
 		this.info = info;
 		
 		int numberOfControlBusses = info.getControlParameters().length;

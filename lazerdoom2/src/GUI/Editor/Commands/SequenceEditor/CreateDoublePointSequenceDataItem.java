@@ -11,7 +11,7 @@ import com.trolltech.qt.core.QPointF;
 
 import edu.uci.ics.jung.graph.util.Pair;
 
-public class CreateDoublePointSequenceDataItem<T extends BaseType> extends BaseEditorCommand {
+public class CreateDoublePointSequenceDataItem<T extends BaseType> extends SequenceEditorCommand {
 
 	private EventPointsSequence<T> sequence;
 	private QPointF pos;
@@ -21,6 +21,7 @@ public class CreateDoublePointSequenceDataItem<T extends BaseType> extends BaseE
 	private String slot;
 	
 	public CreateDoublePointSequenceDataItem(EventPointsSequence<T> sequence, QPointF pos, Editor editor, QGraphicsScene scene, Object object, String slot) {
+		super();
 		this.sequence = sequence;
 		this.pos = pos;
 		this.scene = scene;

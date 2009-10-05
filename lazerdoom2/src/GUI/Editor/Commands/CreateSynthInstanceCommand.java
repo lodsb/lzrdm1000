@@ -9,6 +9,7 @@ import com.trolltech.qt.gui.QGraphicsScene;
 import GUI.Editor.BaseEditorCommand;
 import GUI.Item.SynthesizerItem;
 import GUI.Scene.Editor.EditorScene;
+import Session.SessionHandler;
 import Synth.SynthInstance;
 
 public class CreateSynthInstanceCommand extends BaseEditorCommand {
@@ -26,6 +27,8 @@ public class CreateSynthInstanceCommand extends BaseEditorCommand {
 		SynthesizerItem item = new SynthesizerItem();
 		((EditorScene)this.scene).addItem(item);
 		item.setPos(this.pos);
+		
+		SessionHandler.getInstance().registerObject(item);
 		
 		return true;
 	}

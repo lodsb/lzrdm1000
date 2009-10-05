@@ -11,6 +11,7 @@ import GUI.Item.SequenceItem;
 import GUI.Item.SequencePlayerItem;
 import GUI.Item.SynthesizerItem;
 import GUI.View.SequencerView;
+import Session.SessionHandler;
 
 public class CreateBaseSequencerItemEditor extends BaseEditorCommand {
 
@@ -29,19 +30,25 @@ public class CreateBaseSequencerItemEditor extends BaseEditorCommand {
 				editor = new SynthesizerEditor();
 				editor.setItem((BaseSequencerItem) item);
 				SequencerView.getInstance().getItemEditorController().registerEditor((BaseSequencerItem) item, editor);
+				SessionHandler.getInstance().registerObject(editor);
 				ret = true;
 			} else if(item instanceof SequencePlayerItem) {
 				editor = new SequencePlayerEditor();
 				editor.setItem((BaseSequencerItem) item);
 				SequencerView.getInstance().getItemEditorController().registerEditor((BaseSequencerItem) item, editor);
+				SessionHandler.getInstance().registerObject(editor);
 				ret = true;
 			} else if(item instanceof SequenceItem) {
 				editor = new SequenceEditor();
 				editor.setItem((BaseSequencerItem) item);
 				SequencerView.getInstance().getItemEditorController().registerEditor((BaseSequencerItem) item, editor);
+				SessionHandler.getInstance().registerObject(editor);
 				ret = true;
 			}
 			
+			if(ret) {
+				SessionHandler.getInstance().registerObject(item);
+			}
 			
 		return ret;
 	}

@@ -3,8 +3,13 @@ package GUI.Editor;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map.Entry;
+import java.util.concurrent.CopyOnWriteArrayList;
+
+import java.util.Iterator;
 
 import lazerdoom.Core;
+import lazerdoom.LzrDmObjectInterface;
 
 import com.trolltech.qt.core.QPointF;
 import com.trolltech.qt.core.QRectF;
@@ -29,6 +34,7 @@ import GUI.Editor.Commands.DeleteSequenceItemCommand;
 import GUI.Editor.Commands.DeleteSequencePlayerCommand;
 import GUI.Editor.Commands.DeleteSynthConnectionCommand;
 import GUI.Editor.Commands.DeleteSynthItemCommand;
+import GUI.Editor.Commands.SequenceEditor.CreateBaseSequence;
 import GUI.Editor.Commands.SequenceEditor.CreateDoublePointSequenceDataItem;
 import GUI.Editor.Commands.SequenceEditor.CreateNoteTypeSequenceDataItem;
 import GUI.Editor.Commands.SequenceEditor.MoveNoteTypeSequenceDataItem;
@@ -63,8 +69,10 @@ import Sequencer.Pause;
 import Sequencer.SequenceEvent;
 import Sequencer.SequenceEventListenerInterface;
 import Sequencer.SequenceEvent.SequenceEventType;
+import Session.BaseSequenceDataDescriptor;
+import Session.DoubleEventPointsDataDescriptor;
 
-public class SequenceEditor extends BaseSequencerItemEditor {
+public class SequenceEditor extends BaseSequencerItemEditor implements LzrDmObjectInterface {
 	
 	private abstract class SequenceEditMode {
 		private SequenceEditor editor;
@@ -125,25 +133,32 @@ public class SequenceEditor extends BaseSequencerItemEditor {
 			
 			switch(currentInitSequenceTypeIndex) {
 				case 0: 
-					System.out.println("Pause");
+					/*System.out.println("Pause");
 					sequence = Core.getInstance().getSequenceController().createPauseSequence(Core.getInstance().oneBarInPPQ());
 					setItemType(sequence);
 					setCurrentMode(new PauseMode(this.getEditor(), sequence));
+					*/
+					
+					executeCommand(new CreateBaseSequence(this.getEditor(), SequenceType.PAUSE));
 				break;
 				case 1:
-					System.out.println("EventPoints");
+					/*System.out.println("EventPoints");
 					sequence = Core.getInstance().getSequenceController().createDoubleTypeEventPointsSequence();
 					((EventPointsSequence)sequence).setLength(Core.getInstance().oneBarInPPQ());
 					setItemType(sequence);
 					setCurrentMode(new EventPointsMode(this.getEditor(), sequence));
-
+					*/
+					
+					executeCommand(new CreateBaseSequence(this.getEditor(), SequenceType.EVENT_POINTS));
 				break;
 				case 2:
-					System.out.println("NoteEvents");
+					/*System.out.println("NoteEvents");
 					sequence = Core.getInstance().getSequenceController().createDoubleTypeEventPointsSequence();
 					((EventPointsSequence)sequence).setLength(Core.getInstance().oneBarInPPQ());
 					setItemType(sequence);
 					setCurrentMode(new NoteEventsMode(this.getEditor(), sequence));
+					*/
+					executeCommand(new CreateBaseSequence(this.getEditor(), SequenceType.NOTE));
 				break;
 			}
 		}
@@ -355,18 +370,65 @@ public class SequenceEditor extends BaseSequencerItemEditor {
 		
 	}
 	
+	public enum SequenceType {
+		PAUSE,
+		EVENT_POINTS,
+		NOTE,
+	};
+	
+	public void setSequence(BaseSequence seq, SequenceType type, BaseSequenceDataDescriptor descriptor) {
+		switch(type) {
+			case PAUSE:
+				this.sequence = seq;
+				setItemType(sequence);
+				setCurrentMode(new PauseMode(this, sequence));
+				break;
+			case EVENT_POINTS:
+				this.sequence = seq;
+				setItemType(sequence);
+				setCurrentMode(new EventPointsMode(this, sequence));
+				break;
+			case NOTE:
+				this.sequence = seq;
+				setItemType(sequence);
+				setCurrentMode(new NoteEventsMode(this, sequence));				
+				break;
+		}
+	}
+	
 	private class EventPointsMode extends PauseMode {
 		
 		public EventPointsMode(SequenceEditor editor, BaseSequence baseSequence) {
 			super(editor, baseSequence, new EventPointsDoubleSequenceScene());
 			((BaseSequenceScene)this.getScene()).startMoved.connect(this, "startMoved(Long, Boolean)");
 			((BaseSequenceScene)this.getScene()).setStartOffsetCursor(((EventPointsSequence)baseSequence).getStartOffset());
+			this.initializeContents((EventPointsSequence<DoubleType>)baseSequence);
+		}
+		
+		private void initializeContents(EventPointsSequence<DoubleType> eps) {
+			Iterator<Entry<Long, CopyOnWriteArrayList<DoubleType>>> it = eps.getIterator();
+			while(it.hasNext()) {
+				Entry<Long, CopyOnWriteArrayList<DoubleType>> entry = it.next();
+				
+				CopyOnWriteArrayList<DoubleType> currentList = entry.getValue();
+
+				for(DoubleType e: currentList) {
+					TouchableDoubleTypeSequenceDataItem item = new TouchableDoubleTypeSequenceDataItem(entry.getKey(), e, this.getEditor());
+					this.getScene().addItem(item);
+					QPointF pos = item.getPositionFromTickValue(entry.getKey(), e.getValue());
+					System.out.println(pos);
+					item.setPosition(pos);
+					item.dragged.connect(this, "itemDragged(TouchableSequenceDataItem, QPointF, Boolean)");
+					//System.out.println("addedItem######################");
+				}
+			}
 		}
 		
 		public EventPointsMode(SequenceEditor editor, BaseSequence baseSequence, BaseSequenceScene scene) {
 			super(editor, baseSequence, scene);
 			((BaseSequenceScene)this.getScene()).startMoved.connect(this, "startMoved(Long, Boolean)");
 			((BaseSequenceScene)this.getScene()).setStartOffsetCursor(((EventPointsSequence)baseSequence).getStartOffset());
+			this.initializeContents((EventPointsSequence<DoubleType>)baseSequence);
 		}
 		
 		private void lengthMoved(Long tick, Boolean successful) {
@@ -468,14 +530,51 @@ public class SequenceEditor extends BaseSequencerItemEditor {
 		NoteEventScene scene;
 		public NoteEventsMode(SequenceEditor editor, BaseSequence baseSequence) {
 			super(editor, baseSequence, new NoteEventScene());
+			this.initializeContents((EventPointsSequence<NoteType>) baseSequence);
+		}
+		
+		private void initializeContents(EventPointsSequence<NoteType> eps) {
+			Iterator<Entry<Long, CopyOnWriteArrayList<NoteType>>> it = eps.getIterator();
+			while(it.hasNext()) {
+				Entry<Long, CopyOnWriteArrayList<NoteType>> entry = it.next();
+				
+				CopyOnWriteArrayList<NoteType> currentList = entry.getValue();
+
+				for(NoteType e: currentList) {
+/*					TouchableDoubleTypeSequenceDataItem item = new TouchableDoubleTypeSequenceDataItem(entry.getKey(), e, this.getEditor());
+					this.getScene().addItem(item);
+					QPointF pos = item.getPositionFromTickValue(entry.getKey(), e.getValue());
+					System.out.println(pos);
+					item.setPosition(pos);
+					item.dragged.connect(this, "itemDragged(TouchableSequenceDataItem, QPointF, Boolean)");
+*/
+					if(!e.isNoteOff()) {
+						TouchableNoteTypeSequenceDataItem noteOnItem = new TouchableNoteTypeSequenceDataItem(entry.getKey(), e, this.getEditor(), null); // note-on
+						this.getScene().addItem(noteOnItem);
+						QPointF noteOnPos = noteOnItem.getPositionFromTickValue(entry.getKey(), e);
+						noteOnItem.setPosition(noteOnPos);
+						noteOnItem.dragged.connect( this, "itemDragged(TouchableSequenceDataItem, QPointF, Boolean)");
+
+						TouchableNoteTypeSequenceDataItem noteOffItem = new TouchableNoteTypeSequenceDataItem(entry.getKey()+e.getLength(), e.getNoteOff() , this.getEditor(), noteOnItem); // note-off
+						this.getScene().addItem(noteOffItem);
+						QPointF noteOffPos = noteOnItem.getPositionFromTickValue(entry.getKey()+e.getLength(), e);
+						noteOffItem.setPosition(noteOffPos);
+						noteOffItem.dragged.connect( this, "itemDragged(TouchableSequenceDataItem, QPointF, Boolean)");
+
+					}
+					//System.out.println("addedItem######################");
+				}
+			}
 		}
 		
 		protected void createItem(QPointF pos, int vSnap, int hSnap) {
-			executeCommand(new CreateNoteTypeSequenceDataItem<DoubleType>((EventPointsSequence)this.getBaseSequence(), pos,this.getEditor(), vSnap, this.getEditor().getScene(), this, "itemDragged(TouchableSequenceDataItem, QPointF, Boolean)"));
+			// error?
+			executeCommand(new CreateNoteTypeSequenceDataItem<NoteType>((EventPointsSequence)this.getBaseSequence(), pos,this.getEditor(), vSnap, this.getEditor().getScene(), this, "itemDragged(TouchableSequenceDataItem, QPointF, Boolean)"));
 		}
 		
 		protected void deleteItem(TouchableSequenceDataItem item) {
-			executeCommand(new RemoveNoteTypeSequenceDataItem<DoubleType>((EventPointsSequence<DoubleType>) this.getBaseSequence(), (TouchableNoteTypeSequenceDataItem) item, this.getEditor().getScene()));
+			// error ?
+			executeCommand(new RemoveNoteTypeSequenceDataItem<NoteType>((EventPointsSequence<NoteType>) this.getBaseSequence(), (TouchableNoteTypeSequenceDataItem) item, this.getEditor().getScene()));
 		}
 		
 		protected void itemDragged(TouchableSequenceDataItem item, QPointF position, Boolean successful) {
@@ -487,7 +586,7 @@ public class SequenceEditor extends BaseSequencerItemEditor {
 						if(!successful) {
 							item.setPosition(newPos);
 						} else {
-							executeCommand(new MoveNoteTypeSequenceDataItem<DoubleType>((EventPointsSequence<DoubleType>)this.getBaseSequence(), note, newPos));
+							executeCommand(new MoveNoteTypeSequenceDataItem<NoteType>((EventPointsSequence<NoteType>)this.getBaseSequence(), note, newPos));
 						}
 					}
 				} else {
@@ -499,7 +598,7 @@ public class SequenceEditor extends BaseSequencerItemEditor {
 						note.setPosition(position);
 						noteOff.setPosition(noteOffPos);
 					} else {
-						executeCommand(new MoveNoteTypeSequenceDataItem<DoubleType>((EventPointsSequence<DoubleType>)this.getBaseSequence(), note, position));
+						executeCommand(new MoveNoteTypeSequenceDataItem<NoteType>((EventPointsSequence<NoteType>)this.getBaseSequence(), note, position));
 						//executeCommand(new MoveSequenceDataItem<DoubleType>((EventPointsSequence<DoubleType>)this.getBaseSequence(), (TouchableSequenceDataItem)noteOff, noteOffPos));
 					}
 				}

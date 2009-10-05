@@ -40,6 +40,17 @@ public class TouchableDoubleTypeSequenceDataItem extends TouchableSequenceDataIt
 		this.setFlag(GraphicsItemFlag.ItemIgnoresTransformations, true);
 		//line.setFlag(GraphicsItemFlag.ItemIgnoresTransformations, true);
 	}
+	
+	public TouchableDoubleTypeSequenceDataItem(long tick, DoubleType value, Editor editor) {
+		super(editor);
+		// TODO Auto-generated constructor stub
+		//this.scale(1.5, 1.5);
+		this.setZValue(100.0);
+		//line.setParentItem(this);
+		this.setFlag(GraphicsItemFlag.ItemIgnoresTransformations, true);
+		//line.setFlag(GraphicsItemFlag.ItemIgnoresTransformations, true);
+		this.setTickAndValue(tick, value);
+	}
 
 	private static String svgFileName = System.getProperty("user.dir")+"/src/GUI/Item/SVG/node-icons.svg";
 	private static QSvgRenderer sharedRenderer = new QSvgRenderer(svgFileName);
@@ -136,6 +147,10 @@ public class TouchableDoubleTypeSequenceDataItem extends TouchableSequenceDataIt
 		return true;
 	}
 	
+	public QPointF getPositionFromTickValue(long tick, double value) {
+		return new QPointF(tick*SequenceDataEditorScene.tickMultiplyer, -value*SequenceDataEditorScene.valueMultiplyer);
+	}
+	
 	private double getDoubleValFromPos(QPointF pos) {
 		double value = 0.0;
 		
@@ -150,6 +165,11 @@ public class TouchableDoubleTypeSequenceDataItem extends TouchableSequenceDataIt
 		}
 		
 		return -value;
+	}
+	//ugly
+	private void setTickAndValue(long tick, DoubleType value) {
+		this.currentTick = tick;
+		this.currentValue = value;
 	}
 	
 	public void updateTickAndValueFromPosition(QPointF pos) {
@@ -175,6 +195,7 @@ public class TouchableDoubleTypeSequenceDataItem extends TouchableSequenceDataIt
 
 	@Override
 	public boolean setPosition(QPointF pos) {
+		System.out.println("POSITION "+pos+" scene "+this.scene());
 		this.setPos(pos);
 		return true;
 	}

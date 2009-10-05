@@ -1,5 +1,6 @@
 package GUI.Item;
 
+import Session.SessionHandler;
 import lazerdoom.LzrDmObjectInterface;
 
 public class SynthOutConnector extends SynthConnector implements LzrDmObjectInterface {
@@ -7,6 +8,9 @@ public class SynthOutConnector extends SynthConnector implements LzrDmObjectInte
 	private String parameterName; 
 
 	public SynthOutConnector(String parameterName) {
+		// TODO: put the register-process into a command
+		SessionHandler.getInstance().registerObject(this);
+		
 		this.parameterName = parameterName;
 		super.setIsInPort(false);
 	}

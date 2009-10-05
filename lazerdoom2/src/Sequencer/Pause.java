@@ -2,13 +2,15 @@ package Sequencer;
 
 import java.util.concurrent.atomic.AtomicLong;
 
+import lazerdoom.LzrDmObjectInterface;
+
 import Sequencer.SequenceEvent.SequenceEventSubtype;
 import Sequencer.SequenceEvent.SequenceEventType;
 
 import com.trolltech.qt.QSignalEmitter.Signal1;
 import com.trolltech.qt.core.QObject;
 
-public class Pause extends BaseSequence implements SequenceInterface {
+public class Pause extends BaseSequence implements SequenceInterface, LzrDmObjectInterface {
 
 	private AtomicLong pauseTicks = new AtomicLong();
 	private long runTicks = 0;

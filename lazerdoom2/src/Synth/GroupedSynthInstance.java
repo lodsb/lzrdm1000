@@ -22,7 +22,7 @@ public class GroupedSynthInstance extends SynthInstance implements LzrDmObjectIn
 	private ParameterControlBus[] controlBusses;
 	
 	public GroupedSynthInstance(ControlServer server, SynthInfo info, float[] switchingFreqs, Synth[] synths, boolean triggerOnly) {
-		SessionHandler.getInstance().registerObject(this);
+		//SessionHandler.getInstance().registerObject(this);
 		this.info = info;
 		
 		// quick hack... should check for different parameter-types

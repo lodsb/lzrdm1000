@@ -8,6 +8,7 @@ import GUI.Editor.BaseEditorCommand;
 import GUI.Editor.SequencerEditor;
 import GUI.Item.EditorCursor;
 import GUI.Scene.Editor.EditorScene;
+import Session.SessionHandler;
 
 import com.trolltech.qt.core.QPointF;
 import com.trolltech.qt.gui.QGraphicsScene;
@@ -31,6 +32,8 @@ public class CreateEditorCommand extends BaseEditorCommand {
 		cursor.setPos(this.sceneLocation);
 		cursor.openEditor.connect(this.editor, "openEditor(EditorCursor, BaseSequencerItem)");
 		cursor.closeEditor.connect(this.editor, "closeEditor(EditorCursor)");
+		
+		SessionHandler.getInstance().registerObject(cursor);
 		
 		return true;
 	}

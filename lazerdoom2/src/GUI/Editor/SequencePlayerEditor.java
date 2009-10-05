@@ -8,6 +8,7 @@ import com.trolltech.qt.gui.QGraphicsItemInterface;
 import sparshui.common.messages.events.TouchEvent;
 
 import lazerdoom.Core;
+import lazerdoom.LzrDmObjectInterface;
 
 import GUI.Item.BaseSequencerItem;
 import GUI.Item.SequencePlayerItem;
@@ -17,7 +18,7 @@ import GUI.Scene.Editor.SequencePlayerScene;
 import SceneItems.Util;
 import Synth.SynthInstance;
 
-public class SequencePlayerEditor extends BaseSequencerItemEditor {
+public class SequencePlayerEditor extends BaseSequencerItemEditor implements LzrDmObjectInterface {
 	private int id = Util.getGroupID();
 	private SequencePlayerScene editorScene = new SequencePlayerScene(this);
 	

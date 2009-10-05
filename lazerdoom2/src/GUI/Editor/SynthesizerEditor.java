@@ -37,7 +37,7 @@ public class SynthesizerEditor extends BaseSequencerItemEditor implements LzrDmO
 	public SynthesizerEditor() {
 		super();
 		
-		SessionHandler.getInstance().registerObject(this);
+		//SessionHandler.getInstance().registerObject(this);
 		
 		this.setScene(editorScene);
 		allowedGestures.add(sparshui.gestures.GestureType.TOUCH_GESTURE.ordinal());

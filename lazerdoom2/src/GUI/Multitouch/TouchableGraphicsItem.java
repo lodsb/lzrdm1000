@@ -29,7 +29,7 @@ public abstract class TouchableGraphicsItem extends QGraphicsItem implements Tou
 	private LinkedList<Integer> allowedGestures = new LinkedList<Integer>();
 	private boolean enableTouchEvents = true;
 	
-	public final long sessionID = SessionHandler.getInstance().registerObject(this);
+	//public final long sessionID = SessionHandler.getInstance().registerObject(this);
 	
 	public void setParent(TouchItemInterface parent) {
 		this.parent = parent;

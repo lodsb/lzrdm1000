@@ -23,7 +23,7 @@ public class LzrDmObjectConverter implements Converter {
 			writer.setValue(id.toString());
 			writer.endNode();
 		} else {
-			System.out.println("LzrDmObj-Converter: Unknown obj for SessionHandler!");
+			System.out.println("LzrDmObj-Converter: Unknown obj for SessionHandler! id: "+id+" obj "+obj);
 		}
 	}
 

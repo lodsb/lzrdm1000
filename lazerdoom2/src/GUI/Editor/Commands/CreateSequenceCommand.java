@@ -36,6 +36,8 @@ public class CreateSequenceCommand extends BaseEditorCommand {
 		((EditorScene)this.scene).addItem(item);
 		item.setPos(pos);
 		
+		SessionHandler.getInstance().registerObject(item);
+		
 		return true;
 	}
 

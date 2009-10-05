@@ -14,6 +14,8 @@ import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.atomic.AtomicLong;
 import java.util.concurrent.locks.ReentrantLock;
 
+import lazerdoom.LzrDmObjectInterface;
+
 import Sequencer.SequenceEvent.SequenceEventSubtype;
 import Sequencer.SequenceEvent.SequenceEventType;
 
@@ -26,7 +28,7 @@ import Control.Types.BaseType;
 import Control.Types.DoubleType;
 
 
-public class EventPointsSequence<EventType extends BaseType> extends BaseSequence implements EventSequenceInterface<EventType> {
+public class EventPointsSequence<EventType extends BaseType> extends BaseSequence implements EventSequenceInterface<EventType>, LzrDmObjectInterface {
 	
 	// TODO: 1) locking event-Array & processing // reentrant-lock implemented, better option available? evaluate!
 	// 		 2) implement startoffset&endpoint

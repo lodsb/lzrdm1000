@@ -13,6 +13,7 @@ import GUI.Item.SequencePlayerItem;
 import GUI.Scene.Editor.EditorScene;
 import Sequencer.EventPointsSequence;
 import Sequencer.SequencePlayer;
+import Session.SessionHandler;
 
 public class CreateSequencePlayerCommand extends BaseEditorCommand {
 
@@ -34,6 +35,8 @@ public class CreateSequencePlayerCommand extends BaseEditorCommand {
 		
 		((EditorScene)this.scene).addItem(item);
 		item.setPos(pos);
+		
+		SessionHandler.getInstance().registerObject(item);
 		
 		return true;
 	}

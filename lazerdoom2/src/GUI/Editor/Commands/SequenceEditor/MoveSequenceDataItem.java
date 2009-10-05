@@ -11,13 +11,14 @@ import GUI.Item.Editor.SequenceDataEditor.TouchableDoubleTypeSequenceDataItem;
 import GUI.Item.Editor.SequenceDataEditor.TouchableSequenceDataItem;
 import Sequencer.EventPointsSequence;
 
-public class MoveSequenceDataItem<T extends BaseType> extends BaseEditorCommand {
+public class MoveSequenceDataItem<T extends BaseType> extends SequenceEditorCommand {
 	
 	private EventPointsSequence<T> sequence;
 	private QPointF pos;
 	private TouchableSequenceDataItem item;
 	
 	public MoveSequenceDataItem(EventPointsSequence<T> sequence, TouchableSequenceDataItem item , QPointF pos) {
+		super();
 		this.sequence = sequence;
 		this.pos = pos;
 		this.item = item;	

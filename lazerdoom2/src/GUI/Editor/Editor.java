@@ -4,6 +4,8 @@ import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 
+import lazerdoom.LzrDmObjectInterface;
+
 import GUI.Editor.Commands.GroupCommand;
 import GUI.Item.TouchPointCursor;
 import GUI.Multitouch.TouchItemInterface;
@@ -26,7 +28,7 @@ import com.trolltech.qt.gui.QUndoStack;
 import sparshui.common.TouchState;
 import sparshui.common.messages.events.*;
 
-public class Editor extends QObject {
+public class Editor extends QObject implements LzrDmObjectInterface {
 	//private QUndoStack undoStack = new QUndoStack();
 	
 	private LinkedList<BaseEditorCommand> undoStack = SessionHandler.getInstance().getCommandStack(this);

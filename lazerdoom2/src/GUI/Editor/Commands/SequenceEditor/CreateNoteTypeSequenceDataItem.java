@@ -2,6 +2,7 @@ package GUI.Editor.Commands.SequenceEditor;
 
 import Control.Types.BaseType;
 import Control.Types.DoubleType;
+import Control.Types.NoteType;
 import GUI.Editor.BaseEditorCommand;
 import GUI.Editor.Editor;
 import GUI.Item.Editor.SequenceDataEditor.TouchableDoubleTypeSequenceDataItem;
@@ -12,7 +13,7 @@ import com.trolltech.qt.core.QPointF;
 
 import edu.uci.ics.jung.graph.util.Pair;
 
-public class CreateNoteTypeSequenceDataItem<T extends BaseType> extends BaseEditorCommand {
+public class CreateNoteTypeSequenceDataItem<T extends NoteType> extends SequenceEditorCommand {
 
 	private EventPointsSequence<T> sequence;
 	private QPointF pos;
@@ -23,6 +24,7 @@ public class CreateNoteTypeSequenceDataItem<T extends BaseType> extends BaseEdit
 	private int vSnap;
 	
 	public CreateNoteTypeSequenceDataItem(EventPointsSequence<T> sequence, QPointF pos, Editor editor, int vSnap, QGraphicsScene scene, Object object, String slot) {
+		super();
 		this.sequence = sequence;
 		this.pos = pos;
 		this.scene = scene;
@@ -54,7 +56,9 @@ public class CreateNoteTypeSequenceDataItem<T extends BaseType> extends BaseEdit
 		(this.sequence).insert((T)p2.getSecond(), (Long)p2.getFirst());
 		noteOffItem.dragged.connect(this.object, this.slot);
 		
-		
+		((T)p.getSecond()).setNoteOff((T)p2.getSecond());
+		((T)p2.getSecond()).setIsNoteOff();
+		((T)p.getSecond()).setLength((Long)p2.getFirst()-(Long)p.getFirst());
 
 
 		

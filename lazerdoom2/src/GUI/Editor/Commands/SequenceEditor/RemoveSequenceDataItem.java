@@ -10,13 +10,14 @@ import GUI.Item.Editor.SequenceDataEditor.TouchableDoubleTypeSequenceDataItem;
 import GUI.Item.Editor.SequenceDataEditor.TouchableSequenceDataItem;
 import Sequencer.EventPointsSequence;
 
-public class RemoveSequenceDataItem<T extends BaseType> extends BaseEditorCommand {
+public class RemoveSequenceDataItem<T extends BaseType> extends SequenceEditorCommand {
 
 	private QGraphicsScene scene;
 	private EventPointsSequence<T> sequence;
 	private TouchableSequenceDataItem item;
 	
 	public RemoveSequenceDataItem(EventPointsSequence<T> sequence, TouchableSequenceDataItem item, QGraphicsScene scene) {
+		super();
 		this.scene = scene;
 		this.sequence = sequence;
 		this.item = item;

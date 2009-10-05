@@ -20,7 +20,7 @@ public class SynthInstance implements LzrDmObjectInterface {
 	public SynthInstance() {}
 	
 	public SynthInstance(ControlServer server, SynthInfo info, Synth synth) {
-		SessionHandler.getInstance().registerObject(this);
+		//SessionHandler.getInstance().registerObject(this);
 		this.info = info;
 		
 		int numberOfControlBusses = info.getControlParameters().length;

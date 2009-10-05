@@ -393,15 +393,51 @@ public static enum NoteIndex {
 
 	public static int noteScaleSize = NoteType.noteArray.length;
 	private float gateValue = 0.0f;
-
+	private int noteNumber = 0;
+	private boolean isNoteOff = false;
+	private NoteType noteOff = null;
+	
 	public NoteType(int noteNumber, float gate) {
 		super(NoteType.noteArray[noteNumber]);
+		this.noteNumber = noteNumber;
 		this.gateValue = gate;
+	}
+	
+	public int getNoteNumber() {
+		return this.noteNumber;
+	}
+	
+	private long length = 0;
+	public void setLength(long length) {
+		this.length = length;
+	}
+	public long getLength() {
+		return this.length;
+	}
+	
+	public void setIsNoteOff() {
+		this.isNoteOff = true;
+	}
+	
+	public boolean isNoteOff() {
+		return this.isNoteOff;
+	}
+	
+	public void setNoteOff(NoteType noteOff) {
+		this.noteOff = noteOff;
+	}
+	
+	public NoteType getNoteOff() {
+		return this.noteOff;
 	}
 	
 	@Override
 	public float getFloatValue2() {
-		return gateValue;
+		return this.gateValue;
+	}
+	
+	public float getGateValue() {
+		return this.gateValue;
 	}
 
 }

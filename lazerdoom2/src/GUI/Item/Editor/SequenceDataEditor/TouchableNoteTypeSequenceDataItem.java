@@ -61,6 +61,37 @@ public class TouchableNoteTypeSequenceDataItem extends TouchableSequenceDataItem
 		//this.line.setParentItem(this);
 	}
 	
+public TouchableNoteTypeSequenceDataItem(long tick, NoteType value, Editor editor, TouchableNoteTypeSequenceDataItem parentItem) {
+		
+		super(editor);
+		// TODO Auto-generated constructor stub
+		//this.scale(1.5, 1.5);
+		this.setZValue(100.0);
+		
+		linePen.setWidth(5);
+		//line.setParentItem(this);
+		this.setFlag(GraphicsItemFlag.ItemIgnoresTransformations, true);
+		if(parentItem != null) {
+			this.isNoteOff = true;
+			this.parent = parentItem;
+			this.child = this;
+			this.parent.setNoteOff(this);
+			this.line = new Line();
+			this.line.setPos(this.pos());
+		} else {
+			this.parent = this;
+		}
+		
+		this.currentTick = tick;
+		this.currentValue = value;
+		//this.line.setParentItem(this);
+	}
+	
+	public QPointF getPositionFromTickValue(long tick, NoteType value) {
+		double x = tick*SequenceDataEditorScene.tickMultiplyer;
+		double y = ((NoteType.noteScaleSize - value.getNoteNumber())*NoteEventScene.hGridSize)+NoteEventScene.hSceneStart;
+		return new QPointF(x,y);
+	} 
 	@Override
 	public void destroy() {
 		System.out.println(this.scene());
@@ -157,6 +188,14 @@ public class TouchableNoteTypeSequenceDataItem extends TouchableSequenceDataItem
 		return oldTickValuePair;
 	}
 	
+	public DoubleType getCurrentValue() {
+		return this.currentValue;
+	}
+	
+	public long getCurrenTick() {
+		return this.currentTick;
+	}
+	
 	public boolean processEvent(Event e) {
 		if(e instanceof DragEvent) {
 			
@@ -177,6 +216,12 @@ public class TouchableNoteTypeSequenceDataItem extends TouchableSequenceDataItem
 		int value = 0;
 		
 		value = NoteType.noteScaleSize - ((int)(pos.y()-NoteEventScene.hSceneStart))/NoteEventScene.hGridSize;
+		
+		/*
+		 
+		  y = (value+NoteType.noteScaleSize)*NoteEventScene.hGridSize+-NoteEventScene.hSceneStart;
+		 
+		 */
 		
 		return value;
 	}

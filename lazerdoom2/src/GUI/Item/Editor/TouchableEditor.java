@@ -1,5 +1,6 @@
 package GUI.Item.Editor;
 
+import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -7,6 +8,7 @@ import sparshui.common.Event;
 import sparshui.common.TouchState;
 import sparshui.common.messages.events.DragEvent;
 import sparshui.common.messages.events.TouchEvent;
+import sparshui.gestures.GestureType;
 
 import com.trolltech.qt.core.QPointF;
 import com.trolltech.qt.core.QRectF;
@@ -214,11 +216,141 @@ public class TouchableEditor extends TouchableGraphicsWidget {
 		}
 		
 	}
+
+	
+	public class EditorViewHandle extends TouchableGraphicsItem {
+		private QRectF boundingRect;
+		private QColor color = QColor.black;
+		private QPainterPath path;
+		private QColor normalColor = new QColor(130,130,130);
+		private QBrush gradientBrush;
+		
+		private void setBrushes() {
+			double rad = 100;
+			QRadialGradient gr = new QRadialGradient(100,20, 400, 50,50);
+			gr.setColorAt(0.0, new QColor(255, 255, 255, 80));
+			gr.setColorAt(0.3, new QColor(155, 150, 150, 80));
+			gr.setColorAt(0.9, new QColor(50, 50, 50, 30));
+			gr.setColorAt(0.95, new QColor(0, 0, 0, 20));
+			gr.setColorAt(1, new QColor(0, 0, 0, 0));
+
+			gradientBrush = new QBrush(gr);
+		}
+		
+		private void updatePath() {
+			path = new QPainterPath();
+			path.moveTo(this.boundingRect.bottomLeft());
+			QPointF centerTop = this.boundingRect.center();
+			centerTop.setY(this.boundingRect.top());
+			centerTop.setX(boundingRect.left()+50);
+			
+			QPointF ctrl1 = this.boundingRect.bottomLeft();
+			ctrl1.setX(ctrl1.x());
+			ctrl1.setY(0);
+			
+			QPointF ctrl2 = this.boundingRect.bottomLeft();
+			ctrl2.setX(ctrl2.x());
+			ctrl2.setY(0);
+
+			path.cubicTo(ctrl1, ctrl2, centerTop);
+			
+			centerTop.setY(this.boundingRect.top());
+			centerTop.setX(boundingRect.right()-50);
+			
+			path.lineTo(centerTop);
+
+			ctrl1 = this.boundingRect.bottomRight();
+			ctrl1.setX(ctrl1.x());
+			ctrl1.setY(0);
+			
+			ctrl2 = this.boundingRect.bottomRight();
+			ctrl2.setX(ctrl2.x());
+			ctrl2.setY(0);
+			
+			path.cubicTo(ctrl1, ctrl2, this.boundingRect.bottomRight());
+			path.closeSubpath();
+		}
+		
+		private LinkedList<Integer> allowedGestures = new LinkedList<Integer>();
+		
+		public EditorViewHandle(QRectF size) {
+			this.boundingRect = size;
+			this.setBrushes();
+			this.updatePath();
+			
+			allowedGestures.add(GestureType.TOUCH_GESTURE.ordinal());
+		}
+		
+		public void setColor(QColor color) {
+			this.color = color;
+			this.update();
+		}
+		
+		@Override
+		public QRectF boundingRect() {
+			return boundingRect;
+		}
+
+		@Override
+		public void paint(QPainter painter, QStyleOptionGraphicsItem option,
+				QWidget widget) {
+			
+			painter.setPen(normalColor);
+				painter.setBrush(color);
+				painter.drawPath(path);
+				painter.fillPath(path, gradientBrush);
+		}
+
+		@Override
+		public QSizeF getMaximumSize() {
+			// TODO Auto-generated method stub
+			return null;
+			
+		}
+
+		@Override
+		public QSizeF getPreferedSize() {
+			// TODO Auto-generated method stub
+			return null;
+		}
+
+		@Override
+		public void setGeometry(QRectF size) {
+			// TODO Auto-generated method stub
+			
+		}
+		
+		public List<Integer> getAllowedGestures() {
+			return allowedGestures;
+		} 
+		
+		HashMap<Integer, TouchEvent> currentTouchEvents = new HashMap<Integer, TouchEvent>();
+		
+		public boolean processEvent(Event event){
+			if(event instanceof TouchEvent) {
+				TouchEvent e = (TouchEvent) event;
+				if(e.getState() == TouchState.DEATH) {
+					currentTouchEvents.remove(e.getTouchID());
+				} else {
+					TouchEvent currentTouchEvent = null;
+					if((currentTouchEvent = currentTouchEvents.get(e.getTouchID())) != null) {
+						
+					}
+					
+					currentTouchEvents.put(e.getTouchID(), e);
+				}
+			}
+			return true;
+		}
+		
+	}
+
 	
 	private	int id = Util.getGroupID();
 	private QSizeF containerSize = new QSizeF(800,600);
 	private double zValue = 100.0;
 	private EditorHeader header;
+	private EditorViewHandle viewHandle;
 	
 	private TouchableGraphicsView graphicsView;
 	private TouchableGraphicsViewContainer graphicsViewContainer;
@@ -263,6 +395,11 @@ public class TouchableEditor extends TouchableGraphicsWidget {
 		header.setParent(this);
 		header.setPos(885, 100);
 		
+		/*viewHandle = new EditorViewHandle(new QRectF(0,0,250,160));
+		viewHandle.rotate(-90.0);
+		viewHandle.setParentItem(this);
+		viewHandle.setPos(-152,425);
+		*/
 		closeButton = new EditorButton("delete");
 		closeButton.pressed.connect(this.closeEditor);
 		closeButton.setParent(this);

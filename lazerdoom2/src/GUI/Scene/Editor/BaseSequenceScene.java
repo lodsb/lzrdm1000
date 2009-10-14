@@ -16,6 +16,7 @@ import com.trolltech.qt.gui.QFont;
 import com.trolltech.qt.gui.QGraphicsLineItem;
 import com.trolltech.qt.gui.QGraphicsTextItem;
 import com.trolltech.qt.gui.QLineF;
+import com.trolltech.qt.gui.QMatrix;
 import com.trolltech.qt.gui.QPainter;
 import com.trolltech.qt.gui.QPainterPath;
 import com.trolltech.qt.gui.QPen;
@@ -51,7 +52,7 @@ public class BaseSequenceScene extends EditorScene {
 		public StartCursor() {
 			this.setPath();
 			this.setZValue(1000.0);
-			this.setFlag(GraphicsItemFlag.ItemIgnoresTransformations, true);
+			//this.setFlag(GraphicsItemFlag.ItemIgnoresTransformations, true);
 			
 		}
 		
@@ -119,17 +120,34 @@ public class BaseSequenceScene extends EditorScene {
 		public LengthCursor() {
 			this.setPath();
 			this.setZValue(1000.0);
-			this.setFlag(GraphicsItemFlag.ItemIgnoresTransformations, true);
+			System.out.println("LC CLC LC LC LC LC LC CLCLCL CL CL CL  LC");
+			//this.setFlag(GraphicsItemFlag.ItemIgnoresTransformations, true);
 		}
+		/*
+		@Override
+		public Object itemChange(GraphicsItemChange change, Object value) {
+			System.out.println("ITEM CHANGE ITEM CHANGE ITEMCHANGe "+change+" "+value);
+			// ignore scaling
+			if(change.equals(GraphicsItemChange.ItemMatrixChange)) {
+				System.out.println("IGNORE SCALINGGGGGGGGGGGG");
+				QMatrix matrix = (QMatrix) value;
+				matrix.setMatrix(matrix.m11(), matrix.m12(), 1.0, 1.0, matrix.dx(), matrix.dy());
+				value = matrix;
+				
+				return value;
+			}
+			
+			return super.itemChange(change, value);
+		}*/
 		
 		private void setPath() {
 			path = new QPainterPath();
-			path.moveTo(26,-1000);
-			path.lineTo(26,1000);
-			path.moveTo(26,-15);
-			path.lineTo(-4,0);
-			path.lineTo(26,15);
-			path.lineTo(26,-15);
+			path.moveTo(50,-1000);
+			path.lineTo(50,1000);
+			path.moveTo(50,-15);
+			path.lineTo(20,0);
+			path.lineTo(50,15);
+			path.lineTo(50,-15);
 		}
 		
 		public boolean processEvent(Event e) {
@@ -176,9 +194,9 @@ public class BaseSequenceScene extends EditorScene {
 	private StartCursor startCursor = new StartCursor();
 	private LengthCursor lengthCursor = new LengthCursor();
 	
-	private QPen vGridPen = new QPen(QColor.darkGray);
+	private QPen vGridPen = new QPen(QColor.lightGray);
 	private QPen vGridPenEmph = new QPen(QColor.darkGray);
-	private QPen hGridPen = new QPen(QColor.darkGray);
+	private QPen hGridPen = new QPen(QColor.lightGray);
 	private QPen hGridPenEmph = new QPen(QColor.darkGray);
 	
 	public BaseSequenceScene() {
@@ -187,7 +205,7 @@ public class BaseSequenceScene extends EditorScene {
 		this.cursorPen.setWidth(5);
 		this.cursor.setPen(this.cursorPen);
 		this.addItem(cursor);
-		this.setSceneRect(new QRectF(0,-1000,1000,2000));
+		this.setSceneRect(new QRectF(0,-1000,Integer.MAX_VALUE/2-1, 2000));
 		
 		this.addItem(startCursor);
 		this.addItem(lengthCursor);
@@ -195,7 +213,12 @@ public class BaseSequenceScene extends EditorScene {
 		this.startCursor.moved.connect(this.startMoved);
 		this.lengthCursor.moved.connect(this.lengthMoved);
 		
-		vGridPen.setWidth(2);
+		vGridPen.setCosmetic(true);
+		vGridPenEmph.setCosmetic(true);
+		hGridPen.setCosmetic(true);
+		hGridPenEmph.setCosmetic(true);
+		
+		vGridPen.setWidth(4);
 		vGridPenEmph.setWidth(4);
 		hGridPen.setWidth(2);
 		hGridPenEmph.setWidth(4);
@@ -224,7 +247,7 @@ public class BaseSequenceScene extends EditorScene {
 	
 	@Override
 	public void drawVerticalGrid(QPainter painter, QRectF rect, double verticalScale) {
-		int gridSize = verticalGridSize(verticalScale);
+		/*int gridSize = verticalGridSize(verticalScale);
 		int leftSide = (int)rect.left();
 		int rightSide = (int)rect.right();
 		int offset = (int)leftSide% (int)gridSize;
@@ -244,6 +267,24 @@ public class BaseSequenceScene extends EditorScene {
 			}
 			painter.drawLine(pos, top, pos, bottom);
 			gridStart++;
+		}*/
+		
+		int gridSize = verticalGridSize(verticalScale);
+		int rightSide = (int) rect.right();
+		int top = (int) rect.top();
+		int bottom = (int) rect.bottom();
+		
+		painter.setClipRect(rect);
+		
+		int gridPos = 0;
+		for(int pos = 0; pos <= rightSide; pos = pos+gridSize) {
+			if(gridPos % 4 == 0) {
+				painter.setPen(vGridPenEmph);
+			} else {
+				painter.setPen(vGridPen);
+			}
+			painter.drawLine(pos, top, pos, bottom);
+			gridPos++;
 		}
 	}
 	

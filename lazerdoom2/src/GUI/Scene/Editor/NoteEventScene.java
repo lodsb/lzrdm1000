@@ -56,6 +56,8 @@ public class NoteEventScene extends BaseSequenceScene {
 	
 	@Override
 	public int horizontalSnapToGridResolution(double horizontalScale) {
-		return (int)(this.hGridSize*horizontalScale);
+		//return (int)(((double)this.hGridSize)*(horizontalScale));
+		return this.hGridSize;
+		//return 1;
 	}
 }

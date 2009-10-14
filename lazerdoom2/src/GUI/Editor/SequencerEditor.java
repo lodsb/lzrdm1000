@@ -124,6 +124,8 @@ public class SequencerEditor extends Editor implements LzrDmObjectInterface {
 	
 	@Override
 	protected void handleDragEvent(DragEvent event) {
+		System.out.println(event);
+		System.out.println(event.getSource());
 		if(event.getSource() instanceof TouchableGraphicsItem) {
 			if(((TouchableGraphicsItem)event.getSource()).belongsToGroup() != null) {
 				//System.out.println("BELONGS TO GROUP");
@@ -145,9 +147,9 @@ public class SequencerEditor extends Editor implements LzrDmObjectInterface {
 		} else if(event.getSource() instanceof EditorCursor) {
 			EditorCursor cursor = (EditorCursor) event.getSource();
 			if(event.isSuccessful()) {
-				this.executeCommand(new MoveTouchableGraphicsItemCommand(new QPointF(event.getSceneLocation().x()-cursor.boundingRect().width()/2, event.getSceneLocation().y()-cursor.boundingRect().height()/2), cursor));
+				this.executeCommand(new MoveTouchableGraphicsItemCommand(event.getSceneLocation(), cursor));
 			} else {
-				cursor.setPosition(new QPointF(event.getSceneLocation().x()-cursor.boundingRect().width()/2, event.getSceneLocation().y()-cursor.boundingRect().height()/2));
+				cursor.setPosition(event.getSceneLocation());//new QPointF(event.getSceneLocation().x()-cursor.boundingRect().width()/2, event.getSceneLocation().y()-cursor.boundingRect().height()/2));
 			}
 		} else if(event.getSource() instanceof TouchableItemGroupItem) {
 			TouchableItemGroupItem group = (TouchableItemGroupItem) event.getSource();

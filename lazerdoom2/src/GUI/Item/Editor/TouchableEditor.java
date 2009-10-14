@@ -7,13 +7,18 @@ import java.util.List;
 import sparshui.common.Event;
 import sparshui.common.TouchState;
 import sparshui.common.messages.events.DragEvent;
+import sparshui.common.messages.events.RotateEvent;
 import sparshui.common.messages.events.TouchEvent;
+import sparshui.common.messages.events.ZoomEvent2D;
+import sparshui.gestures.GestureType;
+import sparshui.gestures.ZoomGesture2D;
 import sparshui.gestures.GestureType;
 
 import com.trolltech.qt.core.QPointF;
 import com.trolltech.qt.core.QRectF;
 import com.trolltech.qt.core.QSizeF;
 import com.trolltech.qt.core.Qt.Orientation;
+import com.trolltech.qt.core.Qt.ScrollBarPolicy;
 import com.trolltech.qt.gui.QBrush;
 import com.trolltech.qt.gui.QColor;
 import com.trolltech.qt.gui.QGraphicsLinearLayout;
@@ -218,7 +223,7 @@ public class TouchableEditor extends TouchableGraphicsWidget {
 	}
 
 	
-	public class EditorViewHandle extends TouchableGraphicsItem {
+/*	public class EditorViewHandle extends TouchableGraphicsItem {
 		private QRectF boundingRect;
 		private QColor color = QColor.black;
 		private QPainterPath path;
@@ -343,6 +348,147 @@ public class TouchableEditor extends TouchableGraphicsWidget {
 			return true;
 		}
 		
+	}*/
+
+	
+	public class EditorViewHandle extends TouchableGraphicsItem {
+		private QRectF boundingRect;
+		private QColor color = QColor.black;
+		private QPainterPath path;
+		private QColor normalColor = new QColor(130,130,130);
+		private QBrush gradientBrush;
+		
+		private void setBrushes() {
+			double rad = 100;
+			QRadialGradient gr = new QRadialGradient(100,20, 400, 50,50);
+			gr.setColorAt(0.0, new QColor(255, 255, 255, 80));
+			gr.setColorAt(0.3, new QColor(155, 150, 150, 80));
+			gr.setColorAt(0.9, new QColor(50, 50, 50, 30));
+			gr.setColorAt(0.95, new QColor(0, 0, 0, 20));
+			gr.setColorAt(1, new QColor(0, 0, 0, 0));
+
+			gradientBrush = new QBrush(gr);
+		}
+		
+		private void updatePath() {
+			path = new QPainterPath();
+			path.moveTo(this.boundingRect.bottomLeft());
+			QPointF centerTop = this.boundingRect.center();
+			centerTop.setY(this.boundingRect.top());
+			centerTop.setX(boundingRect.left()+50);
+			
+			QPointF ctrl1 = this.boundingRect.bottomLeft();
+			ctrl1.setX(ctrl1.x());
+			ctrl1.setY(0);
+			
+			QPointF ctrl2 = this.boundingRect.bottomLeft();
+			ctrl2.setX(ctrl2.x());
+			ctrl2.setY(0);
+
+			path.cubicTo(ctrl1, ctrl2, centerTop);
+			
+			centerTop.setY(this.boundingRect.top());
+			centerTop.setX(boundingRect.right()-50);
+			
+			path.lineTo(centerTop);
+
+			ctrl1 = this.boundingRect.bottomRight();
+			ctrl1.setX(ctrl1.x());
+			ctrl1.setY(0);
+			
+			ctrl2 = this.boundingRect.bottomRight();
+			ctrl2.setX(ctrl2.x());
+			ctrl2.setY(0);
+			
+			path.cubicTo(ctrl1, ctrl2, this.boundingRect.bottomRight());
+			path.closeSubpath();
+		}
+		
+		private LinkedList<Integer> allowedGestures = new LinkedList<Integer>();
+		
+		public EditorViewHandle(QRectF size) {
+			this.boundingRect = size;
+			this.setBrushes();
+			this.updatePath();
+			
+			allowedGestures.add(GestureType.ZOOM_GESTURE2D.ordinal());
+			allowedGestures.add(GestureType.TOUCH_GESTURE.ordinal());
+		}
+		
+		public void setColor(QColor color) {
+			this.color = color;
+			this.update();
+		}
+		
+		@Override
+		public QRectF boundingRect() {
+			return boundingRect;
+		}
+
+		@Override
+		public void paint(QPainter painter, QStyleOptionGraphicsItem option,
+				QWidget widget) {
+			
+			painter.setPen(normalColor);
+				painter.setBrush(color);
+				painter.drawPath(path);
+				painter.fillPath(path, gradientBrush);
+		}
+
+		@Override
+		public QSizeF getMaximumSize() {
+			// TODO Auto-generated method stub
+			return null;
+			
+		}
+
+		@Override
+		public QSizeF getPreferedSize() {
+			// TODO Auto-generated method stub
+			return null;
+		}
+
+		@Override
+		public void setGeometry(QRectF size) {
+			// TODO Auto-generated method stub
+			
+		}
+		
+		public List<Integer> getAllowedGestures() {
+			return allowedGestures;
+		} 
+		
+		private HashMap<Integer, TouchEvent> currentTouchEvents = new HashMap<Integer, TouchEvent>();
+		
+		public Signal2<Double, Double> scrollBy = new Signal2<Double, Double>();
+		
+		public Signal2<Double, Double> zoomTo = new Signal2<Double, Double>();
+		
+		public boolean processEvent(Event event){
+			if(event instanceof ZoomEvent2D) {
+				ZoomEvent2D ze = (ZoomEvent2D) event;
+				System.out.println("ZOOM "+ze.getXZoom()+" "+ze.getYZoom());
+				
+				zoomTo.emit(ze.getXZoom(),ze.getYZoom());
+			} else if(event instanceof TouchEvent) {
+				TouchEvent e = (TouchEvent) event;
+				if(e.getState() == TouchState.DEATH) {
+					currentTouchEvents.remove(e.getTouchID());
+				} else {
+						// scroll
+						TouchEvent currentTouchEvent = null;
+						if((currentTouchEvent = currentTouchEvents.get(e.getTouchID())) != null) {
+							QPointF oldPos = this.parentItem().mapFromScene(currentTouchEvent.getSceneLocation());
+							//System.out.println(oldPos+" --- "+this.parentItem().mapFromScene(oldPos));
+							QPointF newPos = this.parentItem().mapFromScene(event.getSceneLocation());
+							scrollBy.emit(oldPos.x()-newPos.x(), oldPos.y()-newPos.y());
+						}
+					currentTouchEvents.put(e.getTouchID(), e);
+				}
+			}
+			return true;
+		}
+		
 	}
 
 	
@@ -358,9 +504,9 @@ public class TouchableEditor extends TouchableGraphicsWidget {
 	
 	private LinkedList<Integer> allowedGestures = new LinkedList<Integer>();
 	
-	public void shit() {
-		this.baseLayout.removeItem(graphicsViewContainer);
-	}
+	//public void shit() {
+	//	this.baseLayout.removeItem(graphicsViewContainer);
+	//}
 	
 	private BaseSequencerItemEditor editor  = null;
 	
@@ -385,6 +531,8 @@ public class TouchableEditor extends TouchableGraphicsWidget {
 		baseLayout = new QGraphicsLinearLayout();
 		baseLayout.setOrientation(Orientation.Vertical);
 		graphicsView = new TouchableGraphicsView(this);
+		graphicsView.setHorizontalScrollBarPolicy(ScrollBarPolicy.ScrollBarAlwaysOff);
+		graphicsView.setVerticalScrollBarPolicy(ScrollBarPolicy.ScrollBarAlwaysOff);
 		graphicsViewContainer = new TouchableGraphicsViewContainer(graphicsView, containerSize);
 		baseLayout.addItem(graphicsViewContainer);
 		this.setLayout(baseLayout);
@@ -394,6 +542,15 @@ public class TouchableEditor extends TouchableGraphicsWidget {
 		header.rotate(90.0);
 		header.setParent(this);
 		header.setPos(885, 100);
+		
+		viewHandle = new EditorViewHandle(new QRectF(0,0,250,180));
+		viewHandle.rotate(-90.0);
+		viewHandle.setParentItem(this);
+		viewHandle.setPos(-172,425);
+		
+		viewHandle.scrollBy.connect(this, "scrollBy(Double, Double)");
+		viewHandle.zoomTo.connect(this, "zoomTo(Double, Double)");
+		
 		
 		/*viewHandle = new EditorViewHandle(new QRectF(0,0,250,160));
 		viewHandle.rotate(-90.0);
@@ -411,10 +568,28 @@ public class TouchableEditor extends TouchableGraphicsWidget {
 		
 		//this.setParent(SequencerView.getInstance());
 		
+		this.allowedGestures.add(sparshui.gestures.GestureType.ROTATE_GESTURE.ordinal());
 		this.allowedGestures.add(sparshui.gestures.GestureType.DRAG_GESTURE.ordinal());
 		this.allowedGestures.add(sparshui.gestures.GestureType.TOUCH_GESTURE.ordinal());
 		
+		this.rotate(-193.34);
+		
 
+	}
+	private double currentZoomX = 1.0;
+	private double currentZoomY = 1.0;
+	
+	private void zoomTo(Double x, Double y) {
+		if(this.editor.allowViewpointChange()) {
+			this.graphicsView.zoomTo(x, y);
+		}
+	}
+	
+	private void scrollBy(Double x, Double y) {
+		if(this.editor.allowViewpointChange()) {
+			this.graphicsView.scrollBy(x,y);
+		}
+		//System.out.println(10*x.intValue()+"-------"+y.intValue()*10);
 	}
 		
 	public void setColor(QColor color){
@@ -446,7 +621,12 @@ public class TouchableEditor extends TouchableGraphicsWidget {
 				this.closeEditor.emit();
 			}
 		}else {
-			if(event instanceof DragEvent) {
+			if(event instanceof RotateEvent) {
+				RotateEvent re = (RotateEvent) event;
+				System.out.println(re);
+				//this.rotate(re.getRotation()*180.0/Math.PI);
+				
+			} else if(event instanceof DragEvent) {
 				DragEvent e = (DragEvent) event;
 				
 				if(e.isOngoing()) {

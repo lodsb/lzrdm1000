@@ -14,6 +14,7 @@ import com.trolltech.qt.core.QRectF;
 import com.trolltech.qt.core.Qt;
 import com.trolltech.qt.gui.QColor;
 import com.trolltech.qt.gui.QGraphicsLineItem;
+import com.trolltech.qt.gui.QGraphicsTextItem;
 import com.trolltech.qt.gui.QLineF;
 import com.trolltech.qt.gui.QMatrix;
 import com.trolltech.qt.gui.QPainter;
@@ -48,6 +49,10 @@ public class TouchableDoubleTypeSequenceDataItem extends TouchableSequenceDataIt
 		this.setZValue(100.0);
 		//line.setParentItem(this);
 		this.setFlag(GraphicsItemFlag.ItemIgnoresTransformations, true);
+		
+		QGraphicsTextItem shitText = new QGraphicsTextItem("SHITTEST");
+		shitText.setParentItem(this);
+		shitText.setFlag(GraphicsItemFlag.ItemIgnoresTransformations, true);
 		//line.setFlag(GraphicsItemFlag.ItemIgnoresTransformations, true);
 		this.setTickAndValue(tick, value);
 	}

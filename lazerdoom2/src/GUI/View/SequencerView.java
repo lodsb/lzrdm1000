@@ -342,6 +342,8 @@ public class SequencerView extends QGraphicsView implements Client, TouchItemInt
 		viewGestures.add(sparshui.gestures.GestureType.DRAG_GESTURE.ordinal());
 		viewGestures.add(sparshui.gestures.GestureType.DELETE_GESTURE.ordinal());
 		
+		//viewGestures.add(sparshui.gestures.GestureType.ZOOM_GESTURE2D.ordinal());
+		
 		this.setCacheMode(QGraphicsView.CacheModeFlag.CacheNone);
 		this.setViewportUpdateMode(ViewportUpdateMode.FullViewportUpdate);
 		this.sharedGlWidget = new QGLWidget();

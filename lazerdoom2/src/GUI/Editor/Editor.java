@@ -24,6 +24,7 @@ import com.trolltech.qt.gui.QGraphicsScene;
 import com.trolltech.qt.gui.QPainterPath;
 import com.trolltech.qt.gui.QPen;
 import com.trolltech.qt.gui.QUndoStack;
+import com.trolltech.qt.gui.QGraphicsItem.GraphicsItemFlag;
 
 import sparshui.common.TouchState;
 import sparshui.common.messages.events.*;
@@ -32,7 +33,7 @@ public class Editor extends QObject implements LzrDmObjectInterface {
 	//private QUndoStack undoStack = new QUndoStack();
 	
 	private LinkedList<BaseEditorCommand> undoStack = SessionHandler.getInstance().getCommandStack(this);
-	private EditorScene scene;
+	protected EditorScene scene;
 	
 	public Signal0 executedCommand = new Signal0();
 	public Signal0 undoneCommand = new Signal0();
@@ -164,7 +165,7 @@ public class Editor extends QObject implements LzrDmObjectInterface {
 		}
 	}
 	
-	private HashMap<Integer, QGraphicsPathItem> gestureVisualizationsMap = new HashMap<Integer, QGraphicsPathItem>();
+	protected HashMap<Integer, QGraphicsPathItem> gestureVisualizationsMap = new HashMap<Integer, QGraphicsPathItem>();
 	
 	protected QPainterPath updateGestureVisualization(ExtendedGestureEvent event) {
 		QPainterPath ppath = null;
@@ -175,6 +176,7 @@ public class Editor extends QObject implements LzrDmObjectInterface {
 
 			if((p = gestureVisualizationsMap.get(event.getTouchID())) == null) {
 				p = new QGraphicsPathItem();
+				//p.setFlag(GraphicsItemFlag.ItemIgnoresTransformations, true);
 				p.setZValue(-1000.0);
 				this.scene.addItem(p);
 				//p.setPos(point);

@@ -57,21 +57,24 @@ public class EditorCursor extends TouchableGraphicsItem implements LzrDmObjectIn
 	
 	public EditorCursor() {
 		this.generateBrushAndPen();
-		this.setFlag(GraphicsItemFlag.ItemIsMovable, true);
-		this.setFlag(GraphicsItemFlag.ItemIsSelectable, true);
+		//this.setFlag(GraphicsItemFlag.ItemIsMovable, true);
+		//this.setFlag(GraphicsItemFlag.ItemIsSelectable, true);
 		cursorPath = new QPainterPath();
 		cursorPath.moveTo(-35, 50);
 		cursorPath.lineTo(0,-50);
 		cursorPath.lineTo(35, 50);
 		cursorPath.lineTo(0, 20);
 		cursorPath.closeSubpath();
+		
+		this.setParent(SequencerView.getInstance());
+		
 	}
 	
-	public void mouseMoveEvent(QGraphicsSceneMouseEvent event) {
+	/*public void mouseMoveEvent(QGraphicsSceneMouseEvent event) {
 		if(setPosition(this.mapToScene(event.pos()))) {
 			super.mouseMoveEvent(event);
 		}
-	}
+	}*/
 	
 	private TouchableEditor editor = null;
 	
@@ -138,6 +141,7 @@ public class EditorCursor extends TouchableGraphicsItem implements LzrDmObjectIn
 	public boolean setPosition(QPointF nextPos) {
 		boolean ret = true;
 		
+		this.setPos(nextPos);
 		QPointF pos = this.mapToScene(new QPointF(0,0));
 		List<QGraphicsItemInterface> itemList = this.scene().items(pos.x()-200, pos.y()-200, 400, 400);
 		
@@ -180,7 +184,7 @@ public class EditorCursor extends TouchableGraphicsItem implements LzrDmObjectIn
 				//collidesWithBaseItem.emit(this, (BaseSequenceViewItem) nearestItem);
 				
 				if(!isDocked) {
-					System.out.println("DICKING...");
+					System.out.println("DOCKING...");
 					this.openEditor.emit(this, (BaseSequencerItem)nearestItem);
 					BaseSequencerItem parent  = ((BaseSequencerItem) nearestItem);
 					System.out.println(" ddd "+parent);

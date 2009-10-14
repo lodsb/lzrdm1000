@@ -1,6 +1,7 @@
 package sparshui.common.messages.events;
 
-import SceneItems.TouchItemInterface;
+
+import GUI.Multitouch.TouchItemInterface;
 
 import com.trolltech.qt.core.QPointF;
 
@@ -148,6 +149,21 @@ public class RotateEvent implements Event {
 	@Override
 	public void setSource(TouchItemInterface it) {
 		item = it;
-	}	
+	}
+	@Override
+	public boolean isFocused() {
+		// TODO Auto-generated method stub
+		return false;
+	}
+	@Override
+	public boolean isOngoing() {
+		// TODO Auto-generated method stub
+		return false;
+	}
+	@Override
+	public void setFocused() {
+		// TODO Auto-generated method stub
+		
+	}
 
 }

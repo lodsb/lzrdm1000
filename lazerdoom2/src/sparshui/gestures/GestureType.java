@@ -21,4 +21,5 @@ public enum GestureType {
 	FLICK_GESTURE, 
 	GROUP_GESTURE, 
 	DELETE_GESTURE,
+	ZOOM_GESTURE2D
 }

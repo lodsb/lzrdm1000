@@ -27,7 +27,9 @@ import com.trolltech.qt.core.QPointF;
 import com.trolltech.qt.core.QRect;
 import com.trolltech.qt.core.QRectF;
 import com.trolltech.qt.core.QSize;
+import com.trolltech.qt.core.Qt.ScrollBarPolicy;
 import com.trolltech.qt.gui.QColor;
+import com.trolltech.qt.gui.QGraphicsEllipseItem;
 import com.trolltech.qt.gui.QGraphicsItemInterface;
 import com.trolltech.qt.gui.QGraphicsScene;
 import com.trolltech.qt.gui.QGraphicsView;
@@ -52,16 +54,67 @@ public class TouchableGraphicsView extends QGraphicsView implements TouchItemInt
 	
 	private EditorScene currentEditorScene = null;
 	
+	/*public TouchableGraphicsView() {
+		System.out.println("######################################################################################################");
+		this.setHorizontalScrollBarPolicy(ScrollBarPolicy.ScrollBarAlwaysOff);
+		this.setVerticalScrollBarPolicy(ScrollBarPolicy.ScrollBarAlwaysOff);
+	}*/
+	
+	double currentCenterX = 400;
+	double currentCenterY = 0;
+	
+	double currentZoomX = 1.0;
+	double currentZoomY = 1.0;
+	
 	public void setEditorScene(EditorScene scene) {
 		this.currentEditorScene = scene;
 		this.verticalScale = 1.0;
 		this.horizontalScale = 1.0;
 		//this.scale(2.0,2.0);
 		this.setScene(scene);
+		//QGraphicsEllipseItem ei = new QGraphicsEllipseItem();
+		//scene.addItem(ei);
+		//ei.setPos(100, 0);
 		this.setSceneRect(scene.sceneRect());
+		//System.out.println(scene.sceneRect()+"");
+		//this.centerOn(5000,0);
 		this.update();
+		//this.scroll(100, 100);
+		currentCenterX = 400;
+		currentCenterY = 0;
 		
+		this.resetMatrix();
+		//this.scale(currentZoomX, currentZoomY);
+		
+		this.centerOn(currentCenterX, currentCenterY);
 		this.scale(horizontalScale, verticalScale);
+		
+		//this.zoomTo(0.5, 2.456);
+	}
+	
+	public void zoomTo(double x, double y) {
+		//y = x;
+		//his.scale(1.0/currentZoomX, 1.0/currentZoomY);
+		this.resetMatrix();
+		this.scale(x, y);
+		System.out.println("zx zy "+x+" "+y);
+		
+		this.verticalScale = x;
+		this.horizontalScale = y;
+	}
+	
+	public void scrollBy(double x, double y) {
+		/*this.scrollContentsBy((int)x, (int)y);
+		this.scroll((int)x, (int)y);
+		System.out.println("WHWHWHWH wHWH WHW whw lkj lkj lkkj piu ");
+		*/
+		if(currentCenterX+x > 0) {
+			this.currentCenterX = this.currentCenterX +x;
+		}
+		this.currentCenterY = this.currentCenterY +y;
+		this.centerOn(this.currentCenterX, this.currentCenterY);
+		System.out.println("cx cy" + this.currentCenterX+" "+this.currentCenterY);
+		this.update();
 	}
 	
 	@Override
@@ -69,6 +122,7 @@ public class TouchableGraphicsView extends QGraphicsView implements TouchItemInt
 		painter.setBrush(QColor.white);
 		painter.setPen(QPen.NoPen);
 		painter.drawRect(rect);
+		System.out.println("drawBG !!!!!");
 		
 		if(currentEditorScene != null) {
 			this.currentEditorScene.drawHorizontalGrid(painter, rect, this.horizontalScale);
@@ -88,10 +142,10 @@ public class TouchableGraphicsView extends QGraphicsView implements TouchItemInt
 		/*allowedGestures.add(sparshui.gestures.GestureType.TOUCH_GESTURE.ordinal());
 		allowedGestures.add(sparshui.gestures.GestureType.DELETE_GESTURE.ordinal());*/
 		//this.setScene(new QGraphicsScene());
-		this.setupViewport(new QGLWidget((QWidget)null, (QGLWidget)SequencerView.sharedGlWidget));
-		//this.setCacheMode(CacheModeFlag.CacheBackground);
+	//	this.setupViewport(new QGLWidget((QWidget)null, (QGLWidget)SequencerView.sharedGlWidget));
+		this.setCacheMode(CacheModeFlag.CacheBackground);
 		//this.setRenderHint(RenderHint.Antialiasing);
-		this.setViewportUpdateMode(ViewportUpdateMode.FullViewportUpdate);
+	//	this.setViewportUpdateMode(ViewportUpdateMode.FullViewportUpdate);
 		this.editor = editor;
 	}
 	
@@ -141,6 +195,7 @@ public class TouchableGraphicsView extends QGraphicsView implements TouchItemInt
 		
 		if(oldHSc != this.horizontalScale || oldEd != this.currentEditorScene) {
 			hGridRes = currentEditorScene.horizontalSnapToGridResolution(this.horizontalScale);
+			System.out.println(hGridRes+" HGRID " + currentEditorScene.horizontalSnapToGridResolution(1.0));
 			oldHSc = this.horizontalScale;
 		}
 		
@@ -164,6 +219,7 @@ public class TouchableGraphicsView extends QGraphicsView implements TouchItemInt
 			}
 			
 			this.editor.getCurrentEditor().handleExtendedGestureEvent(e, vGridRes, hGridRes);
+			this.update();
 
 		}  
 		
@@ -172,6 +228,7 @@ public class TouchableGraphicsView extends QGraphicsView implements TouchItemInt
 			QPointF itemCoordinates = editor.mapFromScene(e.getSceneLocation());
 			e.setSceneLocation(this.mapToScene((int)itemCoordinates.x(), (int)itemCoordinates.y()));
 			this.editor.getCurrentEditor().handleTouchEvent(e, vGridRes, hGridRes);
+			this.update();
 			//System.out.println("WHA?");
 		} 
 		/*if(event instanceof DragEvent) {

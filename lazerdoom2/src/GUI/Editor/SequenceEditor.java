@@ -14,7 +14,12 @@ import lazerdoom.LzrDmObjectInterface;
 import com.trolltech.qt.core.QPointF;
 import com.trolltech.qt.core.QRectF;
 import com.trolltech.qt.core.QTimer;
+import com.trolltech.qt.gui.QColor;
 import com.trolltech.qt.gui.QGraphicsItemInterface;
+import com.trolltech.qt.gui.QGraphicsPathItem;
+import com.trolltech.qt.gui.QPainterPath;
+import com.trolltech.qt.gui.QPen;
+import com.trolltech.qt.gui.QGraphicsItem.GraphicsItemFlag;
 
 import edu.uci.ics.jung.graph.util.Pair;
 
@@ -691,4 +696,52 @@ public class SequenceEditor extends BaseSequencerItemEditor implements LzrDmObje
 	public void handleTouchEvent(TouchEvent e, int vSnap, int hSnap) {
 		currentMode.handleTouchEvent(e, vSnap, hSnap);
 	}
+	
+	@Override
+	protected QPainterPath updateGestureVisualization(ExtendedGestureEvent event) {
+		QPainterPath ppath = null;
+		QGraphicsPathItem p;
+		
+		if(event.isOngoing()) {
+			QPointF point = event.getSceneLocation();
+
+			if((p = gestureVisualizationsMap.get(event.getTouchID())) == null) {
+				p = new QGraphicsPathItem();
+				//p.setFlag(GraphicsItemFlag.ItemIgnoresTransformations, true);
+				p.setZValue(-1000.0);
+				this.scene.addItem(p);
+				//p.setPos(point);
+				//this.scene().addEllipse(point.x(), point.y(), 100,100);
+				QPen pen = new QPen(QColor.yellow);
+				//pen.setCosmetic(true);
+				pen.setWidth(4);
+				p.setPen(pen);
+				QPainterPath path = new QPainterPath();
+				path.addEllipse(point, 50,50);
+				path.moveTo(point);
+				p.setPath(path);
+				gestureVisualizationsMap.put(event.getTouchID(), p);
+			} 
+
+			QPainterPath path = new QPainterPath(p.path());
+			path.lineTo(point);
+			p.setPath(path);
+		} else {
+			if((p = gestureVisualizationsMap.get(event.getTouchID())) != null) {
+				this.scene.removeItem(gestureVisualizationsMap.get(event.getTouchID()));
+				this.gestureVisualizationsMap.remove(event.getTouchID());
+				if(event instanceof GroupEvent) {
+					System.out.println(event+" "+p);
+					((GroupEvent)event).setPath(p.path());
+				}
+			}
+		}
+		
+		if(p != null) {
+			ppath =  p.path();
+		}
+		
+		return ppath;
+	}
+	
 }

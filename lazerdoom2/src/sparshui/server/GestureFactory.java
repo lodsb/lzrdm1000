@@ -12,6 +12,7 @@ import sparshui.gestures.SpinGesture;
 import sparshui.gestures.TouchGesture;
 import sparshui.gestures.ZoomGesture;
 import sparshui.gestures.DblClkGesture;
+import sparshui.gestures.ZoomGesture2D;
 
 public class GestureFactory {
 
@@ -63,6 +64,8 @@ public class GestureFactory {
 			return new GroupGesture();
 		if(gestureID == GestureType.DELETE_GESTURE.ordinal()) 
 			return new DeleteGesture();
+		if(gestureID == GestureType.ZOOM_GESTURE2D.ordinal()) 
+			return new ZoomGesture2D();
 		
 		System.err.println("[GestureFactory] Gesture not recognized: " + gestureID);
 		return null;

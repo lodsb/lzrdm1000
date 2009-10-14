@@ -35,6 +35,8 @@ public class XchgSynthesizerCommand extends BaseEditorCommand {
 		this.newSynthID = uniqueID;
 		this.editor = sequencerEditor;
 		this.synthEditor = synthEditor;
+		System.out.println("FIXME: disable prohibitSaveToSessionFile() in XChg");
+		this.prohibitSaveToSessionFile();
 	}
 
 	@Override

@@ -90,6 +90,8 @@ public class TouchableGraphicsView extends QGraphicsView implements TouchItemInt
 		this.scale(horizontalScale, verticalScale);
 		
 		//this.zoomTo(0.5, 2.456);
+		
+		this.updateEditorCaption();
 	}
 	
 	public void zoomTo(double x, double y) {
@@ -101,6 +103,14 @@ public class TouchableGraphicsView extends QGraphicsView implements TouchItemInt
 		
 		this.verticalScale = x;
 		this.horizontalScale = y;
+		
+		this.updateEditorCaption();
+	}
+	
+	private void updateEditorCaption() {
+		if(this.currentEditorScene != null) {
+			this.editor.updateInfoCaption(this.currentEditorScene.getHorizontalGridCaption(this.horizontalScale)+" "+this.currentEditorScene.getVerticalGridCaption(this.verticalScale));
+		}
 	}
 	
 	public void scrollBy(double x, double y) {
@@ -130,13 +140,13 @@ public class TouchableGraphicsView extends QGraphicsView implements TouchItemInt
 		}
 	}
 	
-	@Override
+	/*@Override
 	public void drawForeground(QPainter painter, QRectF rect) {
 		if(currentEditorScene != null) {
 			this.currentEditorScene.drawVerticalGridCaption(painter, rect, this.mapToScene(this.viewport().width()-100, this.viewport().height()-20), this.verticalScale);
 			this.currentEditorScene.drawHorizontalGridCaption(painter, rect, this.mapToScene(100, 50), this.verticalScale);
 		}
-	}
+	}*/
 	
 	public TouchableGraphicsView(TouchableEditor editor) {
 		/*allowedGestures.add(sparshui.gestures.GestureType.TOUCH_GESTURE.ordinal());

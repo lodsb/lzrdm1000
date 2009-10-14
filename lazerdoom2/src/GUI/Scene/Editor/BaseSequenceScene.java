@@ -304,6 +304,11 @@ public class BaseSequenceScene extends EditorScene {
 		painter.drawText(point, "1/"+lazerdoom.Util.nearestPowerOfTwo((int)(8.0*(verticalScale))));
 	}
 	
+	@Override 
+	public String getVerticalGridCaption(double verticalScale) {
+		return "bar 1/"+lazerdoom.Util.nearestPowerOfTwo((int)(8.0*(verticalScale)));
+	}
+	
 	double oldVerticalScale = -1337.0;
 	int oldVerticalSnapGridResolution = 1000; 
 	

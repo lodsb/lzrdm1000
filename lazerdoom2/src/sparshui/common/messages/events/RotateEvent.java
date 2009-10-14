@@ -29,9 +29,11 @@ public class RotateEvent implements Event {
 		_center = new Location();
 	}
 	
-	public RotateEvent(float rotation, Location center) {
+	public RotateEvent(float rotation, Location center, int id, boolean isOngoing) {
 		_rotation = rotation;
 		_center = center;
+		this.setTouchID(id);
+		this.isOngoing = isOngoing;
 	}
 	
 	private QPointF _pos = null;
@@ -155,10 +157,12 @@ public class RotateEvent implements Event {
 		// TODO Auto-generated method stub
 		return false;
 	}
+	
+	private boolean isOngoing = false;
 	@Override
 	public boolean isOngoing() {
 		// TODO Auto-generated method stub
-		return false;
+		return this.isOngoing;
 	}
 	@Override
 	public void setFocused() {

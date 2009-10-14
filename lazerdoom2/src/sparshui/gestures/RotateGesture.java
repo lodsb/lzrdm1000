@@ -14,20 +14,82 @@ import sparshui.server.TouchPoint;
  */
 public class RotateGesture extends StandardDynamicGesture {
 
-	/**
-	 * 
-	 */
-	private float _rotation = 0f;
+		int currentTouchPoints = 0;
+			
+		TouchData p1Data = null;
+		TouchData p2Data = null;
+		
+		
+		double origDistance = 1.0;
+		double origXDist = 1.0;
+		double origYDist = 1.0;
+		
+		protected Vector<Event> processBirth(TouchData touchData) {
+			currentTouchPoints++;
+			
+			// two touchpoints -> origin for zoom
+			if(currentTouchPoints == 1) {
+				p1Data = touchData;
+				p2Data = null;
+			} else if (currentTouchPoints == 2) {
+				p2Data = touchData;
+				if(p1Data.getLocation().getY() > p2Data.getLocation().getY()) {
+					TouchData xchg = p1Data;
+					p1Data = p2Data;
+					p2Data = xchg;
+				}
+				
+			} else {
+				p1Data = null;
+				p2Data = null;
+			}
+			
+			return null;
+		}
+		
+		double currentAngle = 0.0;
+		
+		@Override
+		protected Vector<Event> processMove(TouchData touchData) {
+			Vector<Event> events = null;
+			if(p1Data != null && p2Data != null) {
+				double xDA = 1.0;
+				double yDA = 1.0;	
+				
+				if(p1Data.getUniqueID() == touchData.getUniqueID()) {
+					p1Data = touchData;
+				} else if(p2Data.getUniqueID() == touchData.getUniqueID()) {
+					p2Data = touchData;
+				}
+				double y1 = p1Data.getLocation().getY();
+				double y2 = p2Data.getLocation().getY();
+				
+				double x1 = p1Data.getLocation().getX();
+				double x2 = p2Data.getLocation().getX();
+				
+				double angle = (Math.atan2(y2 - y1, x2 - x1) * 180 / Math.PI)-90.0;
+				currentAngle = angle;
+				System.out.println("ANGLE: "+angle);
+				events = new Vector<Event>();
+				events.add(new RotateEvent((float)angle, p1Data.getLocation(), p1Data.getUniqueID(), true));
+				//events.add(new ZoomEvent2D(xZoom, yZoom, p1Data.getLocation(), true, true, p1Data.getUniqueID()));
+			}
+			
+			return events;
+		}
+		
+		@Override
+		protected Vector<Event> processDeath(TouchData touchData) {
+			Vector<Event> events = null;
+			if(currentTouchPoints == 2) {
+				events = new Vector<Event>();
+				events.add(new RotateEvent((float)currentAngle, p1Data.getLocation(), p1Data.getUniqueID(), false));
+			}
+			currentTouchPoints--;
+			System.out.println("ZOOM DEATH" + currentTouchPoints);
+			return events;
+		}
 
-	/**
-	 * 
-	 */
-	private Location _offset = null;
-
-	/**
-	 * 
-	 */
-	protected Location _offsetCentroid = null;
 
 	@Override
 	public String getName() {
@@ -38,177 +100,4 @@ public class RotateGesture extends StandardDynamicGesture {
 	public GestureType getGestureType() {
 		return GestureType.ROTATE_GESTURE;
 	}
-
-	/**
-	 * Override to create RotateData instances instead of TouchData. This way we
-	 * can use the existing _knownPoints HashMap, but add the extra data on
-	 * rotation that we need to do our calculations.
-	 */
-	@Override
-	protected TouchData createTouchData(TouchPoint touchPoint) {
-		return new RotateData(touchPoint.getLocation(), touchPoint.getID());
-	}
-
-	@Override
-	protected Vector<Event> processBirth(TouchData touchData) {
-		if (_offset == null) {
-			_offset = new Location(0, 0);
-			_offsetCentroid = _newCentroid;
-		} else {
-			adjustOffset();
-		}
-		calculateRotation();
-		return null;
-	}
-
-	@Override
-	protected Vector<Event> processDeath(TouchData touchData) {
-		if (_knownPoints.size() == 0) {
-			_offset = null;
-			_offsetCentroid = null;
-		} else {
-			adjustOffset();
-		}
-		calculateRotation();
-		return null;
-	}
-
-	@Override
-	protected Vector<Event> processMove(TouchData touchData) {
-		Vector<Event> events = new Vector<Event>();
-		adjustOffset();
-		updateOffsetCentroid();
-		_rotation = calculateRotation();
-		events.add(new RotateEvent(_rotation, _newCentroid));
-		
-		return events;
-	}
-
-	/**
-	 * 
-	 */
-	protected class RotateData extends TouchData {
-		private float _angle;
-		private float _oldAngle;
-
-		public RotateData(Location location, int id) {
-			super(location, id);
-			_oldAngle = _angle = 0f;
-		}
-
-		public float getAngle() {
-			return _angle;
-		}
-
-		public float getOldAngle() {
-			return _oldAngle;
-		}
-
-		public void setAngle(float angle) {
-			_oldAngle = _angle;
-			_angle = angle;
-		}
-	}
-
-	private float calculateRotation() {
-		// TODO Auto-generated method stub
-		float retRotation = 0;
-		Collection<TouchData> touchPoints = _knownPoints.values();
-		Iterator<TouchData> touchDataIterator = touchPoints.iterator();
-		while (touchDataIterator.hasNext()) {
-			TouchData pointData = touchDataIterator.next();
-			RotateData pointRotateData = null;
-			// System.out.println("Processing Rotate");
-			if (pointData instanceof RotateData) {
-				// System.out.println("Cast successful");
-				pointRotateData = (RotateData) pointData;
-				// Find the new angle
-				float angle = (float) Math.atan2(pointRotateData.getLocation()
-						.getY()
-						- _newCentroid.getY(), pointRotateData.getLocation()
-						.getX()
-						- _newCentroid.getX());
-				pointRotateData.setAngle(angle);
-
-				// Calculate the angle change
-				float deltaAngle = pointRotateData.getAngle()
-						- pointRotateData.getOldAngle();
-				//System.out.println("Angle = " + pointRotateData.getAngle() + ", Old Angle = " + pointRotateData.getOldAngle());
-				// Normalize the change in angle
-				if (deltaAngle > Math.PI)
-					deltaAngle -= 2 * Math.PI;
-				else if (deltaAngle < -Math.PI)
-					deltaAngle += 2 * Math.PI;
-				// System.out.println("New Centroid: " +
-				// _newCentroid.toString());
-				// System.out.println("Point: + " +
-				// pointZoomData.getDistance());
-				retRotation += deltaAngle;
-			}
-		}
-		retRotation = retRotation / _knownPoints.size();
-		return retRotation;
-
-	}
-
-	/**
-	 * 
-	 */
-	protected void adjustOffset() {
-		_offset = new Location(_newCentroid.getX() - _oldCentroid.getX(),
-				_newCentroid.getY() - _oldCentroid.getY());
-	}
-
-	/**
-	 * 
-	 */
-	protected void updateOffsetCentroid() {
-		float x = _newCentroid.getX() - _offset.getX();
-		float y = _newCentroid.getY() - _offset.getY();
-		_offsetCentroid = new Location(x, y);
-	}
-
-	/*
-	 * @Override public Vector<Event> processChange(Vector<TouchPoint>
-	 * touchPoints, TouchPoint changedTouchPoint) { Vector<Event> retEvents =
-	 * new Vector<Event>(); // If this is the first update, initialize the
-	 * known points if (_knownPoints.size() == 0) { _sumX = 0; _sumY = 0; for
-	 * (TouchPoint touchPoint : touchPoints) { addTouchPoint(touchPoint); }
-	 * _oldCentroid = new Location(_sumX, _sumY); _newCentroid = new
-	 * Location(_sumX, _sumY); } else { // A touch point has been changed.
-	 * Recalculate the centroid // and fire a drag event if a point has moved
-	 * 
-	 * _oldCentroid = _newCentroid; _sumX = _oldCentroid.getX() *
-	 * _knownPoints.size(); _sumY = _oldCentroid.getY() * _knownPoints.size(); //
-	 * Process a birth if (changedTouchPoint.getState() == TouchState.BIRTH) {
-	 * processBirth(changedTouchPoint); } // Process a move else if
-	 * (changedTouchPoint.getState() == TouchState.MOVE) {
-	 * processMove(changedTouchPoint); _rotation =
-	 * getRotationChange(touchPoints); retEvents.add(new RotateEvent(_rotation,
-	 * _newCentroid)); return retEvents; } // Process a death else if
-	 * (changedTouchPoint.getState() == TouchState.DEATH) {
-	 * _knownPoints.remove(changedTouchPoint); _newCentroid = new
-	 * Location(_sumX, _sumY); } } return retEvents; }
-	 * 
-	 * private float getRotationChange(Vector<TouchPoint> touchPoints) {
-	 * 
-	 * float rotation = 0;
-	 * 
-	 * for (TouchPoint touchPoint : touchPoints) { float newAngle =
-	 * getAngle(touchPoint, _newCentroid); float oldAngle = getAngle(touchPoint,
-	 * _oldCentroid); float deltaAngle = newAngle - oldAngle; if (deltaAngle >
-	 * Math.PI) deltaAngle -= 2 * Math.PI; else if (deltaAngle < -Math.PI)
-	 * deltaAngle += 2 * Math.PI; if (!Double.isNaN(deltaAngle)) { rotation +=
-	 * deltaAngle; } }
-	 * 
-	 * return rotation; }
-	 * 
-	 * private float getAngle(TouchPoint touchPoint, Location center) { float
-	 * retAngle;
-	 * 
-	 * float y = touchPoint.getLocation().getX() - center.getX(); float x =
-	 * touchPoint.getLocation().getY() - center.getY();
-	 * 
-	 * retAngle = (float) Math.atan2(y, x); return retAngle; }
-	 */
 }

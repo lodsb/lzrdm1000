@@ -21,13 +21,17 @@ import com.trolltech.qt.core.Qt.Orientation;
 import com.trolltech.qt.core.Qt.ScrollBarPolicy;
 import com.trolltech.qt.gui.QBrush;
 import com.trolltech.qt.gui.QColor;
+import com.trolltech.qt.gui.QFont;
 import com.trolltech.qt.gui.QGraphicsLinearLayout;
+import com.trolltech.qt.gui.QGraphicsTextItem;
 import com.trolltech.qt.gui.QPainter;
 import com.trolltech.qt.gui.QPainterPath;
 import com.trolltech.qt.gui.QRadialGradient;
 import com.trolltech.qt.gui.QStyleOptionGraphicsItem;
+import com.trolltech.qt.gui.QTransform;
 import com.trolltech.qt.gui.QWidget;
 import com.trolltech.qt.gui.QGraphicsItem.GraphicsItemFlag;
+import com.trolltech.qt.svg.QGraphicsSvgItem;
 import com.trolltech.qt.svg.QSvgRenderer;
 
 import edu.uci.ics.jung.graph.util.Pair;
@@ -508,6 +512,9 @@ public class TouchableEditor extends TouchableGraphicsWidget {
 	//	this.baseLayout.removeItem(graphicsViewContainer);
 	//}
 	
+	private String svgFileName = System.getProperty("user.dir")+"/src/GUI/Item/SVG/editor-frame.svg";
+	private QSvgRenderer renderer = new QSvgRenderer(svgFileName);
+	
 	private BaseSequencerItemEditor editor  = null;
 	
 	public BaseSequencerItemEditor getCurrentEditor() {
@@ -515,6 +522,7 @@ public class TouchableEditor extends TouchableGraphicsWidget {
 	}
 	
 	public void setCurrentEditor(BaseSequencerItemEditor editor) {
+		this.updateInfoCaption("");
 		this.editor = editor;
 		EditorScene scene = editor.getScene();
 		this.graphicsView.setEditorScene(scene);
@@ -527,7 +535,19 @@ public class TouchableEditor extends TouchableGraphicsWidget {
 	
 	private EditorButton closeButton;
 	
+	private QGraphicsTextItem infoText;
+	
 	public TouchableEditor() {
+		
+		QFont infoFont = new QFont("Helvetica [Cronyx]", 24);
+		infoText = new QGraphicsTextItem(this.info);
+		infoText.setPos(600, -45);
+		infoText.setDefaultTextColor(QColor.white);
+		infoText.setFont(infoFont);
+		infoText.setZValue(1.0);
+		infoText.setParentItem(this);
+		//infoText.setHtml("<p align=\"right\">Some<br/>centred<br/>text</p>");
+		
 		baseLayout = new QGraphicsLinearLayout();
 		baseLayout.setOrientation(Orientation.Vertical);
 		graphicsView = new TouchableGraphicsView(this);
@@ -572,10 +592,27 @@ public class TouchableEditor extends TouchableGraphicsWidget {
 		this.allowedGestures.add(sparshui.gestures.GestureType.DRAG_GESTURE.ordinal());
 		this.allowedGestures.add(sparshui.gestures.GestureType.TOUCH_GESTURE.ordinal());
 		
-		this.rotate(-193.34);
+		//this.rotate(-193.34);
 		
 
 	}
+	
+	private String info = "";
+	public void updateInfoCaption(String info) {
+		this.info = info;
+		this.infoText.setPlainText(info);
+		
+	} 
+	
+	private QRectF frameBounds = new QRectF(-95,-60,940, 680);
+	@Override
+	public void paint(QPainter painter, QStyleOptionGraphicsItem option, QWidget widget) {
+//		painter.setClipRect(option.exposedRect());
+		renderer.render(painter, "frame",  frameBounds);
+	}
+	
+	
+	
 	private double currentZoomX = 1.0;
 	private double currentZoomY = 1.0;
 	
@@ -614,6 +651,8 @@ public class TouchableEditor extends TouchableGraphicsWidget {
 
 	QPointF dragOffset = null;
 	QPointF start = null;
+	
+	private double currentAngle = 0.0;
 	@Override
 	public boolean processEvent(Event event) {
 		if(event instanceof TouchEvent) {
@@ -624,7 +663,19 @@ public class TouchableEditor extends TouchableGraphicsWidget {
 			if(event instanceof RotateEvent) {
 				RotateEvent re = (RotateEvent) event;
 				System.out.println(re);
-				//this.rotate(re.getRotation()*180.0/Math.PI);
+				double angle = re.getRotation();
+				
+				System.out.println("ANGLE bbb "+angle);
+				angle = angle + currentAngle;
+				System.out.println("ANGLE ---- "+angle);
+				this.setTransform(new QTransform().translate(885, 400).rotate(angle).translate(-885,-400), false);
+				
+				if(!re.isOngoing()) {
+					System.out.println(currentAngle+"===");
+					currentAngle = angle;
+				} /*else {
+					currentAngle = 0;
+				}*/
 				
 			} else if(event instanceof DragEvent) {
 				DragEvent e = (DragEvent) event;

@@ -25,6 +25,14 @@ public class EditorScene extends QGraphicsScene implements LzrDmObjectInterface 
 		
 	}
 	
+	public String getVerticalGridCaption(double verticalScale) {
+		return "";
+	}
+	
+	public String getHorizontalGridCaption(double horizontalScale) {
+		return "";
+	}
+	
 	public void drawHorizontalGridCaption(QPainter painter, QRectF rect, QPointF point, double horizontalScale) {
 		
 	}

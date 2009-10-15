@@ -141,6 +141,7 @@ public class Editor extends QObject implements LzrDmObjectInterface {
 	protected void handleDeleteEvent(DeleteEvent event) {
 		
 		if(event.isSuccessful()) {
+			System.out.println("Delete successful");
 			if(deleteEllipse == null) {
 				deleteEllipse = new QGraphicsEllipseItem(-20,-20,40,40);
 				deleteEllipse.setPen(new QPen(QColor.red));
@@ -171,44 +172,50 @@ public class Editor extends QObject implements LzrDmObjectInterface {
 		QPainterPath ppath = null;
 		QGraphicsPathItem p;
 		
-		if(event.isOngoing()) {
-			QPointF point = event.getSceneLocation();
+		//if(event instanceof DragEvent) {
+			if(event.isOngoing() && event instanceof DragEvent) {
+				QPointF point = event.getSceneLocation();
+				System.out.println("gesture viz "+point+" "+event+" # "+event.getTouchID());
 
-			if((p = gestureVisualizationsMap.get(event.getTouchID())) == null) {
-				p = new QGraphicsPathItem();
-				//p.setFlag(GraphicsItemFlag.ItemIgnoresTransformations, true);
-				p.setZValue(-1000.0);
-				this.scene.addItem(p);
-				//p.setPos(point);
-				//this.scene().addEllipse(point.x(), point.y(), 100,100);
-				QPen pen = new QPen(QColor.yellow);
-				pen.setWidth(8);
-				p.setPen(pen);
-				QPainterPath path = new QPainterPath();
-				path.addEllipse(point, 50,50);
-				path.moveTo(point);
-				p.setPath(path);
-				gestureVisualizationsMap.put(event.getTouchID(), p);
-			} 
+				if((p = gestureVisualizationsMap.get(event.getTouchID())) == null) {
+					System.out.println("NEW PATH");
+					p = new QGraphicsPathItem();
+					//p.setFlag(GraphicsItemFlag.ItemIgnoresTransformations, true);
+					p.setZValue(-1000.0);
+					this.scene.addItem(p);
+					//p.setPos(point);
+					//this.scene().addEllipse(point.x(), point.y(), 100,100);
+					QPen pen = new QPen(QColor.yellow);
+					pen.setWidth(8);
+					p.setPen(pen);
+					QPainterPath path = new QPainterPath();
+					path.addEllipse(point, 50,50);
+					path.moveTo(point);
+					p.setPath(path);
+					gestureVisualizationsMap.put(event.getTouchID(), p);
+				} else {
 
-			QPainterPath path = new QPainterPath(p.path());
-			path.lineTo(point);
-			p.setPath(path);
-		} else {
-			if((p = gestureVisualizationsMap.get(event.getTouchID())) != null) {
-				this.scene.removeItem(gestureVisualizationsMap.get(event.getTouchID()));
-				this.gestureVisualizationsMap.remove(event.getTouchID());
-				if(event instanceof GroupEvent) {
-					System.out.println(event+" "+p);
-					((GroupEvent)event).setPath(p.path());
+					QPainterPath path = new QPainterPath(p.path());
+					path.lineTo(point);
+					p.setPath(path);
+				}
+			} else {
+				if((p = gestureVisualizationsMap.get(event.getTouchID())) != null) {
+					if(event instanceof GroupEvent) {
+						System.out.println("GROUP GROUP GROUP");
+						System.out.println(event+" "+p);
+						((GroupEvent)event).setPath(p.path());
+					} else if(event instanceof DragEvent) {
+						this.scene.removeItem(gestureVisualizationsMap.get(event.getTouchID()));
+						this.gestureVisualizationsMap.remove(event.getTouchID());
+					}
 				}
 			}
-		}
-		
-		if(p != null) {
-			ppath =  p.path();
-		}
-		
+
+			if(p != null) {
+				ppath =  p.path();
+			}
+		//}
 		return ppath;
 	}
 	

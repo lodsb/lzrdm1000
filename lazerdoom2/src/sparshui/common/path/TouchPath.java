@@ -9,21 +9,29 @@ import com.trolltech.qt.gui.QPainterPath;
 
 public class TouchPath {
 	private LinkedList<QPainterPath> pathSegments = new LinkedList<QPainterPath>();
+	private QPainterPath completePath = new QPainterPath();
 	
 	private QPointF lastLocation = null;
 	
 	public TouchPath(Location start) {
 		this.lastLocation = new QPointF(start.getX(), start.getY());
+		completePath.moveTo(start.getX(), start.getY());
 	}
 	
 	public void addPoint(Location location) {
 		QPointF point = new QPointF(location.getX(), location.getY());
+		this.addPointToSegmentList(pathSegments, lastLocation, point);
+		this.lastLocation = point;
+		
+		completePath.lineTo(point);
+	}
+	
+	private void addPointToSegmentList(LinkedList<QPainterPath> pathS, QPointF pointL, QPointF point) {
 		QPainterPath path = new QPainterPath();
-		path.moveTo(this.lastLocation);
+		path.moveTo(pointL);
 		path.lineTo(point);
 		
-		pathSegments.add(path);
-		this.lastLocation = point;
+		pathS.add(path);
 	}
 	
 	public QPointF getIntersectionPoint() {
@@ -70,6 +78,50 @@ public class TouchPath {
 		}
 		
 		return intersectionPoint;
+	}
+
+	
+	public double pathLenght() {
+		return completePath.length();
+	}
+	
+	boolean simplified = false;
+	QPainterPath simplifiedPath;
+	
+	public double slopeAtStart() {
+		if(simplified) {
+			return simplifiedPath.slopeAtPercent(0.1);
+		}
+		
+		return 0.0;
+	}
+	
+	public double slopeAtEnd() {
+		if(simplified) {
+			return simplifiedPath.slopeAtPercent(0.9);
+		}
+		
+		return 0.0;
+	}
+	
+	public void simplify() {
+		QPointF lastPoint = completePath.pointAtPercent(0.0);
+		LinkedList<QPainterPath> newSegments = new LinkedList<QPainterPath>();
+		
+		//System.out.println("PATHLENGTH "+completePath.length());
+		simplifiedPath = new QPainterPath();
+		simplifiedPath.moveTo(lastPoint);
+		
+		for(double i = 0.1; i <= 1.0; i += 0.1) {
+			QPointF newPoint = completePath.pointAtPercent(i);
+			this.addPointToSegmentList(newSegments, lastPoint, newPoint);
+			lastPoint = newPoint;
+			simplifiedPath.lineTo(newPoint);
+		}
+		this.pathSegments = newSegments;
+		
+		this.simplified = true;
+		//System.out.println("SLOPES A E "+this.slopeAtStart()+" "+this.slopeAtEnd());
 	}
 
 }

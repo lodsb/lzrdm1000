@@ -8,6 +8,8 @@ import sparshui.common.Location;
 
 import java.util.Vector;
 
+import lazerdoom.LazerdoomConfiguration;
+
 import com.trolltech.qt.core.QPointF;
 import com.trolltech.qt.gui.QPainterPath;
 import com.trolltech.qt.gui.QPainterPath_Element;
@@ -56,15 +58,24 @@ public class DeleteGesture implements Gesture {
 			break;
 		case DEATH:
 			QPointF crossPoint = null;
+			boolean gestureSuccessful = false;
 			
 			TouchPath p2 = paths.get(changedTouchPoint.getID());
 			if(p2 != null) {
 				p2.addPoint(changedTouchPoint.getLocation());
+				p2.simplify();
 				crossPoint = p2.getIntersectionPoint();
-				System.out.println("delete gesture-> FIXME: slopes!");
+				if(crossPoint != null) {
+					if(p2.pathLenght() >= LazerdoomConfiguration.minimumDeleteGestureLength) {
+						if(p2.slopeAtStart()*p2.slopeAtEnd() < 0.0) {
+							gestureSuccessful = true;
+						}
+					}
+				}
 			}
 			
-			events.add(new DeleteEvent(changedTouchPoint.getLocation(), crossPoint,  false, (crossPoint != null), changedTouchPoint.getID()));
+			events.add(new DeleteEvent(changedTouchPoint.getLocation(), crossPoint,  false, gestureSuccessful, changedTouchPoint.getID()));
+			//System.out.println("Delete gesture!");
 			
 			break;
 			

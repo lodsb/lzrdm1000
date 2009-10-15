@@ -796,12 +796,14 @@ public class SequencerView extends QGraphicsView implements Client, TouchItemInt
 			}
 			
 			this.sequencerEditor.handleExtendedGestureEvent(e);
+			this.update();
 
 		} else if(event instanceof TouchEvent) {
 			//System.out.println("tp ");
 			TouchEvent e = (TouchEvent) event;
 			e.setSceneLocation(convertScreenPos(e.getX(), e.getY()));
 			this.sequencerEditor.handleTouchEvent(e);
+			this.update();
 			//System.out.println("WHA?");
 		} 
 		/*if(event instanceof DragEvent) {

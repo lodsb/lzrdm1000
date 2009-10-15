@@ -58,7 +58,7 @@ public class lazerdoom extends QWidget {
 	private Thread sparshGestureServerThread;
 	private ServerConnection sparshServerConnection;
 	
-	private SessionHandler sessionHandler = new SessionHandler("/home/lodsb/lzrdm/session");
+	private SessionHandler sessionHandler = new SessionHandler(LazerdoomConfiguration.sessionPath+LazerdoomConfiguration.sessionFileName);
 	
 	private EditorScene scene = new EditorScene();
 	private SequencerView view = new SequencerView(new SequencerEditor(scene,false), this);

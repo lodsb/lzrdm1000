@@ -220,6 +220,8 @@ public class TouchableItemGroupItem extends TouchableGraphicsItem implements Lzr
 		}
 		
 		this.items.clear();
+		// FIXME: why doesnt remove work?
+		this.setVisible(false);
 	}
 	
 	@Override

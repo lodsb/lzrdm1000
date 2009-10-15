@@ -583,8 +583,8 @@ public class TouchableEditor extends TouchableGraphicsWidget {
 		closeButton.setPos(847,450);
 		closeButton.setZValue(10);
 		
-		this.setFlag(GraphicsItemFlag.ItemIsMovable, true);
-		this.setFlag(GraphicsItemFlag.ItemIsSelectable, true);
+		//this.setFlag(GraphicsItemFlag.ItemIsMovable, true);
+		//this.setFlag(GraphicsItemFlag.ItemIsSelectable, true);
 		
 		//this.setParent(SequencerView.getInstance());
 		
@@ -605,8 +605,11 @@ public class TouchableEditor extends TouchableGraphicsWidget {
 	} 
 	
 	private QRectF frameBounds = new QRectF(-95,-60,940, 680);
-	@Override
-	public void paint(QPainter painter, QStyleOptionGraphicsItem option, QWidget widget) {
+	
+	public QRectF boundingRect() {
+		return frameBounds;
+	}
+	@Override	public void paint(QPainter painter, QStyleOptionGraphicsItem option, QWidget widget) {
 //		painter.setClipRect(option.exposedRect());
 		renderer.render(painter, "frame",  frameBounds);
 	}
@@ -655,6 +658,7 @@ public class TouchableEditor extends TouchableGraphicsWidget {
 	private double currentAngle = 0.0;
 	@Override
 	public boolean processEvent(Event event) {
+		System.out.println("GOT AN EVENT");
 		if(event instanceof TouchEvent) {
 			if(event.getSource() == this.closeButton && ((TouchEvent)event).getState() == TouchState.DEATH) {
 				this.closeEditor.emit();

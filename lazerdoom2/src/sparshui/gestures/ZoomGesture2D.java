@@ -35,7 +35,7 @@ public class ZoomGesture2D extends MultiPointDragGesture {
 		if(currentTouchPoints == 1) {
 			p1Data = touchData;
 			p2Data = null;
-		} else if (currentTouchPoints == 2) {
+		} else if (currentTouchPoints == 2 && p1Data != null) {
 			p2Data = touchData;
 			
 			origDistance = 	Math.sqrt((

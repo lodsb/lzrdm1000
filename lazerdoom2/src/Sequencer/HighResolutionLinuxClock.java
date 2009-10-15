@@ -14,7 +14,7 @@ public class HighResolutionLinuxClock implements ClockInterface, Runnable{
 	
 	//FIXME: fix path
 	static {
-		System.load("/home/lodsb/idpworkspace2svn/workspace/lazerdoom2/src/Sequencer/Native/LinuxClock/linuxclock.so");
+		System.load(System.getProperty("user.dir")+"/src/Sequencer/Native/LinuxClock/linuxclock.so");
 	}
 	
 	private int numberOfLatencyMeasurements = 10;

@@ -18,6 +18,8 @@ public class RotateGesture extends StandardDynamicGesture {
 			
 		TouchData p1Data = null;
 		TouchData p2Data = null;
+		float startX = 0;
+		float startY = 0;
 		
 		
 		double origDistance = 1.0;
@@ -25,6 +27,7 @@ public class RotateGesture extends StandardDynamicGesture {
 		double origYDist = 1.0;
 		
 		protected Vector<Event> processBirth(TouchData touchData) {
+			System.out.println("ROTATE BIRTH");
 			currentTouchPoints++;
 			
 			// two touchpoints -> origin for zoom
@@ -32,12 +35,14 @@ public class RotateGesture extends StandardDynamicGesture {
 				p1Data = touchData;
 				p2Data = null;
 			} else if (currentTouchPoints == 2) {
+				startX = p1Data.getLocation().getX();
+				startY = p1Data.getLocation().getY();
 				p2Data = touchData;
-				if(p1Data.getLocation().getY() > p2Data.getLocation().getY()) {
+				/*if(p1Data.getLocation().getY() > p2Data.getLocation().getY()) {
 					TouchData xchg = p1Data;
 					p1Data = p2Data;
 					p2Data = xchg;
-				}
+				}*/
 				
 			} else {
 				p1Data = null;
@@ -51,6 +56,7 @@ public class RotateGesture extends StandardDynamicGesture {
 		
 		@Override
 		protected Vector<Event> processMove(TouchData touchData) {
+			System.out.println("ROTATE MOVE");
 			Vector<Event> events = null;
 			if(p1Data != null && p2Data != null) {
 				double xDA = 1.0;
@@ -68,10 +74,11 @@ public class RotateGesture extends StandardDynamicGesture {
 				double x2 = p2Data.getLocation().getX();
 				
 				double angle = (Math.atan2(y2 - y1, x2 - x1) * 180 / Math.PI)-90.0;
+				System.out.println("X, Y START "+startX+" "+startY);
 				currentAngle = angle;
 				System.out.println("ANGLE: "+angle);
 				events = new Vector<Event>();
-				events.add(new RotateEvent((float)angle, p1Data.getLocation(), p1Data.getUniqueID(), true));
+				events.add(new RotateEvent((float)angle, new Location(startX, startY), p1Data.getUniqueID(), true));
 				//events.add(new ZoomEvent2D(xZoom, yZoom, p1Data.getLocation(), true, true, p1Data.getUniqueID()));
 			}
 			
@@ -81,9 +88,9 @@ public class RotateGesture extends StandardDynamicGesture {
 		@Override
 		protected Vector<Event> processDeath(TouchData touchData) {
 			Vector<Event> events = null;
-			if(currentTouchPoints == 2) {
+			if(currentTouchPoints == 2 && p2Data != null) {
 				events = new Vector<Event>();
-				events.add(new RotateEvent((float)currentAngle, p1Data.getLocation(), p1Data.getUniqueID(), false));
+				events.add(new RotateEvent((float)currentAngle, new Location(startX, startY), p1Data.getUniqueID(), false));
 			}
 			currentTouchPoints--;
 			System.out.println("ZOOM DEATH" + currentTouchPoints);

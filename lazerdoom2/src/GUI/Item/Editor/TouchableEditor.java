@@ -48,6 +48,42 @@ public class TouchableEditor extends TouchableGraphicsWidget {
 
 	public Signal0 closeEditor = new Signal0();
 	
+	public class EditorFrame extends TouchableGraphicsItem {
+
+		private String svgFileName = System.getProperty("user.dir")+"/src/GUI/Item/SVG/editor-frame.svg";
+		private QSvgRenderer renderer = new QSvgRenderer(svgFileName);
+		
+		private QRectF frameBounds = new QRectF(-95,-60,940, 680);
+		
+		public QRectF boundingRect() {
+			return frameBounds;
+		}
+
+		@Override	public void paint(QPainter painter, QStyleOptionGraphicsItem option, QWidget widget) {
+//			painter.setClipRect(option.exposedRect());
+			renderer.render(painter, "frame",  frameBounds);
+		}
+
+		@Override
+		public QSizeF getMaximumSize() {
+			// TODO Auto-generated method stub
+			return null;
+		}
+
+		@Override
+		public QSizeF getPreferedSize() {
+			// TODO Auto-generated method stub
+			return null;
+		}
+
+		@Override
+		public void setGeometry(QRectF size) {
+			// TODO Auto-generated method stub
+			
+		}
+		
+	}
+	
 	public class EditorButton extends TouchableGraphicsItem {
 		
 		public Signal0 pressed = new Signal0();
@@ -512,9 +548,6 @@ public class TouchableEditor extends TouchableGraphicsWidget {
 	//	this.baseLayout.removeItem(graphicsViewContainer);
 	//}
 	
-	private String svgFileName = System.getProperty("user.dir")+"/src/GUI/Item/SVG/editor-frame.svg";
-	private QSvgRenderer renderer = new QSvgRenderer(svgFileName);
-	
 	private BaseSequencerItemEditor editor  = null;
 	
 	public BaseSequencerItemEditor getCurrentEditor() {
@@ -534,11 +567,14 @@ public class TouchableEditor extends TouchableGraphicsWidget {
 	}
 	
 	private EditorButton closeButton;
+	private EditorFrame editorFrame;
 	
 	private QGraphicsTextItem infoText;
 	
 	public TouchableEditor() {
-		
+		editorFrame = new EditorFrame();
+		editorFrame.setParent(this);
+		editorFrame.setZValue(0.0);
 		QFont infoFont = new QFont("Helvetica [Cronyx]", 24);
 		infoText = new QGraphicsTextItem(this.info);
 		infoText.setPos(600, -45);
@@ -604,15 +640,6 @@ public class TouchableEditor extends TouchableGraphicsWidget {
 		
 	} 
 	
-	private QRectF frameBounds = new QRectF(-95,-60,940, 680);
-	
-	public QRectF boundingRect() {
-		return frameBounds;
-	}
-	@Override	public void paint(QPainter painter, QStyleOptionGraphicsItem option, QWidget widget) {
-//		painter.setClipRect(option.exposedRect());
-		renderer.render(painter, "frame",  frameBounds);
-	}
 	
 	
 	
@@ -656,6 +683,9 @@ public class TouchableEditor extends TouchableGraphicsWidget {
 	QPointF start = null;
 	
 	private double currentAngle = 0.0;
+	private QPointF rotateStartPoint = null;
+	private boolean isRotating = false;
+	
 	@Override
 	public boolean processEvent(Event event) {
 		System.out.println("GOT AN EVENT");
@@ -669,19 +699,30 @@ public class TouchableEditor extends TouchableGraphicsWidget {
 				System.out.println(re);
 				double angle = re.getRotation();
 				
+				if(re.getSource() == this.editorFrame) {
+					angle += 90.0;
+				}
+				
 				System.out.println("ANGLE bbb "+angle);
 				angle = angle + currentAngle;
 				System.out.println("ANGLE ---- "+angle);
-				this.setTransform(new QTransform().translate(885, 400).rotate(angle).translate(-885,-400), false);
+				
+				if(!isRotating) {
+					rotateStartPoint = this.mapFromScene(re.getSceneLocation());
+					isRotating = true;
+				}
+				QPointF centerCoord = rotateStartPoint;
+				this.setTransform(new QTransform().translate(centerCoord.x(), centerCoord.y()).rotate(angle).translate(-centerCoord.x(), -centerCoord.y()), false);
 				
 				if(!re.isOngoing()) {
 					System.out.println(currentAngle+"===");
-					currentAngle = angle;
+					isRotating = false;
+					//currentAngle = angle;
 				} /*else {
 					currentAngle = 0;
 				}*/
 				
-			} else if(event instanceof DragEvent) {
+			} else if(event instanceof DragEvent && !isRotating) {
 				DragEvent e = (DragEvent) event;
 				
 				if(e.isOngoing()) {

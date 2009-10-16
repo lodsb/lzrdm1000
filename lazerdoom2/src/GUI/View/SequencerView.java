@@ -15,6 +15,7 @@ import sparshui.common.messages.events.DragEvent;
 import sparshui.common.messages.events.EventType;
 import sparshui.common.messages.events.ExtendedGestureEvent;
 import sparshui.common.messages.events.GroupEvent;
+import sparshui.common.messages.events.RotateEvent;
 import sparshui.common.messages.events.TouchEvent;
 
 import com.trolltech.qt.QThread;
@@ -701,6 +702,9 @@ public class SequencerView extends QGraphicsView implements Client, TouchItemInt
 				} else if(event instanceof DragEvent) {
 					DragEvent e = (DragEvent) event;
 					e.setSceneLocation(convertScreenPos(e.getRelX(), e.getRelY()));
+				} else if(event instanceof RotateEvent) {
+					RotateEvent e = (RotateEvent) event;
+					e.setSceneLocation(convertScreenPos(e.getCenter().getX(), e.getCenter().getY()));
 				} else if(event instanceof DeleteEvent) {
 					DeleteEvent e = (DeleteEvent) event;
 					e.setSceneLocation(convertScreenPos(e.getRelX(), e.getRelY()));

@@ -6,6 +6,8 @@ import java.util.LinkedList;
 import java.util.List;
 import GUI.Editor.*;
 
+import lazerdoom.LazerdoomConfiguration;
+
 import sparshui.client.Client;
 import sparshui.common.Event;
 import sparshui.common.Location;
@@ -345,12 +347,12 @@ public class SequencerView extends QGraphicsView implements Client, TouchItemInt
 		
 		//viewGestures.add(sparshui.gestures.GestureType.ZOOM_GESTURE2D.ordinal());
 		
-		this.setCacheMode(QGraphicsView.CacheModeFlag.CacheNone);
+		if(LazerdoomConfiguration.enableOpenGl) {
+			this.setCacheMode(QGraphicsView.CacheModeFlag.CacheNone);
+			SequencerView.sharedGlWidget = new QGLWidget();
+			this.setViewport(SequencerView.sharedGlWidget);
+		}
 		this.setViewportUpdateMode(ViewportUpdateMode.FullViewportUpdate);
-		this.sharedGlWidget = new QGLWidget();
-		//System.out.println(this.sharedGlWidget);
-		this.setViewport(this.sharedGlWidget);
-		//System.out.println("fdsdf "+this.viewportUpdateMode());
 		
 		SequencerView.instance = this;
 		
@@ -359,7 +361,7 @@ public class SequencerView extends QGraphicsView implements Client, TouchItemInt
 		tect.moveToThread(thread);
 		thread.start();
 		
-		this.setRenderHint(QPainter.RenderHint.HighQualityAntialiasing);
+		this.setRenderHint(LazerdoomConfiguration.viewRenderHint);
 		
 		this.registerTouchItem(this);
 	

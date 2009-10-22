@@ -23,6 +23,7 @@ public abstract class TouchableSequenceDataItem<T extends BaseType> extends Touc
 	// 1st value is tick, 2nd value is T
 	public abstract Pair<Object> getTickValuePairFromPosition();
 	public abstract Pair<Object> getOldTickValuePair();
+	public abstract String getValueLabelText();
 	// 1st value is tick, 2nd value is T
 	//public abstract Pair<Object> getValue();
 	public void destroy() {

@@ -504,13 +504,16 @@ public class TouchableEditor extends TouchableGraphicsWidget {
 		
 		public Signal2<Double, Double> zoomTo = new Signal2<Double, Double>();
 		
+		public boolean isZooming = false;
+		
 		public boolean processEvent(Event event){
 			if(event instanceof ZoomEvent2D) {
 				ZoomEvent2D ze = (ZoomEvent2D) event;
-				System.out.println("ZOOM "+ze.getXZoom()+" "+ze.getYZoom());
+				System.out.println("ZOOM "+ze.getPinchAngle()+" "+ze.getGlobalZoom());
+				isZooming = ze.isOngoing();
 				
-				zoomTo.emit(ze.getXZoom(),ze.getYZoom());
-			} else if(event instanceof TouchEvent) {
+				zoomTo.emit(ze.getPinchAngle(),ze.getGlobalZoom());
+			} else if(event instanceof TouchEvent && !isZooming) {
 				TouchEvent e = (TouchEvent) event;
 				if(e.getState() == TouchState.DEATH) {
 					currentTouchEvents.remove(e.getTouchID());
@@ -574,7 +577,7 @@ public class TouchableEditor extends TouchableGraphicsWidget {
 	public TouchableEditor() {
 		editorFrame = new EditorFrame();
 		editorFrame.setParent(this);
-		editorFrame.setZValue(0.0);
+		editorFrame.setZValue(-1230.0);
 		QFont infoFont = new QFont("Helvetica [Cronyx]", 24);
 		infoText = new QGraphicsTextItem(this.info);
 		infoText.setPos(600, -45);
@@ -646,9 +649,18 @@ public class TouchableEditor extends TouchableGraphicsWidget {
 	private double currentZoomX = 1.0;
 	private double currentZoomY = 1.0;
 	
-	private void zoomTo(Double x, Double y) {
+	private void zoomTo(Double angle, Double globalZoom) {
 		if(this.editor.allowViewpointChange()) {
-			this.graphicsView.zoomTo(x, y);
+			/*double xZoom = Math.cos(this.currentAngle)*x;
+			double yZoom = Math.sin(this.currentAngle)*y;
+			System.out.println("xZoom yZoom "+xZoom+" "+yZoom+" "+x+" "+y);*/
+			
+			double xZoom = (1.0+Math.cos((angle+this.currentAngle)*Math.PI/180.0))*globalZoom;
+			double yZoom = (1.0+Math.sin((angle+this.currentAngle)*Math.PI/180.0))*globalZoom;
+			
+			System.out.println(xZoom+" <- x y -> "+yZoom+" ca "+this.currentAngle+" a "+angle+" glz "+globalZoom);
+			
+			this.graphicsView.zoomTo(xZoom, yZoom);
 		}
 	}
 	
@@ -704,7 +716,8 @@ public class TouchableEditor extends TouchableGraphicsWidget {
 				}
 				
 				System.out.println("ANGLE bbb "+angle);
-				angle = angle + currentAngle;
+				//angle = angle+ currentAngle;
+				currentAngle = angle;
 				System.out.println("ANGLE ---- "+angle);
 				
 				if(!isRotating) {

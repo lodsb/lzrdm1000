@@ -75,7 +75,7 @@ public class lazerdoom extends QWidget {
         lazerdoomApp.loadSession();
         QApplication.exec();
         
-        SessionHandler.getInstance().safeSession("/home/lodsb/lzrdm/session");
+        SessionHandler.getInstance().safeSession(LazerdoomConfiguration.sessionPath+LazerdoomConfiguration.sessionFileName);
         
         System.exit(0);
     }

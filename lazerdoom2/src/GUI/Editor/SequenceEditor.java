@@ -15,8 +15,10 @@ import com.trolltech.qt.core.QPointF;
 import com.trolltech.qt.core.QRectF;
 import com.trolltech.qt.core.QTimer;
 import com.trolltech.qt.gui.QColor;
+import com.trolltech.qt.gui.QFont;
 import com.trolltech.qt.gui.QGraphicsItemInterface;
 import com.trolltech.qt.gui.QGraphicsPathItem;
+import com.trolltech.qt.gui.QGraphicsTextItem;
 import com.trolltech.qt.gui.QPainterPath;
 import com.trolltech.qt.gui.QPen;
 import com.trolltech.qt.gui.QGraphicsItem.GraphicsItemFlag;
@@ -445,11 +447,32 @@ public class SequenceEditor extends BaseSequencerItemEditor implements LzrDmObje
 			}
 		}
 		
+		private HashMap<TouchableSequenceDataItem, QGraphicsTextItem> labelMap = new HashMap<TouchableSequenceDataItem, QGraphicsTextItem>();
+		private QFont labelFont = new QFont("Helvetica [Cronyx]", 24);
+		
 		protected void itemDragged(TouchableSequenceDataItem item, QPointF position, Boolean successful) {
 			if(!successful) {
 				item.setPosition(position);
+				
+				QGraphicsTextItem label = null;
+				if((label = labelMap.get(item)) == null) {
+					label = new QGraphicsTextItem();
+					label.setFont(labelFont);
+					labelMap.put(item, label);
+					this.getScene().addItem(label);
+				}
+				
+				label.setPos(item.pos().x()-50, item.pos().y()-80);
+				label.setPlainText(item.getValueLabelText());
+				label.setVisible(true);
+				
 			} else {
 				executeCommand(new MoveSequenceDataItem<DoubleType>((EventPointsSequence<DoubleType>)this.getBaseSequence(), (TouchableSequenceDataItem)item, position));
+				
+				QGraphicsTextItem label = null;
+				if((label = labelMap.get(item)) != null) {
+					label.setVisible(false);
+				}
 			}
 		}
 		
@@ -518,6 +541,7 @@ public class SequenceEditor extends BaseSequencerItemEditor implements LzrDmObje
 					for(QGraphicsItemInterface item: items) {
 						if(item instanceof TouchableSequenceDataItem) {
 							this.deleteItem((TouchableSequenceDataItem)item);
+							labelMap.remove(item);
 							break;
 						}
 					}
@@ -582,6 +606,10 @@ public class SequenceEditor extends BaseSequencerItemEditor implements LzrDmObje
 			executeCommand(new RemoveNoteTypeSequenceDataItem<NoteType>((EventPointsSequence<NoteType>) this.getBaseSequence(), (TouchableNoteTypeSequenceDataItem) item, this.getEditor().getScene()));
 		}
 		
+		
+		private HashMap<TouchableSequenceDataItem, QGraphicsTextItem> labelMap = new HashMap<TouchableSequenceDataItem, QGraphicsTextItem>();
+		private QFont labelFont = new QFont("Helvetica [Cronyx]", 24);
+		
 		protected void itemDragged(TouchableSequenceDataItem item, QPointF position, Boolean successful) {
 				TouchableNoteTypeSequenceDataItem note = (TouchableNoteTypeSequenceDataItem) item;
 				
@@ -602,8 +630,26 @@ public class SequenceEditor extends BaseSequencerItemEditor implements LzrDmObje
 					if(!successful) {
 						note.setPosition(position);
 						noteOff.setPosition(noteOffPos);
+						
+						
+						QGraphicsTextItem label = null;
+						if((label = labelMap.get(item)) == null) {
+							label = new QGraphicsTextItem();
+							label.setFont(labelFont);
+							labelMap.put(item, label);
+							this.getScene().addItem(label);
+						}
+						
+						label.setPos(item.pos().x()-50, item.pos().y()-80);
+						label.setPlainText(item.getValueLabelText());
+						label.setVisible(true);
+						
 					} else {
 						executeCommand(new MoveNoteTypeSequenceDataItem<NoteType>((EventPointsSequence<NoteType>)this.getBaseSequence(), note, position));
+						QGraphicsTextItem label = null;
+						if((label = labelMap.get(item)) != null) {
+							label.setVisible(false);
+						}
 						//executeCommand(new MoveSequenceDataItem<DoubleType>((EventPointsSequence<DoubleType>)this.getBaseSequence(), (TouchableSequenceDataItem)noteOff, noteOffPos));
 					}
 				}

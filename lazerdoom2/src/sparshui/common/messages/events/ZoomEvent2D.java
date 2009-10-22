@@ -14,23 +14,25 @@ public class ZoomEvent2D extends ExtendedGestureEvent {
 	public void setFocused() {
 		this.isFocused = true;
 	}
-	
-	private double xZoom = 1.0;
-	private double yZoom = 1.0;
-	public double getXZoom() {
-		return xZoom;
+
+	private double angle = 0.0;
+
+	public double getPinchAngle() {
+		return angle;
 	}
 	
-	public double getYZoom() {
-		return yZoom;
+	private double globalZoom = 1.0;
+	public double getGlobalZoom() {
+		return globalZoom;
 	}
 	
-	public ZoomEvent2D(double xZoom, double yZoom, Location loc, boolean isOng, boolean isSucc, int id) {
+	public ZoomEvent2D(double angle, double globalZoom, Location loc, boolean isOng, boolean isSucc, int id) {
 		super(loc);
 		this.setTouchID(id);
 		this.setFlags(isOng, isSucc);
-		this.xZoom = xZoom;
-		this.yZoom = yZoom;
+		
+		this.angle = angle;
+		this.globalZoom = globalZoom;
 	}
 
 	/**

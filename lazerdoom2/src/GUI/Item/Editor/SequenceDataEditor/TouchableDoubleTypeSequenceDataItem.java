@@ -50,9 +50,6 @@ public class TouchableDoubleTypeSequenceDataItem extends TouchableSequenceDataIt
 		//line.setParentItem(this);
 		this.setFlag(GraphicsItemFlag.ItemIgnoresTransformations, true);
 		
-		QGraphicsTextItem shitText = new QGraphicsTextItem("SHITTEST");
-		shitText.setParentItem(this);
-		shitText.setFlag(GraphicsItemFlag.ItemIgnoresTransformations, true);
 		//line.setFlag(GraphicsItemFlag.ItemIgnoresTransformations, true);
 		this.setTickAndValue(tick, value);
 	}
@@ -104,11 +101,11 @@ public class TouchableDoubleTypeSequenceDataItem extends TouchableSequenceDataIt
 		
 	//	System.out.println("--- "+this.pos());
 		sharedRenderer.render(painter, "node", this.SVGboundingRect);
-		if(this.currentValue != null) {
+		/*if(this.currentValue != null) {
 			painter.setPen(QColor.black);
 			//painter.scale(0.7, 0.7);
-			painter.drawText(-70, -50, 100, 100, Qt.AlignmentFlag.AlignHCenter.ordinal(), ""+this.getDoubleValFromPos(this.pos()));
-		}
+			//painter.drawText(-70, -50, 100, 100, Qt.AlignmentFlag.AlignHCenter.ordinal(), ""+this.getDoubleValFromPos(this.pos()));
+		}*/
 		//line.updateLine();
 	}
 	
@@ -203,6 +200,12 @@ public class TouchableDoubleTypeSequenceDataItem extends TouchableSequenceDataIt
 		System.out.println("POSITION "+pos+" scene "+this.scene());
 		this.setPos(pos);
 		return true;
+	}
+
+	@Override
+	public String getValueLabelText() {
+		// TODO Auto-generated method stub
+		return ""+this.getDoubleValFromPos(this.pos());
 	}
 
 	

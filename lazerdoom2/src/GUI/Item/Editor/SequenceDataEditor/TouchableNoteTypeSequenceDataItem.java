@@ -152,7 +152,7 @@ public TouchableNoteTypeSequenceDataItem(long tick, NoteType value, Editor edito
 		if(!this.isNoteOff && this.currentValue != null) {
 			painter.setPen(QColor.black);
 			//painter.scale(0.7, 0.7);
-			painter.drawText(-50, -50, 62, 100, Qt.AlignmentFlag.AlignHCenter.ordinal(), ""+NoteType.noteNameArray[this.getNoteIndexFromPos(this.pos())]);
+			//painter.drawText(-50, -50, 62, 100, Qt.AlignmentFlag.AlignHCenter.ordinal(), ""+NoteType.noteNameArray[this.getNoteIndexFromPos(this.pos())]);
 		} else if(this.isNoteOff && this.parent != null) {
 			//painter.setPen(this.linePen);
 			//painter.drawLine(-16, 0,0,0);
@@ -260,6 +260,11 @@ public TouchableNoteTypeSequenceDataItem(long tick, NoteType value, Editor edito
 		this.setPos(pos);
 		
 		return true;
+	}
+
+	@Override
+	public String getValueLabelText() {
+		return ""+NoteType.noteNameArray[this.getNoteIndexFromPos(this.pos())];
 	}
 
 	

@@ -95,16 +95,25 @@ public class ZoomGesture2D extends MultiPointDragGesture {
 			
 			double globalZoomFactor = newDistance/origDistance;
 			
+			double y1 = p1Data.getLocation().getY();
+			double y2 = p2Data.getLocation().getY();
+			
+			double x1 = p1Data.getLocation().getX();
+			double x2 = p2Data.getLocation().getX();
+			
+			double angle = (Math.atan2(y2 - y1, x2 - x1) * 180 / Math.PI);
+			
+			//System.out.println("ZOOM ANGLE: "+angle+" "+Math.sin(angle));
 
 			double xZoom = (xEdgeLength/edgeLength)*globalZoomFactor;
 			double yZoom = (yEdgeLength/edgeLength)*globalZoomFactor;
 			
-			System.out.println("ZOOM update "+origDistance+" "+newDistance+" el "+edgeLength+" xel "+xEdgeLength+" yel "+yEdgeLength);
-			System.out.println("ZOOM zoom "+xZoom+" "+yZoom);
+			//System.out.println("ZOOM update "+origDistance+" "+newDistance+" el "+edgeLength+" xel "+xEdgeLength+" yel "+yEdgeLength);
+			//System.out.println("ZOOM zoom "+xZoom+" "+yZoom);
 			
 			
 			events = new Vector<Event>();
-			events.add(new ZoomEvent2D(xZoom, yZoom, p1Data.getLocation(), true, true, p1Data.getUniqueID()));
+			events.add(new ZoomEvent2D(angle, globalZoomFactor, p1Data.getLocation(), true, true, p1Data.getUniqueID()));
 		}
 		
 		return events;
@@ -112,8 +121,41 @@ public class ZoomGesture2D extends MultiPointDragGesture {
 	
 	@Override
 	protected Vector<Event> processDeath(TouchData touchData) {
+		Vector<Event> events = null;
 		currentTouchPoints--;
-		System.out.println("ZOOM DEATH" + currentTouchPoints);
-		return null;
+
+		if(p1Data != null && p2Data != null) {
+			double newDistance = Math.sqrt((
+					(p1Data.getLocation().getX() -
+							p2Data.getLocation().getX())*
+							(p1Data.getLocation().getX() -
+									p2Data.getLocation().getX())
+			) +
+			(
+					(p1Data.getLocation().getY() -
+							p2Data.getLocation().getY())*
+							(p1Data.getLocation().getY() -
+									p2Data.getLocation().getY())
+			)); 
+
+
+			double globalZoomFactor = newDistance/origDistance;
+
+			double y1 = p1Data.getLocation().getY();
+			double y2 = p2Data.getLocation().getY();
+
+			double x1 = p1Data.getLocation().getX();
+			double x2 = p2Data.getLocation().getX();
+
+			double angle = (Math.atan2(y2 - y1, x2 - x1) * 180 / Math.PI);
+
+
+			System.out.println("ZOOM DEATH" + currentTouchPoints);
+			events = new Vector<Event>();
+			events.add(new ZoomEvent2D(angle, globalZoomFactor, p1Data.getLocation(), false, true, p1Data.getUniqueID()));
+
+		}
+
+		return events;
 	}
 }

@@ -93,8 +93,8 @@ public class lazerdoom extends QWidget {
     	} else {
     		// Dump base-cfg
     		try {
-    			LazerdoomConfiguration shit = new LazerdoomConfiguration();
-    			configParser.toXML(shit, new FileWriter(configFile));
+    			LazerdoomConfiguration newConfig = new LazerdoomConfiguration();
+    			configParser.toXML(newConfig, new FileWriter(configFile));
     		} catch (IOException e) {
     			// TODO Auto-generated catch block
     			e.printStackTrace();

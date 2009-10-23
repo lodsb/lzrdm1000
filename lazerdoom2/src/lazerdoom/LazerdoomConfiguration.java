@@ -29,6 +29,8 @@ public class LazerdoomConfiguration {
 	// (c) 1969 Monty Python 
 	public boolean enableDebugOutput = false;
 	
+	public boolean showSupercolliderConsole = true;
+	
 	private static LazerdoomConfiguration instance = null;
 	
 	public static LazerdoomConfiguration getInstance() {

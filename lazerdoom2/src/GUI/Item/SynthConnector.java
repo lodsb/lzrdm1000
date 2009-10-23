@@ -18,7 +18,7 @@ import com.trolltech.qt.gui.QWidget;
 import GUI.Multitouch.*;
 
 public class SynthConnector extends TouchableGraphicsItem implements LzrDmObjectInterface {
-	private static QColor normalColor = new QColor(255,2,104);
+	protected static QColor normalColor = new QColor(255,2,104);
 	private static QColor selectionColor = new QColor(255,255,255);
 
 	private static int stdAlpha = 130;
@@ -50,7 +50,7 @@ public class SynthConnector extends TouchableGraphicsItem implements LzrDmObject
 	}
 	
 	public SynthConnector() {
-		this.setFlag(GraphicsItemFlag.ItemIsSelectable,true);
+		//this.setFlag(GraphicsItemFlag.ItemIsSelectable,true);
 		this.setZValue(10);
 	}
 

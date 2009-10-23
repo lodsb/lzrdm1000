@@ -55,7 +55,10 @@ public class Core {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-		core.createAndShowServerPanel();
+		
+		if(LazerdoomConfiguration.getInstance().showSupercolliderConsole) {
+			core.createAndShowServerPanel();
+		}
 		
 		//for(int i = 0; i < 1000; i++) {
 			//System.out.println(core.getSynthManager().createSynthInstance(core.getSynthManager().getAvailableSynths().get(0)));

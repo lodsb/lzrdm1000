@@ -237,8 +237,9 @@ public class Editor extends QObject implements LzrDmObjectInterface {
 		boolean ret = false;
 		if(command.execute()) {
 			undoStack.push(command);
-			System.out.println("WHAT?");
+			/*System.out.println("WHAT?");
 			SessionHandler.getInstance().dumpSession();
+			*/
 		}
 		return ret;
 	}

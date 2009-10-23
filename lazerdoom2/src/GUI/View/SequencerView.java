@@ -347,7 +347,7 @@ public class SequencerView extends QGraphicsView implements Client, TouchItemInt
 		
 		//viewGestures.add(sparshui.gestures.GestureType.ZOOM_GESTURE2D.ordinal());
 		
-		if(LazerdoomConfiguration.enableOpenGl) {
+		if(LazerdoomConfiguration.getInstance().enableOpenGl) {
 			this.setCacheMode(QGraphicsView.CacheModeFlag.CacheNone);
 			SequencerView.sharedGlWidget = new QGLWidget();
 			this.setViewport(SequencerView.sharedGlWidget);
@@ -361,7 +361,7 @@ public class SequencerView extends QGraphicsView implements Client, TouchItemInt
 		tect.moveToThread(thread);
 		thread.start();
 		
-		this.setRenderHint(LazerdoomConfiguration.viewRenderHint);
+		this.setRenderHint(LazerdoomConfiguration.getInstance().viewRenderHint);
 		
 		this.registerTouchItem(this);
 	

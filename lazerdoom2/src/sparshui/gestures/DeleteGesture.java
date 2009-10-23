@@ -66,7 +66,7 @@ public class DeleteGesture implements Gesture {
 				p2.simplify();
 				crossPoint = p2.getIntersectionPoint();
 				if(crossPoint != null) {
-					if(p2.pathLenght() >= LazerdoomConfiguration.minimumDeleteGestureLength) {
+					if(p2.pathLenght() >= LazerdoomConfiguration.getInstance().minimumDeleteGestureLength) {
 						if(p2.slopeAtStart()*p2.slopeAtEnd() < 0.0) {
 							gestureSuccessful = true;
 						}

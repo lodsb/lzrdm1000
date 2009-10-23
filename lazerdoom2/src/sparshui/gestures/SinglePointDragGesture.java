@@ -34,7 +34,7 @@ public class SinglePointDragGesture extends MultiPointDragGesture {
 		Vector<Event> events = null;
 		
 		if(currentLenght != null) {
-			if(currentLenght % LazerdoomConfiguration.gestureRecognitionPathUpdateResolution == 0) {
+			if(currentLenght % LazerdoomConfiguration.getInstance().gestureRecognitionPathUpdateResolution == 0) {
 				events = new Vector<Event>();
 				
 				events.add(new DragEvent(touchData.getLocation(), true, false, touchData.getUniqueID()));

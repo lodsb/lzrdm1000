@@ -1,6 +1,10 @@
 package lazerdoom;
 
 import java.awt.Point;
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileReader;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.net.SocketException;
 import java.net.UnknownHostException;
@@ -28,6 +32,8 @@ import com.illposed.osc.OSCBundle;
 import com.illposed.osc.OSCMessage;
 import com.illposed.osc.OSCPacket;
 import com.illposed.osc.OSCPortOut;
+import com.thoughtworks.xstream.XStream;
+import com.thoughtworks.xstream.io.xml.DomDriver;
 import com.trolltech.qt.QThread;
 import com.trolltech.qt.core.QEvent;
 import com.trolltech.qt.core.QTimer;
@@ -58,13 +64,48 @@ public class lazerdoom extends QWidget {
 	private Thread sparshGestureServerThread;
 	private ServerConnection sparshServerConnection;
 	
-	private SessionHandler sessionHandler = new SessionHandler(LazerdoomConfiguration.sessionPath+LazerdoomConfiguration.sessionFileName);
+	private SessionHandler sessionHandler = new SessionHandler(LazerdoomConfiguration.getInstance().baseLzrdmPath+LazerdoomConfiguration.getInstance().sessionFileName);
 	
 	private EditorScene scene = new EditorScene();
 	private SequencerView view = new SequencerView(new SequencerEditor(scene,false), this);
 	private QHBoxLayout layout = new QHBoxLayout();
 
     public static void main(String[] args) {
+    	
+    	File configFile = new File(System.getProperty("user.home")+"/lzrdm/lzrdmConfig.xml");
+		XStream configParser = new XStream(new DomDriver());
+		configParser.alias("lzrdmConfig", LazerdoomConfiguration.class);
+
+    	if(configFile.exists()) {
+    		System.out.print("Loading configuration ...");
+    		LazerdoomConfiguration lzrdmConfig;
+			
+    		try {
+				lzrdmConfig = (LazerdoomConfiguration) configParser.fromXML(new FileReader(configFile));
+	    		lzrdmConfig._setInstance(lzrdmConfig);
+			} catch (FileNotFoundException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+			
+    		System.out.println("done");
+
+    	} else {
+    		// Dump base-cfg
+    		try {
+    			LazerdoomConfiguration shit = new LazerdoomConfiguration();
+    			configParser.toXML(shit, new FileWriter(configFile));
+    		} catch (IOException e) {
+    			// TODO Auto-generated catch block
+    			e.printStackTrace();
+    		}
+    	}
+    	
+    	if(!LazerdoomConfiguration.getInstance().enableDebugOutput) {
+    		// /dev/null ;)
+    		System.setOut (new java.io.PrintStream(new java.io.OutputStream() {public void write( int b) {}})) ;
+    	}
+    	
         QApplication.initialize(args);
 
         lazerdoom lazerdoomApp = new lazerdoom(null);
@@ -75,7 +116,7 @@ public class lazerdoom extends QWidget {
         lazerdoomApp.loadSession();
         QApplication.exec();
         
-        SessionHandler.getInstance().safeSession(LazerdoomConfiguration.sessionPath+LazerdoomConfiguration.sessionFileName);
+        SessionHandler.getInstance().safeSession(LazerdoomConfiguration.getInstance().baseLzrdmPath+LazerdoomConfiguration.getInstance().sessionFileName);
         
         System.exit(0);
     }

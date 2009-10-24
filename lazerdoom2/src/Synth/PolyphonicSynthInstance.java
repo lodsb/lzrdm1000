@@ -65,6 +65,7 @@ public class PolyphonicSynthInstance extends SynthInstance implements LzrDmObjec
 			if(!(desc.getName().equals("freq") || desc.getName().equals("gate"))) {
 				controlBusses[busIdx] = new MultiplexParameterControlBus<DoubleType>(server, desc, synths);
 				System.out.println(desc.getName());
+				busIdx++;
 			}
 		}
 		for(ParameterControlBus controlBus: controlBusses) {

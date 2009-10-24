@@ -65,6 +65,7 @@ public class SynthInstance implements LzrDmObjectInterface {
 			if(!(desc.getName().equals("freq") || desc.getName().equals("gate"))) {
 				controlBusses[busIdx] = new ParameterControlBus<DoubleType>(server, desc, synth);
 				System.out.println(desc.getName());
+				busIdx++;
 			}
 		}
 		for(ParameterControlBus controlBus: controlBusses) {

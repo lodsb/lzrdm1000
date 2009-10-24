@@ -33,6 +33,34 @@ public class StaticSynthLoader implements SynthLoaderInterface {
 		this.createSynthDefs();
 	}
 	
+	private void createAndRegisterFunkLead() {
+		try {
+			SynthDef synthDefs[] = SynthDef.readDefFile(new File(System.getProperty("user.dir")+"/src/Synth/SC3Synths/funklead.scsyndef"));
+			Control ck = Control.kr( new String[] {"freq","gate", "amp", "cutoff", "rez", "lfospeed"}, new float[] { 0.0f, 0.0f, 0.2f, 20000.0f, 1.0f, 0.0f});
+			SynthInfo synthInfo = new PolyphonicSC3SynthInfo(this.server, "FunkLead76", "LeadSynth", new ControlDesc[]{ck.getDesc(0), ck.getDesc(1), ck.getDesc(2), ck.getDesc(3), ck.getDesc(4), ck.getDesc(5)}, 8);
+			synthInfoMap.put(synthInfo, synthDefs[0]);
+			
+			
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+	}
+	
+	private void createAndRegisterStringMachine() {
+		try {
+			SynthDef synthDefs[] = SynthDef.readDefFile(new File(System.getProperty("user.dir")+"/src/Synth/SC3Synths/strings.scsyndef"));
+			Control ck = Control.kr( new String[] {"freq","gate", "amp"}, new float[] { 0.0f, 0.0f, 0.2f});
+			SynthInfo synthInfo = new PolyphonicSC3SynthInfo(this.server, "StringMachine", "StringMachine!", new ControlDesc[]{ck.getDesc(0), ck.getDesc(1), ck.getDesc(2)}, 8);
+			synthInfoMap.put(synthInfo, synthDefs[0]);
+			
+			
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+	}
+	
 	private void createAndRegisterDrumMachine() {
 		try {
 			SynthDef synthDefs[] = SynthDef.readDefFile(new File(System.getProperty("user.dir")+"/src/Synth/SC3Synths/kick.scsyndef"));
@@ -113,10 +141,12 @@ public class StaticSynthLoader implements SynthLoaderInterface {
         ControlDesc ckd2 = ck2.getDesc(0);
         ControlDesc ckd3 = ck2.getDesc(1);
         ControlDesc ckd4 = ck2.getDesc(2);
-		synthInfo = new PolyphonicSC3SynthInfo(this.server, synthDef.getName(), "A polyphonic Saw-Synth", new ControlDesc[]{ckd2, ckd3, ckd4}, 10);
+		synthInfo = new PolyphonicSC3SynthInfo(this.server, synthDef.getName(), "A polyphonic Saw-Synth", new ControlDesc[]{ckd2, ckd3, ckd4}, 8);
 		synthInfoMap.put(synthInfo, synthDef);
 		
 		this.createAndRegisterDrumMachine();
+		this.createAndRegisterFunkLead();
+		this.createAndRegisterStringMachine();
 		
 		
        /* Control ck = Control.kr( new String[] { "freq", "out" }, new float

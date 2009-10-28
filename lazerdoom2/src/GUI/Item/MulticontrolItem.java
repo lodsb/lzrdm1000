@@ -193,7 +193,7 @@ public class MulticontrolItem extends TouchableGraphicsItem {
 	
 	
 	public MulticontrolItem() {
-		allowedGestures.add(GestureType.DBLCLK_GESTURE.ordinal());
+		//allowedGestures.add(GestureType.DBLCLK_GESTURE.ordinal());
 		allowedGestures.add(GestureType.TOUCH_GESTURE.ordinal());
 		
 		modeColors.add(new QBrush(editColor));
@@ -212,85 +212,11 @@ public class MulticontrolItem extends TouchableGraphicsItem {
 		
 		LinkedList<ControlParameter> testParm = new LinkedList<ControlParameter>();
 		
-		ControlParameter cp = new ControlParameter();
-		cp.label = "whaha";
-		testParm.add(cp);
-		
-		cp = new ControlParameter();
-		cp.label = "whaha1";
-		testParm.add(cp);
-		
-		cp = new ControlParameter();
-		cp.label = "whaha2";
-		testParm.add(cp);
-		
-		cp = new ControlParameter();
-		cp.label = "whaha3";
-		testParm.add(cp);
-		
-		cp = new ControlParameter();
-		cp.label = "whaha4";
-		testParm.add(cp);
-		
-		cp = new ControlParameter();
-		cp.label = "whaha5";
-		testParm.add(cp);
-		
-		cp = new ControlParameter();
-		cp.label = "whaha6";
-		testParm.add(cp);
-		
-		cp = new ControlParameter();
-		cp.label = "whaha7";
-		testParm.add(cp);
-		
-		cp = new ControlParameter();
-		cp.label = "whaha7";
-		testParm.add(cp);
-		
-		cp = new ControlParameter();
-		cp.label = "whaha7";
-		testParm.add(cp);
-		
-		cp = new ControlParameter();
-		cp.label = "whaha7";
-		testParm.add(cp);
-		
-		cp = new ControlParameter();
-		cp.label = "whaha7";
-		testParm.add(cp);
-		
-		cp = new ControlParameter();
-		cp.label = "whaha7";
-		testParm.add(cp);
-		
-		cp = new ControlParameter();
-		cp.label = "whaha7";
-		testParm.add(cp);
-		
-		cp = new ControlParameter();
-		cp.label = "whaha7";
-		testParm.add(cp);
-		
-		cp = new ControlParameter();
-		cp.label = "whaha7";
-		testParm.add(cp);
-		
-		cp = new ControlParameter();
-		cp.label = "whaha7";
-		testParm.add(cp);
-		
-		cp = new ControlParameter();
-		cp.label = "whaha7";
-		testParm.add(cp);
-		
-		cp = new ControlParameter();
-		cp.label = "whaha7";
-		testParm.add(cp);
-		
-		cp = new ControlParameter();
-		cp.label = "whaha7";
-		testParm.add(cp);
+
+		this.addControlBlob("TEST");
+		this.addControlBlob("TEST1");
+		this.addControlBlob("TEST2");
+		this.addControlBlob("TEST3");
 		
 		
 		
@@ -431,7 +357,7 @@ public class MulticontrolItem extends TouchableGraphicsItem {
 	}
 	
 	public void setMode(Mode mode) {
-		if(this.currentMode == Mode.Edit && mode == Mode.Control) {
+		/*if(this.currentMode == Mode.Edit && mode == Mode.Control) {
 			if(!activeControlBlobs.isEmpty()) {
 				LinkedList<ControlBlob> cbList = new LinkedList<ControlBlob>();
 				
@@ -449,7 +375,7 @@ public class MulticontrolItem extends TouchableGraphicsItem {
 		} else if(this.currentMode == Mode.Control && mode == Mode.Edit) {
 			alignAndCreateControlBlobsFromControlParameters();
 		}
-		
+		*/
 		this.currentMode = mode;
 		
 		update();
@@ -457,7 +383,9 @@ public class MulticontrolItem extends TouchableGraphicsItem {
 
 	public boolean processEvent(Event event) {
 		if(event instanceof TouchEvent) {
-			QPointF coordinate = mapFromScene(lazerdoom.View.getInstance().convertScreenPos(((TouchEvent) event).getX(),((TouchEvent) event).getY()));
+			//QPointF coordinate = mapFromScene(lazerdoom.View.getInstance().convertScreenPos(((TouchEvent) event).getX(),((TouchEvent) event).getY()));
+			
+			QPointF coordinate = event.getSceneLocation();
 			//Blobs
 			TouchItemInterface it; 
 			if((it = event.getSource()) != null) {
@@ -508,14 +436,14 @@ public class MulticontrolItem extends TouchableGraphicsItem {
 					} 
 				}
 			} 
-		} else if(event instanceof DblClkEvent){
+		} /*else if(event instanceof DblClkEvent){
 			// center touched ...
 			if(currentMode == Mode.Control) {
 				this.setMode(Mode.Edit);
 			} else if(currentMode == Mode.Edit) {
 				this.setMode(Mode.Control);
 			}
-		}
+		}*/
 		return true;
 	}
 

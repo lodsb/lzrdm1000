@@ -383,6 +383,10 @@ public class SequencerView extends QGraphicsView implements Client, TouchItemInt
 		this.viewport().setSizePolicy(Policy.Maximum, Policy.Maximum);
 		this.setSceneRect(this.scene().sceneRect());
 		
+		/*ControllerItem cc = new ControllerItem();
+		this.scene().addItem(cc);
+		cc.setPos(600,600);*/
+		
 		//this.scene().setItemIndexMethod(ItemIndexMethod.NoIndex);
 		/*
 		

@@ -155,7 +155,7 @@ public class TouchableGraphicsView extends QGraphicsView implements TouchItemInt
 	//	this.setupViewport(new QGLWidget((QWidget)null, (QGLWidget)SequencerView.sharedGlWidget));
 		this.setCacheMode(CacheModeFlag.CacheNone);
 		//this.setRenderHint(RenderHint.Antialiasing);
-	//	this.setViewportUpdateMode(ViewportUpdateMode.FullViewportUpdate);
+		this.setViewportUpdateMode(ViewportUpdateMode.FullViewportUpdate);
 		this.editor = editor;
 	}
 	

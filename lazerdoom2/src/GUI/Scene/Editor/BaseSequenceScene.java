@@ -10,6 +10,7 @@ import GUI.Multitouch.TouchableGraphicsItem;
 import com.trolltech.qt.core.QPointF;
 import com.trolltech.qt.core.QRectF;
 import com.trolltech.qt.core.QSizeF;
+import com.trolltech.qt.core.Qt.FillRule;
 import com.trolltech.qt.gui.QBrush;
 import com.trolltech.qt.gui.QColor;
 import com.trolltech.qt.gui.QFont;
@@ -44,17 +45,29 @@ public class BaseSequenceScene extends EditorScene {
 		public Signal2<Long, Boolean> moved = new Signal2<Long, Boolean>();
 		
 		QRectF boundingRect = new QRectF(0,-1000, 50, 2000);
-		QColor color = new QColor(QColor.green);
+		protected QColor color = new QColor(QColor.green);
 		QPen pen = new QPen(color);
 		QBrush brush = new QBrush(color);
 		QPainterPath path;
 		
+		public void setColor(QColor cl) {
+			this.brush = new QBrush(cl);
+			this.pen  = new QPen(cl);
+		}
+		
 		public StartCursor() {
 			this.setPath();
-			this.setZValue(1000.0);
+			this.setZValue(-1000.0);
+			//this.scale(2.0, 2.0);
 			//this.setFlag(GraphicsItemFlag.ItemIgnoresTransformations, true);
 			
 		}
+		
+		@Override
+		public QPainterPath shape() {
+			return this.path;
+		}
+
 		
 		public boolean processEvent(Event e) {
 			if(e instanceof DragEvent) {
@@ -65,12 +78,13 @@ public class BaseSequenceScene extends EditorScene {
 		
 		private void setPath() {
 			path = new QPainterPath();
-			path.moveTo(0,-1000);
-			path.lineTo(0,1000);
-			path.moveTo(0,-15);
-			path.lineTo(30,0);
-			path.lineTo(0,15);
-			path.lineTo(0,-15);
+			path.moveTo(0,-2000);
+			path.lineTo(0,2000);
+			path.moveTo(0,-30);
+			path.lineTo(60,0);
+			path.lineTo(0,30);
+			path.lineTo(0,-30);
+			path.setFillRule(FillRule.WindingFill);
 		}
 		
 		@Override
@@ -107,88 +121,12 @@ public class BaseSequenceScene extends EditorScene {
 		
 	}
 	
-	public class LengthCursor extends TouchableGraphicsItem {
-
-		QRectF boundingRect = new QRectF(0,-1000, 50, 2000);
-		QColor color = new QColor(QColor.blue);
-		QPen pen = new QPen(color);
-		QBrush brush = new QBrush(color);
-		QPainterPath path;
-		
-		Signal2<Long, Boolean> moved = new Signal2<Long, Boolean>();
-		
+	public class LengthCursor extends StartCursor {
 		public LengthCursor() {
-			this.setPath();
-			this.setZValue(1000.0);
-			System.out.println("LC CLC LC LC LC LC LC CLCLCL CL CL CL  LC");
-			//this.setFlag(GraphicsItemFlag.ItemIgnoresTransformations, true);
+			super();
+			this.rotate(180.0);
+			this.setColor(QColor.blue);
 		}
-		/*
-		@Override
-		public Object itemChange(GraphicsItemChange change, Object value) {
-			System.out.println("ITEM CHANGE ITEM CHANGE ITEMCHANGe "+change+" "+value);
-			// ignore scaling
-			if(change.equals(GraphicsItemChange.ItemMatrixChange)) {
-				System.out.println("IGNORE SCALINGGGGGGGGGGGG");
-				QMatrix matrix = (QMatrix) value;
-				matrix.setMatrix(matrix.m11(), matrix.m12(), 1.0, 1.0, matrix.dx(), matrix.dy());
-				value = matrix;
-				
-				return value;
-			}
-			
-			return super.itemChange(change, value);
-		}*/
-		
-		private void setPath() {
-			path = new QPainterPath();
-			path.moveTo(50,-1000);
-			path.lineTo(50,1000);
-			path.moveTo(50,-15);
-			path.lineTo(20,0);
-			path.lineTo(50,15);
-			path.lineTo(50,-15);
-		}
-		
-		public boolean processEvent(Event e) {
-			if(e instanceof DragEvent) {
-				this.moved.emit((long)(e.getSceneLocation().x()/ tickMultiplyer), ((DragEvent) e).isSuccessful());
-			}
-			return true;
-		}
-		
-		@Override
-		public QRectF boundingRect() {
-			return this.boundingRect;
-		}
-
-		@Override
-		public void paint(QPainter painter, QStyleOptionGraphicsItem option,
-				QWidget widget) {
-			
-			painter.setPen(this.pen);
-			painter.setBrush(this.brush);
-			painter.drawPath(this.path);
-		}
-		
-		@Override
-		public QSizeF getMaximumSize() {
-			// TODO Auto-generated method stub
-			return null;
-		}
-
-		@Override
-		public QSizeF getPreferedSize() {
-			// TODO Auto-generated method stub
-			return null;
-		}
-
-		@Override
-		public void setGeometry(QRectF size) {
-			// TODO Auto-generated method stub
-			
-		}
-		
 	} 
 
 	private StartCursor startCursor = new StartCursor();
@@ -235,7 +173,8 @@ public class BaseSequenceScene extends EditorScene {
 	}
 	
 	public void setLengthCursor(long tick) {
-		this.lengthCursor.setPos(tickMultiplyer*tick-lengthCursor.boundingRect.width(), 0);
+		System.out.println("length cursor "+tick);
+		this.lengthCursor.setPos(tickMultiplyer*tick,0);//-lengthCursor.boundingRect.width(), 0);
 	}
 	
 	private int verticalGridSize(double verticalScale) {

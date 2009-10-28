@@ -83,6 +83,11 @@ public class SequencerEditor extends Editor implements LzrDmObjectInterface {
 			
 			for(QGraphicsItemInterface item: items) {
 				if(item instanceof TouchableGraphicsItem) {
+					
+					if(((TouchableGraphicsItem) item).belongsToGroup() != null) {
+						break;
+					}
+					
 					if(item instanceof TouchableItemGroupItem) {
 						this.executeCommand(new UnGroupCommand((TouchableItemGroupItem)item));
 						System.out.println("UNGROUP SOUP SOUP");

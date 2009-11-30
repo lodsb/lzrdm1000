@@ -78,7 +78,11 @@ public class RotateGesture extends StandardDynamicGesture {
 				currentAngle = angle;
 				System.out.println("ANGLE: "+angle);
 				events = new Vector<Event>();
-				events.add(new RotateEvent((float)angle, new Location(startX, startY), p1Data.getUniqueID(), true));
+				
+				//testfix
+				//events.add(new RotateEvent((float)angle, new Location(startX, startY), p1Data.getUniqueID(), true));
+				
+				events.add(new RotateEvent((float)angle, new Location((float)x1, (float)y1), p1Data.getUniqueID(), true));
 				//events.add(new ZoomEvent2D(xZoom, yZoom, p1Data.getLocation(), true, true, p1Data.getUniqueID()));
 			}
 			
@@ -90,7 +94,20 @@ public class RotateGesture extends StandardDynamicGesture {
 			Vector<Event> events = null;
 			if(currentTouchPoints == 2 && p2Data != null) {
 				events = new Vector<Event>();
-				events.add(new RotateEvent((float)currentAngle, new Location(startX, startY), p1Data.getUniqueID(), false));
+				
+				if(p1Data.getUniqueID() == touchData.getUniqueID()) {
+					p1Data = touchData;
+				} else if(p2Data.getUniqueID() == touchData.getUniqueID()) {
+					p2Data = touchData;
+				}
+				
+				double y1 = p1Data.getLocation().getY();
+				double x1 = p2Data.getLocation().getX();
+				
+				//testfix
+				//events.add(new RotateEvent((float)currentAngle, new Location(startX, startY), p1Data.getUniqueID(), false));
+				events.add(new RotateEvent((float)currentAngle, new Location((float)x1,(float) y1), p1Data.getUniqueID(), false));
+				
 			}
 			currentTouchPoints--;
 			System.out.println("ZOOM DEATH" + currentTouchPoints);

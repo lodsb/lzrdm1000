@@ -26,6 +26,7 @@ import Control.ControlBusInterface;
 import Control.TestingControlBus;
 import Control.Types.BaseType;
 import Control.Types.DoubleType;
+import Control.Types.NoteType;
 
 
 public class EventPointsSequence<EventType extends BaseType> extends BaseSequence implements EventSequenceInterface<EventType>, LzrDmObjectInterface {
@@ -51,6 +52,8 @@ public class EventPointsSequence<EventType extends BaseType> extends BaseSequenc
 	
 	boolean isRunning = false;
 	
+	
+	
 	public Iterator<Entry<Long, CopyOnWriteArrayList<EventType>>> getIterator() {
 		return this.events.entrySet().iterator();
 	}
@@ -69,6 +72,8 @@ public class EventPointsSequence<EventType extends BaseType> extends BaseSequenc
 		this.controlBuses = new CopyOnWriteArrayList<ControlBusInterface<EventType>>();
 	} 
 	
+	private boolean isNoteSequence = false;
+	private boolean firstRun = true;
 	
 	@Override
 	public void insert(EventType t, long tick) {
@@ -80,6 +85,15 @@ public class EventPointsSequence<EventType extends BaseType> extends BaseSequenc
 			list.add(t);
 			this.events.put(tick, list);
 		}
+		
+		// disgusting hack
+		if(firstRun) {
+			firstRun = false;
+			if(t instanceof NoteType) {
+				isNoteSequence = true;
+			}
+		}
+		
 		this.postSequenceEvent(SequenceEventType.INSERT, SequenceEventSubtype.TICK, tick);
 	}
 
@@ -174,9 +188,11 @@ public class EventPointsSequence<EventType extends BaseType> extends BaseSequenc
 			this.postSequenceEvent(SequenceEventType.STOPPED, SequenceEventSubtype.NONE, null);
 			
 			// reset all busses
-			/*for(ControlBusInterface<EventType> bus: this.controlBuses) {
-				bus.setDefaultValue(this, tick);
-			}*/
+			if(isNoteSequence) {
+				for(ControlBusInterface<EventType> bus: this.controlBuses) {
+					bus.setDefaultValue(this, tick);
+				}
+			}
 			return false;
 		}
 	

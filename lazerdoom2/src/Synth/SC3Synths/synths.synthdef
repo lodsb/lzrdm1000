@@ -1,6 +1,6 @@
 (
 
-SynthDef("funklead",{ arg freq = 700, amp = 0.2, gate = 1, cutoff = 20000, rez = 1, lfospeed=0;
+SynthDef("funklead",{ arg freq = 700, amp = 1.0, gate = 0.0, cutoff = 20000, rez = 1, lfospeed=0;
 
      var e,x,env,range,filterfreq;
 
@@ -30,7 +30,7 @@ rez);
 }).load(s);
 
 
-SynthDef("strings",{ arg freq = 700, amp = 0.2, gate = 1;
+SynthDef("strings",{ arg freq = 700, amp = 1.0, gate = 0.0;
 
      var x,enve;
 

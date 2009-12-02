@@ -14,9 +14,9 @@ filterfreq = SinOsc.kr(lfospeed,0, range, cutoff).abs;
 
 x = RLPF.ar(Mix.ar([
 
-Mix.arFill(2, {Saw.ar(freq *2 + 0.2.rand2, amp)}),
+Mix.arFill(2, {Saw.ar(freq *2 + 0.2.rand2, 0.5)}),
 
-Mix.arFill(2, {Saw.ar(freq *4+ 0.2.rand2, amp)})
+Mix.arFill(2, {Saw.ar(freq *4+ 0.2.rand2, 0.5)})
 
 ]),
 

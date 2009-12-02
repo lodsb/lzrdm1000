@@ -58,7 +58,7 @@ public class BaseSequenceScene extends EditorScene {
 		public StartCursor() {
 			this.setPath();
 			this.setZValue(-1000.0);
-			//this.scale(2.0, 2.0);
+			this.scale(1.5, 1.5);
 			//this.setFlag(GraphicsItemFlag.ItemIgnoresTransformations, true);
 			
 		}
@@ -84,7 +84,7 @@ public class BaseSequenceScene extends EditorScene {
 			path.lineTo(60,0);
 			path.lineTo(0,30);
 			path.lineTo(0,-30);
-			path.setFillRule(FillRule.WindingFill);
+			//path.setFillRule(FillRule.WindingFill);
 		}
 		
 		@Override

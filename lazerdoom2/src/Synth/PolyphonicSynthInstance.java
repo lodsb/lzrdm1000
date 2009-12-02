@@ -34,6 +34,7 @@ public class PolyphonicSynthInstance extends SynthInstance implements LzrDmObjec
 		LinkedList<ParameterControlBus> groupBusses = new LinkedList<ParameterControlBus>();
 		
 		System.out.println("LOAD SYNTH");
+		System.out.println(synths);
 		
 		for(ControlDesc desc: info.getControlParameters()) {
 			if(desc.getName().equals("freq")) {

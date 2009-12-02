@@ -83,6 +83,7 @@ public abstract class TouchableGraphicsItem extends QGraphicsItem implements Tou
 			}
 			return parent.processEvent(event);
 		} 
+		this.update();
 		
 		return false;
 	}

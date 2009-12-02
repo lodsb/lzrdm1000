@@ -30,6 +30,7 @@ import sparshui.common.messages.events.DeleteEvent;
 import sparshui.common.messages.events.DragEvent;
 import sparshui.common.messages.events.ExtendedGestureEvent;
 import sparshui.common.messages.events.GroupEvent;
+import sparshui.common.messages.events.TapEvent;
 import sparshui.common.messages.events.TouchEvent;
 
 import Control.Types.DoubleType;
@@ -491,6 +492,8 @@ public class SequenceEditor extends BaseSequencerItemEditor implements LzrDmObje
 		
 		@Override
 		public boolean handleTouchEvent(TouchEvent e, int vSnap, int hSnap) {
+			if(e instanceof TapEvent) { 
+			
 			QPointF pos = e.getSceneLocation();
 			
 			if(!this.filterEvent(e) && !e.isFocused() && pos.x() > 0 && !(this.getScene().itemAt(pos) instanceof TouchableGraphicsItem) && !e.isOngoing()) {
@@ -512,6 +515,7 @@ public class SequenceEditor extends BaseSequencerItemEditor implements LzrDmObje
 				
 				this.createItem(pos, vSnap, hSnap);
 			}
+		}
 			return true;
 		}
 		
@@ -671,7 +675,7 @@ public class SequenceEditor extends BaseSequencerItemEditor implements LzrDmObje
 		
 		allowedGestures.add(sparshui.gestures.GestureType.DRAG_GESTURE.ordinal());
 		allowedGestures.add(sparshui.gestures.GestureType.DELETE_GESTURE.ordinal());
-		allowedGestures.add(sparshui.gestures.GestureType.TOUCH_GESTURE.ordinal());
+		allowedGestures.add(sparshui.gestures.GestureType.TAP_GESTURE.ordinal());
 		
 		this.setCurrentMode(new SequenceInitMode(this));
 	

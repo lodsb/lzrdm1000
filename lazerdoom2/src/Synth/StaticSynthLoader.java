@@ -36,8 +36,8 @@ public class StaticSynthLoader implements SynthLoaderInterface {
 	private void createAndRegisterFunkLead() {
 		try {
 			SynthDef synthDefs[] = SynthDef.readDefFile(new File(System.getProperty("user.dir")+"/src/Synth/SC3Synths/funklead.scsyndef"));
-			Control ck = Control.kr( new String[] {"freq","gate", "amp", "cutoff", "rez", "lfospeed"}, new float[] { 0.0f, 0.0f, 0.2f, 20000.0f, 1.0f, 0.0f});
-			SynthInfo synthInfo = new PolyphonicSC3SynthInfo(this.server, "FunkLead76", "LeadSynth", new ControlDesc[]{ck.getDesc(0), ck.getDesc(1), ck.getDesc(2), ck.getDesc(3), ck.getDesc(4), ck.getDesc(5)}, 8);
+			Control ck = Control.kr( new String[] {"freq","gate", "amp", "cutoff", "rez", "lfospeed"}, new float[] { 0.0f, 0.0f, 1.0f, 20000.0f, 1.0f, 0.0f});
+			SynthInfo synthInfo = new PolyphonicSC3SynthInfo(this.server, synthDefs[0].getName(), "TrashLead", new ControlDesc[]{ck.getDesc(0), ck.getDesc(1), ck.getDesc(2), ck.getDesc(3), ck.getDesc(4), ck.getDesc(5)}, 8);
 			synthInfoMap.put(synthInfo, synthDefs[0]);
 			
 			
@@ -50,8 +50,8 @@ public class StaticSynthLoader implements SynthLoaderInterface {
 	private void createAndRegisterStringMachine() {
 		try {
 			SynthDef synthDefs[] = SynthDef.readDefFile(new File(System.getProperty("user.dir")+"/src/Synth/SC3Synths/strings.scsyndef"));
-			Control ck = Control.kr( new String[] {"freq","gate", "amp"}, new float[] { 0.0f, 0.0f, 0.2f});
-			SynthInfo synthInfo = new PolyphonicSC3SynthInfo(this.server, "StringMachine", "StringMachine!", new ControlDesc[]{ck.getDesc(0), ck.getDesc(1), ck.getDesc(2)}, 8);
+			Control ck = Control.kr( new String[] {"freq","gate", "amp"}, new float[] { 0.0f, 0.0f, 1.0f});
+			SynthInfo synthInfo = new PolyphonicSC3SynthInfo(this.server, synthDefs[0].getName(), "StringMachine!", new ControlDesc[]{ck.getDesc(0), ck.getDesc(1), ck.getDesc(2)}, 8);
 			synthInfoMap.put(synthInfo, synthDefs[0]);
 			
 			
@@ -129,7 +129,7 @@ public class StaticSynthLoader implements SynthLoaderInterface {
 		
 		// TestSynth1
         Control ck = Control.kr( new String[] {"freq","gate"}, new float[] { 0.0f, 0.0f});
-        synthDef = new SynthDef( "SimpleSineSynth", UGen.ar( "Out", UGen.ir( 0 ), UGen.ar("Pan2",UGen.ar("*", ck.getChannel(1), UGen.ar( "SinOsc", ck.getChannel(0))))));
+        synthDef = new SynthDef( "SimpleSineSynth", UGen.ar( "Out", UGen.ir( 0 ), UGen.ar("Pan2",UGen.ar("*", UGen.ar("*",ck.getChannel(1), UGen.ar( "SinOsc", ck.getChannel(0))), UGen.ir(0.5f)))));
         ControlDesc ckd = ck.getDesc(0);
         ControlDesc ckd1 = ck.getDesc(1);
 		synthInfo = new SC3SynthInfo(this.server, synthDef, synthDef.getName(), "A simple Sine-Synth", new ControlDesc[]{ckd, ckd1});
@@ -137,7 +137,7 @@ public class StaticSynthLoader implements SynthLoaderInterface {
 		
 		// TestSynth2
         Control ck2 = Control.kr( new String[] {"freq","gate", "filter_freq"}, new float[] { 0.0f, 0.0f, 20000.0f});
-        synthDef = new SynthDef( "PolySawSynth", UGen.ar( "Out", UGen.ir( 0 ), UGen.ar("Pan2", UGen.ar("*", ck2.getChannel(1), UGen.ar("RLPF", UGen.ar("Saw", ck2.getChannel(0)), ck2.getChannel(2)) ))));
+        synthDef = new SynthDef( "PolySawSynth", UGen.ar( "Out", UGen.ir( 0 ), UGen.ar("Pan2", UGen.ar("*",UGen.ar("*", ck2.getChannel(1), UGen.ar("RLPF", UGen.ar("Saw", ck2.getChannel(0)), ck2.getChannel(2)) ), UGen.ir(0.5f)))));
         ControlDesc ckd2 = ck2.getDesc(0);
         ControlDesc ckd3 = ck2.getDesc(1);
         ControlDesc ckd4 = ck2.getDesc(2);

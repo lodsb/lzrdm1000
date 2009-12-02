@@ -19,6 +19,7 @@ import com.trolltech.qt.gui.QPen;
 import com.trolltech.qt.gui.QRadialGradient;
 import com.trolltech.qt.gui.QStyleOptionGraphicsItem;
 import com.trolltech.qt.gui.QWidget;
+import com.trolltech.qt.svg.QSvgRenderer;
 
 import Control.ParameterControlBus;
 import GUI.Multitouch.*;
@@ -28,6 +29,7 @@ import Synth.SynthInstance;
 
 public class SynthesizerItem extends BaseSynthesizerItem implements ConnectableSynthInterface, LzrDmObjectInterface {
 	private QRectF contentsRect = new QRectF(39.5,39.5, 121, 121);
+	private QRectF iconRect = contentsRect.adjusted(20, 20, -20, -20);
 	private static QColor normalColor = new QColor(130,130,130); 
 	private static QColor actionColor = new QColor(211,120,0);
 	private static QColor controlValueColor = new QColor(255,2,104); 
@@ -40,6 +42,9 @@ public class SynthesizerItem extends BaseSynthesizerItem implements ConnectableS
 	private double currentControlValue = 0.0;
 
 	private static QRectF boundingRect = new QRectF(0,0,200,200);
+	private static String svgFileName = System.getProperty("user.dir")+"/src/GUI/Item/SVG/speaker-icon.svg";
+	private static QSvgRenderer sharedRenderer = new QSvgRenderer(svgFileName);
+	
 
 	private QImage mnemonic = createMnemonic(boundingRect, 10, 8, 40);
 
@@ -178,8 +183,8 @@ public class SynthesizerItem extends BaseSynthesizerItem implements ConnectableS
 			frameColor = actionColor;
 		}
 
-		painter.drawImage(0,0, mnemonic);
-
+		painter.drawImage(0,0, mnemonic);	
+		
 		// outer circle
 		painter.setPen(frameColor);
 		painter.setBrush(QBrush.NoBrush);
@@ -189,6 +194,9 @@ public class SynthesizerItem extends BaseSynthesizerItem implements ConnectableS
 		painter.setBrush(customColor);
 		painter.setPen(frameColor);
 		painter.drawRoundedRect(contentsRect, 25.0,25.0);
+		sharedRenderer.render(painter, "speaker", iconRect);
+		
+		
 
 		//painter.setBrush(actionColor);
 		//painter.drawPie(contentsRect, 16*90, -5000);

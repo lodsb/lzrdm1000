@@ -148,12 +148,13 @@ public TouchableNoteTypeSequenceDataItem(long tick, NoteType value, Editor edito
 	boolean firstRun = true;
 	@Override
 	public void paint(QPainter painter, QStyleOptionGraphicsItem option, QWidget widget) {
-		sharedRenderer.render(painter, "node", this.SVGboundingRect);
 		if(!this.isNoteOff && this.currentValue != null) {
+			sharedRenderer.render(painter, "node", this.SVGboundingRect);
 			painter.setPen(QColor.black);
 			//painter.scale(0.7, 0.7);
 			//painter.drawText(-50, -50, 62, 100, Qt.AlignmentFlag.AlignHCenter.ordinal(), ""+NoteType.noteNameArray[this.getNoteIndexFromPos(this.pos())]);
 		} else if(this.isNoteOff && this.parent != null) {
+			sharedRenderer.render(painter, "nodeEnd", this.SVGboundingRect);
 			//painter.setPen(this.linePen);
 			//painter.drawLine(-16, 0,0,0);
 			if(firstRun) {

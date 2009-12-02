@@ -154,8 +154,9 @@ public class PushButton extends TouchableEditorItem {
 					this.buttonPressed.emit(this);	
 			/*} else {*/
 				this.pressed = false;
-				update();
+				this.update();
 			}
+			this.update();
 		}
 		return false;
 	}

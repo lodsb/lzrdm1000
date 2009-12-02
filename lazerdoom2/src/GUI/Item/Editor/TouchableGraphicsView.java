@@ -95,16 +95,18 @@ public class TouchableGraphicsView extends QGraphicsView implements TouchItemInt
 	}
 	
 	public void zoomTo(double x, double y) {
-		//y = x;
-		//his.scale(1.0/currentZoomX, 1.0/currentZoomY);
-		this.resetMatrix();
-		this.scale(x, y);
-		System.out.println("zx zy "+x+" "+y);
-		
-		this.verticalScale = x;
-		this.horizontalScale = y;
-		
-		this.updateEditorCaption();
+		if((x <= 3.0 && y <= 3.0) && (x >= 0.25 && y >= 0.25)) {
+			//y = x;
+			//his.scale(1.0/currentZoomX, 1.0/currentZoomY);
+			this.resetMatrix();
+			this.scale(x, y);
+			System.out.println("zx zy "+x+" "+y);
+
+			this.verticalScale = x;
+			this.horizontalScale = y;
+
+			this.updateEditorCaption();
+		}
 	}
 	
 	private void updateEditorCaption() {
@@ -132,7 +134,7 @@ public class TouchableGraphicsView extends QGraphicsView implements TouchItemInt
 		painter.setBrush(QColor.white);
 		painter.setPen(QPen.NoPen);
 		painter.drawRect(rect);
-		System.out.println("drawBG !!!!!");
+		//System.out.println("drawBG !!!!!");
 		
 		if(currentEditorScene != null) {
 			this.currentEditorScene.drawHorizontalGrid(painter, rect, this.horizontalScale);
@@ -254,7 +256,8 @@ public class TouchableGraphicsView extends QGraphicsView implements TouchItemInt
 				System.out.println("***>");
 			}
 		}*/
-		//this.update();
+		this.scene().invalidate();
+		//this.repaint();
 		return true;
 	}
 }

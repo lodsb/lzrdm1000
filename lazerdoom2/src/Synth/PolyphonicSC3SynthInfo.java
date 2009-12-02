@@ -32,6 +32,7 @@ public class PolyphonicSC3SynthInfo extends SynthInfo {
 			try {
 				for(int i = 0; i < synths.length; i++) {
 					synths[i] = Synth.head(this.server.asTarget(), this.getName());
+					System.out.println("New synth as polyphonic.... "+i);
 				}
 			} catch (IOException e) {
 				// TODO Auto-generated catch block

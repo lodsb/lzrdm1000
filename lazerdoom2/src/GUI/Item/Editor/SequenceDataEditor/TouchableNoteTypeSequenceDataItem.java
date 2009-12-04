@@ -119,6 +119,7 @@ public TouchableNoteTypeSequenceDataItem(long tick, NoteType value, Editor edito
 	
 	private QRectF boundingRect = new QRectF(-30,-30,80,80);
 	private QRectF SVGboundingRect = new QRectF(-20,-20,40,40);
+	private QRectF SVGboundingRect2 = new QRectF(-15,-15,30,30);
 	private Line line = null; 
 	
 	private class Line extends QGraphicsLineItem {
@@ -154,7 +155,7 @@ public TouchableNoteTypeSequenceDataItem(long tick, NoteType value, Editor edito
 			//painter.scale(0.7, 0.7);
 			//painter.drawText(-50, -50, 62, 100, Qt.AlignmentFlag.AlignHCenter.ordinal(), ""+NoteType.noteNameArray[this.getNoteIndexFromPos(this.pos())]);
 		} else if(this.isNoteOff && this.parent != null) {
-			sharedRenderer.render(painter, "nodeEnd", this.SVGboundingRect);
+			sharedRenderer.render(painter, "node", this.SVGboundingRect2);
 			//painter.setPen(this.linePen);
 			//painter.drawLine(-16, 0,0,0);
 			if(firstRun) {

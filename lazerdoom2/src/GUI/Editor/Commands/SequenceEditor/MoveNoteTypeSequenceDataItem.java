@@ -34,10 +34,20 @@ public class MoveNoteTypeSequenceDataItem<T extends NoteType> extends SequenceEd
 			double noteOffOffset = noteOff.pos().x() - this.item.pos().x();
 			
 			Pair<Object> p = this.item.getOldTickValuePair();
+			
+			if(p == null) {
+				return false;
+			}
+			
 			this.sequence.remove((Long)p.getFirst(), (T)p.getSecond());
 			this.item.setPosition(this.pos);
 			this.item.updateTickAndValueFromPosition(this.item.pos());
 			Pair<Object> p2 = this.item.getTickValuePairFromPosition();
+			
+			if(p2 == null) {
+				return false;
+			}
+			
 			this.sequence.insert((T) p2.getSecond(), (Long) p2.getFirst());
 			
 			Pair<Object> p3 = noteOff.getTickValuePairFromPosition();

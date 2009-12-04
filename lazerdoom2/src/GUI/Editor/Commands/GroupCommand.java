@@ -72,9 +72,18 @@ public class GroupCommand extends BaseEditorCommand {
 					itemsToAdd.add(child);
 				}*/
 
-					if(item instanceof SequenceItem || item instanceof SynthesizerItem) {
-						itemsToAdd.add((TouchableGraphicsItem) item);
+					if(item instanceof TouchableGraphicsItem) {
+						if(((TouchableGraphicsItem)item).belongsToGroup() != null) {
+							return false;
+						}
+						
+						if(item instanceof SequenceItem || item instanceof SynthesizerItem) {
+							itemsToAdd.add((TouchableGraphicsItem) item);
+						} else if(item instanceof TouchableItemGroupItem) {
+							return false;
+						}
 					}
+					
 				}
 				this.addedGroupItems = itemsToAdd;
 			} else {

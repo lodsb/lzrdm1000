@@ -657,8 +657,8 @@ public class SequencerView extends QGraphicsView implements Client, TouchItemInt
 	}
 	
 	public QPointF convertScreenPos(double x, double y) {
-		x = x*this.viewport().width();
-		y = y*this.viewport().height();
+		x = x*this.viewport().width()*(LazerdoomConfiguration.getInstance().hStretch);
+		y = y*this.viewport().height()*(LazerdoomConfiguration.getInstance().vStretch);
 		return this.mapToScene((int)x, (int)y);
 	}
 	

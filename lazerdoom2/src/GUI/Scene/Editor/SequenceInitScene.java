@@ -65,7 +65,7 @@ public class SequenceInitScene extends EditorScene {
 		this.createSequenceButton.buttonPressed.connect(this.createSequencePressed);
 		
 		
-		//this.setSceneRect(new QRectF(0,0,1000,1000));		
+		
 		
 		QGraphicsLinearLayout midLayout = new QGraphicsLinearLayout();
 		midLayout.setOrientation(com.trolltech.qt.core.Qt.Orientation.Horizontal);
@@ -100,7 +100,7 @@ public class SequenceInitScene extends EditorScene {
 		this.addItem(w);
 		w.show();
 		w.setPos(0, 0);
-		//this.setSceneRect(new QRectF(0,0,w.size().width(), w.size().height()));
+		this.setSceneRect(new QRectF(0,0,800,400));
 		w.scale(2.0, 2.0);
 	}
 }

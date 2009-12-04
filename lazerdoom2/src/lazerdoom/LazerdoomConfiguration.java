@@ -7,6 +7,9 @@ public class LazerdoomConfiguration {
 	public int gestureRecognitionPathUpdateResolution = 2;
 	public double minimumDeleteGestureLength = 0.40;
 	
+	public double hStretch = 1.0;
+	public double vStretch = 1.0;
+	
 	// std config-filename
 	public String configFileName = "lzrdmConfig.xml";
 	

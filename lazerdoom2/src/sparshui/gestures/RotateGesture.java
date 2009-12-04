@@ -34,7 +34,7 @@ public class RotateGesture extends StandardDynamicGesture {
 			if(currentTouchPoints == 1) {
 				p1Data = touchData;
 				p2Data = null;
-			} else if (currentTouchPoints == 2) {
+			} else if (currentTouchPoints == 2 && p1Data != null) {
 				startX = p1Data.getLocation().getX();
 				startY = p1Data.getLocation().getY();
 				p2Data = touchData;
@@ -47,6 +47,7 @@ public class RotateGesture extends StandardDynamicGesture {
 			} else {
 				p1Data = null;
 				p2Data = null;
+				
 			}
 			
 			return null;
@@ -92,7 +93,7 @@ public class RotateGesture extends StandardDynamicGesture {
 		@Override
 		protected Vector<Event> processDeath(TouchData touchData) {
 			Vector<Event> events = null;
-			if(currentTouchPoints == 2 && p2Data != null) {
+			if(currentTouchPoints == 2 && (p1Data != null && p2Data != null)) {
 				events = new Vector<Event>();
 				
 				if(p1Data.getUniqueID() == touchData.getUniqueID()) {
@@ -102,14 +103,20 @@ public class RotateGesture extends StandardDynamicGesture {
 				}
 				
 				double y1 = p1Data.getLocation().getY();
-				double x1 = p2Data.getLocation().getX();
+				double x1 = p1Data.getLocation().getX();
 				
 				//testfix
 				//events.add(new RotateEvent((float)currentAngle, new Location(startX, startY), p1Data.getUniqueID(), false));
 				events.add(new RotateEvent((float)currentAngle, new Location((float)x1,(float) y1), p1Data.getUniqueID(), false));
 				
+				if(p1Data.getUniqueID() == touchData.getUniqueID()) {
+					p1Data = null;
+				} else if(p2Data.getUniqueID() == touchData.getUniqueID()) {
+					p2Data = null;
+				}
+				
 			}
-			currentTouchPoints--;
+			currentTouchPoints --;
 			System.out.println("ZOOM DEATH" + currentTouchPoints);
 			return events;
 		}

@@ -78,7 +78,7 @@ public class SynthesizerScene extends EditorScene {
 		this.loadSynthInstanceButton.buttonPressed.connect(this.loadSynthPressed);
 		
 		
-		//this.setSceneRect(new QRectF(0,0,1000,1000));
+		this.setSceneRect(new QRectF(0,0,1000,1000));
 		
 		QGraphicsLinearLayout topLayout = new QGraphicsLinearLayout();
 		topLayout.setOrientation(com.trolltech.qt.core.Qt.Orientation.Horizontal);

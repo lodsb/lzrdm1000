@@ -101,6 +101,8 @@ public class EditorCursor extends TouchableGraphicsItem implements LzrDmObjectIn
 			
 			SequencerView.getInstance().registerEditor(this.editor);
 			
+			this.editor.setVisible(true);
+			
 		} else {
 			this.editor.getCurrentEditor().sceneChanged.disconnect(this);
 			this.editor.setCurrentEditor(editor);
@@ -108,6 +110,7 @@ public class EditorCursor extends TouchableGraphicsItem implements LzrDmObjectIn
 			this.editor.setPos(oldEditorPosition);
 		}
 		
+		this.editor.invalidateAndCenterView();
 		this.editor.getCurrentEditor().sceneChanged.connect(this, "editorSceneChanged()");
 		
 	}

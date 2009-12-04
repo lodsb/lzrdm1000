@@ -93,6 +93,11 @@ public class SequencePlayer extends BaseSequence implements SequencePlayerInterf
 			isRunning.set(false);
 			stopSequence.set(true);
 			scheduledStopTicks = 0;
+			if(sequence.get() != null) {
+				sequence.get().reset();
+			}
+			System.err.println("RESET!!! ");
+			
 		}
 	}
 

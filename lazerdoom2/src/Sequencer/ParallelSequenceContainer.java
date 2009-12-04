@@ -91,7 +91,7 @@ public class ParallelSequenceContainer extends BaseSequence implements SequenceC
 
 	@Override
 	public void reset() {
-		this.reset();
+		//this.reset();
 		isRunning = false;
 		
 		readLock.lock();

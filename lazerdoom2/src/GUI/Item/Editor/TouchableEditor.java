@@ -563,6 +563,8 @@ public class TouchableEditor extends TouchableGraphicsWidget {
 		EditorScene scene = editor.getScene();
 		this.graphicsView.setEditorScene(scene);
 		this.show();
+		
+		this.graphicsView.centerAndInvalidate();
 	}
 	
 	public void updateViewScene() {
@@ -643,7 +645,9 @@ public class TouchableEditor extends TouchableGraphicsWidget {
 		
 	} 
 	
-	
+	public void invalidateAndCenterView() {
+		this.graphicsView.centerAndInvalidate();
+	}
 	
 	
 	private double currentZoomX = 1.0;
@@ -697,6 +701,8 @@ public class TouchableEditor extends TouchableGraphicsWidget {
 	private double currentAngle = 0.0;
 	private QPointF rotateStartPoint = null;
 	private boolean isRotating = false;
+	private double lastAngle = 0.0;
+	private QPointF centerCoord = new QPointF(450, 200);
 	
 	@Override
 	public boolean processEvent(Event event) {
@@ -708,25 +714,70 @@ public class TouchableEditor extends TouchableGraphicsWidget {
 		}else {
 			if(event instanceof RotateEvent) {
 				RotateEvent re = (RotateEvent) event;
+				this.resetTransform();
+				if(re.isOngoing()) {
+					if(dragOffset == null) {
+						dragOffset = re.getSceneLocation();
+						start = this.pos();
+					} else {
+						QPointF p = new QPointF(dragOffset.x()-re.getSceneLocation().x(),re.getSceneLocation().y()-dragOffset.y());
+						this.setPos(start.x()+(re.getSceneLocation().x()-dragOffset.x()), start.y()+(re.getSceneLocation().y()-dragOffset.y()));
+					}
+					
+				} else {
+					dragOffset = null;
+				}
+				
+				
 				System.out.println(re);
 				double angle = re.getRotation();
+				/*
+				if(Math.abs(angle-currentAngle) > 100.0) {
+					if(angle > 0.0) {
+						angle = angle -180;
+					} else {
+						angle = angle +180;
+					}
+				}*/
+				
 				
 				if(re.getSource() == this.editorFrame) {
 					angle += 90.0;
 				}
 				
+				double angleDiff = lastAngle - angle;
+				if(Math.abs(angleDiff) >= 160.0) {
+					System.err.println("WHAT?!?!");
+					if(angleDiff > 0.0) {
+						angleDiff = lastAngle - angle-180;
+					} else {
+						angleDiff = lastAngle - angle-180;
+					}
+					angleDiff = 0;
+				}
+				System.err.println(angleDiff+" *******");
+				lastAngle = angle;
+				
+				
+				
 				System.out.println("ANGLE bbb "+angle);
 				//angle = angle+ currentAngle;
-				currentAngle = angle;
+				currentAngle = currentAngle - angleDiff;
 				System.out.println("ANGLE ---- "+angle);
 				
+				QPointF diff = this.mapFromScene(re.getSceneLocation());
+				this.resetTransform();
 				if(!isRotating) {
 					rotateStartPoint = this.mapFromScene(re.getSceneLocation());
 					isRotating = true;
+					System.err.println("diff "+diff.subtract(rotateStartPoint));
 				}
-				QPointF centerCoord = rotateStartPoint;
-				this.setTransform(new QTransform().translate(centerCoord.x(), centerCoord.y()).rotate(angle).translate(-centerCoord.x(), -centerCoord.y()), false);
+				//rotateStartPoint;
+				System.err.println(centerCoord);
 				
+				//this.translate(rotateStartPoint.x(), rotateStartPoint.y());
+				this.setTransform(new QTransform().translate(centerCoord.x(), centerCoord.y()).rotate(currentAngle).translate(-centerCoord.x(), -centerCoord.y()), false);
+				//this.setTransform(new QTransform().rotate(currentAngle), false);
 				if(!re.isOngoing()) {
 					System.out.println(currentAngle+"===");
 					isRotating = false;
@@ -734,6 +785,7 @@ public class TouchableEditor extends TouchableGraphicsWidget {
 				} /*else {
 					currentAngle = 0;
 				}*/
+				
 				
 			} else if(event instanceof DragEvent && !isRotating) {
 				DragEvent e = (DragEvent) event;

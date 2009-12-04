@@ -119,6 +119,7 @@ public class SequencePlayerScene extends EditorScene {
 		this.addItem(w);
 		w.show();
 		w.setPos(0, 0);
+		this.setSceneRect(new QRectF(0,0,800,400));
 		//this.setSceneRect(new QRectF(0,0,w.size().width(), w.size().height()));
 		w.scale(2.0, 2.0);
 	}

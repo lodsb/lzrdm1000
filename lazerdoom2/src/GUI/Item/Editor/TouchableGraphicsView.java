@@ -66,6 +66,17 @@ public class TouchableGraphicsView extends QGraphicsView implements TouchItemInt
 	double currentZoomX = 1.0;
 	double currentZoomY = 1.0;
 	
+	public void centerAndInvalidate() {
+		this.setSceneRect(this.scene().sceneRect());
+		this.scene().invalidate();
+		this.resetMatrix();
+		this.centerOn(currentCenterX, currentCenterY);
+		this.scale(horizontalScale, verticalScale);
+		this.update();
+		this.repaint();
+		System.err.println("WHAAAT");
+	}
+	
 	public void setEditorScene(EditorScene scene) {
 		this.currentEditorScene = scene;
 		this.verticalScale = 1.0;
@@ -86,18 +97,26 @@ public class TouchableGraphicsView extends QGraphicsView implements TouchItemInt
 		this.resetMatrix();
 		//this.scale(currentZoomX, currentZoomY);
 		
+		this.scene().invalidate();
 		this.centerOn(currentCenterX, currentCenterY);
 		this.scale(horizontalScale, verticalScale);
 		
 		//this.zoomTo(0.5, 2.456);
 		
+		this.repaint();
 		this.updateEditorCaption();
+		
+		this.scene().invalidate();
+		this.centerOn(currentCenterX, currentCenterY);
+		this.scale(horizontalScale, verticalScale);
+		
+		
 	}
 	
 	public void zoomTo(double x, double y) {
-		if((x <= 3.0 && y <= 3.0) && (x >= 0.25 && y >= 0.25)) {
-			//y = x;
-			//his.scale(1.0/currentZoomX, 1.0/currentZoomY);
+		//y = x;
+		//his.scale(1.0/currentZoomX, 1.0/currentZoomY);
+		if((x >= 0.25 && y >= 0.25) && (x <= 3.0 && y <= 3.0)) {
 			this.resetMatrix();
 			this.scale(x, y);
 			System.out.println("zx zy "+x+" "+y);
@@ -134,7 +153,7 @@ public class TouchableGraphicsView extends QGraphicsView implements TouchItemInt
 		painter.setBrush(QColor.white);
 		painter.setPen(QPen.NoPen);
 		painter.drawRect(rect);
-		//System.out.println("drawBG !!!!!");
+		System.out.println("drawBG !!!!!");
 		
 		if(currentEditorScene != null) {
 			this.currentEditorScene.drawHorizontalGrid(painter, rect, this.horizontalScale);
@@ -154,8 +173,8 @@ public class TouchableGraphicsView extends QGraphicsView implements TouchItemInt
 		/*allowedGestures.add(sparshui.gestures.GestureType.TOUCH_GESTURE.ordinal());
 		allowedGestures.add(sparshui.gestures.GestureType.DELETE_GESTURE.ordinal());*/
 		//this.setScene(new QGraphicsScene());
-	//	this.setupViewport(new QGLWidget((QWidget)null, (QGLWidget)SequencerView.sharedGlWidget));
-		this.setCacheMode(CacheModeFlag.CacheNone);
+		this.setupViewport(new QGLWidget());
+		//this.setCacheMode(CacheModeFlag.CacheNone);
 		//this.setRenderHint(RenderHint.Antialiasing);
 		this.setViewportUpdateMode(ViewportUpdateMode.FullViewportUpdate);
 		this.editor = editor;
@@ -256,8 +275,8 @@ public class TouchableGraphicsView extends QGraphicsView implements TouchItemInt
 				System.out.println("***>");
 			}
 		}*/
+		//this.update();
 		this.scene().invalidate();
-		//this.repaint();
 		return true;
 	}
 }

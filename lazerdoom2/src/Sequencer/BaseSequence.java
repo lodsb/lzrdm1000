@@ -1,6 +1,8 @@
 package Sequencer;
 
 import java.util.concurrent.ConcurrentLinkedQueue;
+import java.util.concurrent.CopyOnWriteArrayList;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import lazerdoom.LzrDmObjectInterface;
 
@@ -41,6 +43,8 @@ public abstract class BaseSequence extends QObject implements SequenceInterface,
 	void _pumpSequenceEval(long tick) {
 		//System.out.println("DFDDDDSSD");
 		for(SequenceEvalListenerInterface svali: evalListeners) {
+			//FIXME: this isnt used for gui updates... instead low freq eval!
+			//SequencerView.getInstance().propagateSequenceEval(svali, tick);
 			svali.dispatchEvalEvent(tick);
 		}
 	}
@@ -56,14 +60,41 @@ public abstract class BaseSequence extends QObject implements SequenceInterface,
 	}
 	
 	protected BaseSequence() {
+		this.createSequenceEvents();
 	}
 	
 	BaseSequence(SequencerInterface sequencer) {
 		this.sequencer = sequencer;
+		this.createSequenceEvents();
 	}
 	
+	/*
+	 * FIXME: hack to circumvent memory allocation in "realtime" thread
+	 */
+	
+	private int numSequenceEvents = 1000;
+	private AtomicInteger currentSequenceEventIndex = new AtomicInteger();
+	private CopyOnWriteArrayList<SequenceEvent> sequenceEventContainers = new CopyOnWriteArrayList<SequenceEvent>();
+	
+	private void createSequenceEvents() {
+		for(int i = 0; i < numSequenceEvents; i++) {
+			sequenceEventContainers.add(new SequenceEvent());
+		}
+		
+		currentSequenceEventIndex.set(0);
+	}
+	
+	private SequenceEvent getSequenceEvent() {
+		SequenceEvent event = sequenceEventContainers.get((currentSequenceEventIndex.get()));
+		currentSequenceEventIndex.set((currentSequenceEventIndex.get()+1)% numSequenceEvents);
+		return event;
+	}
+
+	
 	void postSequenceEvent(SequenceEvent.SequenceEventType type, SequenceEvent.SequenceEventSubtype subtype, Object argument) {
-		this.sequencer.postSequenceEvent(new SequenceEvent(this, type, subtype, argument));
+		SequenceEvent event = getSequenceEvent();
+		event.setEvent(this, type, subtype, argument);
+		this.sequencer.postSequenceEvent(event);
 	}
 	
 	@Override

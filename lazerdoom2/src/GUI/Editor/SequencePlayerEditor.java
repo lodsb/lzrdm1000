@@ -49,7 +49,8 @@ public class SequencePlayerEditor extends BaseSequencerItemEditor implements Lzr
 	public SequencePlayerEditor() {
 		super();
 		this.setScene(editorScene);
-		allowedGestures.add(sparshui.gestures.GestureType.TOUCH_GESTURE.ordinal());
+		//allowedGestures.add(sparshui.gestures.GestureType.TOUCH_GESTURE.ordinal());
+		allowedGestures.add(sparshui.gestures.GestureType.TAP_GESTURE.ordinal());
 		
 		this.currentQuantizationIndex = measureArray.length-1; // no quant
 		

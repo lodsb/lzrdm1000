@@ -60,7 +60,19 @@ public class StaticSynthLoader implements SynthLoaderInterface {
 			e.printStackTrace();
 		}
 	}
-	
+	private void createAndRegisterPiano() {
+		try {
+			SynthDef synthDefs[] = SynthDef.readDefFile(new File(System.getProperty("user.dir")+"/src/Synth/SC3Synths/piano.scsyndef"));
+			Control ck = Control.kr( new String[] {"freq","gate"}, new float[] { 0.0f, 0.0f});
+			SynthInfo synthInfo = new PolyphonicSC3SynthInfo(this.server, synthDefs[0].getName(), "Pianoooo!", new ControlDesc[]{ck.getDesc(0), ck.getDesc(1)}, 8);
+			synthInfoMap.put(synthInfo, synthDefs[0]);
+			
+			
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+	}
 	private void createAndRegisterDrumMachine() {
 		try {
 			SynthDef synthDefs[] = SynthDef.readDefFile(new File(System.getProperty("user.dir")+"/src/Synth/SC3Synths/kick.scsyndef"));
@@ -127,7 +139,7 @@ public class StaticSynthLoader implements SynthLoaderInterface {
 			e2.printStackTrace();
 		} 
 		
-		// TestSynth1
+		/*// TestSynth1
         Control ck = Control.kr( new String[] {"freq","gate"}, new float[] { 0.0f, 0.0f});
         synthDef = new SynthDef( "SimpleSineSynth", UGen.ar( "Out", UGen.ir( 0 ), UGen.ar("Pan2",UGen.ar("*", UGen.ar("*",ck.getChannel(1), UGen.ar( "SinOsc", ck.getChannel(0))), UGen.ir(0.5f)))));
         ControlDesc ckd = ck.getDesc(0);
@@ -143,10 +155,11 @@ public class StaticSynthLoader implements SynthLoaderInterface {
         ControlDesc ckd4 = ck2.getDesc(2);
 		synthInfo = new PolyphonicSC3SynthInfo(this.server, synthDef.getName(), "A polyphonic Saw-Synth", new ControlDesc[]{ckd2, ckd3, ckd4}, 8);
 		synthInfoMap.put(synthInfo, synthDef);
-		
+		*/
 		this.createAndRegisterDrumMachine();
 		this.createAndRegisterFunkLead();
 		this.createAndRegisterStringMachine();
+		this.createAndRegisterPiano();
 		
 		
        /* Control ck = Control.kr( new String[] { "freq", "out" }, new float
@@ -167,7 +180,7 @@ public class StaticSynthLoader implements SynthLoaderInterface {
 								}
 		*/
 		
-		synthInfoMap.put(synthInfo, synthDef);
+		//synthInfoMap.put(synthInfo, synthDef);
 		
 		for(SynthDef sd: synthInfoMap.values()) {
 			if(sd != null) {

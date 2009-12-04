@@ -30,7 +30,6 @@ public class HighResolutionLinuxClock implements ClockInterface, Runnable{
 	private long[] meanLatencyMeasurements = new long[numberOfMeanLatencyMeasurements];
 	
 	private void updateLatency(long currentMeasurement) {
-		
 		long currentLatency = currentMeasurement - interval;
 		
 		latencyMeasurements[currentLatencyMeasurement] = currentLatency;
@@ -80,6 +79,7 @@ public class HighResolutionLinuxClock implements ClockInterface, Runnable{
 	@Override
 	public void start() {
 		Thread clockThread = new Thread(this);
+		clockThread.setPriority(Thread.MAX_PRIORITY);
 		clockThread.start();
 	}
 
@@ -87,7 +87,6 @@ public class HighResolutionLinuxClock implements ClockInterface, Runnable{
 	public void run() {
 		while(true) {
 			clockStart = System.nanoTime();
-			
 			linuxclock.next_tick();
 			sequencer.processTick(currentTick++);
 			

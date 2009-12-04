@@ -1,0 +1,13 @@
+(
+SynthDef("piano",{ arg freq = 700, gate = 0.0;
+	var igate = gate-0.5;
+     var son = MdaPiano.ar(
+	freq, // random note
+	stereo: 0.5, 
+	gate: igate, 
+	vel: 80, // varying velocity
+	mul: 0.6);
+     Out.ar(0, son);
+
+}).load(s);
+)

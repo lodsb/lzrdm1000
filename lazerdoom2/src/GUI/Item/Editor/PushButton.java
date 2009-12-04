@@ -5,6 +5,7 @@ import java.util.List;
 
 import sparshui.common.Event;
 import sparshui.common.TouchState;
+import sparshui.common.messages.events.TapEvent;
 import sparshui.common.messages.events.TouchEvent;
 import sparshui.gestures.GestureType;
 
@@ -49,6 +50,7 @@ public class PushButton extends TouchableEditorItem {
 	public PushButton(Editor editor, String labelText) {
 		super(editor);
 		allowedGestures.add(GestureType.TOUCH_GESTURE.ordinal());
+		allowedGestures.add(GestureType.TAP_GESTURE.ordinal());
 		this.labelText = labelText;
 		
 		this.updateSize();
@@ -58,6 +60,7 @@ public class PushButton extends TouchableEditorItem {
 	public PushButton(Editor editor, String enabledText, String disabledText, boolean stateEnabled) {
 		super(editor);
 		allowedGestures.add(GestureType.TOUCH_GESTURE.ordinal());
+		allowedGestures.add(GestureType.TAP_GESTURE.ordinal());
 		
 		this.enabledText = enabledText;
 		this.disabledText = disabledText;
@@ -142,7 +145,7 @@ public class PushButton extends TouchableEditorItem {
 	
 	@Override
 	public boolean processEvent(Event event) {		
-		if(event instanceof TouchEvent) {
+		/*if(event instanceof TouchEvent) {
 			TouchEvent e = (TouchEvent) event;
 			
 			//QPointF coordinate = mapFromScene(lazerdoom.View.getInstance().convertScreenPos(e.getX(),e.getY()));
@@ -152,12 +155,18 @@ public class PushButton extends TouchableEditorItem {
 			}	
 			else if(e.getState() == TouchState.DEATH) {
 					this.buttonPressed.emit(this);	
-			/*} else {*/
+			//} else {
 				this.pressed = false;
 				this.update();
 			}
+			//this.update();
+		}*/
+		if(event instanceof TapEvent) {
+			//System.err.println("!!!!!!!!TAP!!!!!!!!!!!!");
+			this.buttonPressed.emit(this);	
 			this.update();
 		}
+		//System.err.println(event);
 		return false;
 	}
 

@@ -8,6 +8,7 @@ import sparshui.common.Event;
 import sparshui.common.messages.events.DeleteEvent;
 import sparshui.common.messages.events.DragEvent;
 import sparshui.common.messages.events.ExtendedGestureEvent;
+import sparshui.common.messages.events.TapEvent;
 import sparshui.common.messages.events.TouchEvent;
 import GUI.Item.EditorCursor;
 import GUI.Item.SequenceConnection;
@@ -216,7 +217,6 @@ public class TouchableGraphicsView extends QGraphicsView implements TouchItemInt
 	
 	@Override
 	public boolean processEvent(Event event) {
-
 		if(oldVSc != this.verticalScale || oldEd != this.currentEditorScene) {
 			vGridRes = currentEditorScene.verticalSnapToGridResolution(this.verticalScale);
 			oldVSc = this.verticalScale;
@@ -275,8 +275,9 @@ public class TouchableGraphicsView extends QGraphicsView implements TouchItemInt
 				System.out.println("***>");
 			}
 		}*/
-		//this.update();
-		this.scene().invalidate();
+		/*this.scene().invalidate();
+		this.repaint();
+		this.viewport().repaint();*/
 		return true;
 	}
 }

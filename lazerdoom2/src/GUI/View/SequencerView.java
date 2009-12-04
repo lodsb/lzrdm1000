@@ -75,6 +75,7 @@ import GUI.Item.SequencerMenuButton.ActionType;
 import java.util.Map.Entry;
 import SceneItems.TouchPointCursor;
 import Sequencer.EventPointsSequence;
+import Sequencer.SequenceEvalListenerInterface;
 import Sequencer.SequenceEvent;
 import Sequencer.SequenceEventListenerInterface;
 import Sequencer.SequencerInterface;
@@ -82,10 +83,12 @@ import Sequencer.TestingSequencer;
 import GUI.Multitouch.*;
 import GUI.Scene.Editor.SequenceDataEditorScene;
 
+import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.Semaphore;
 import java.util.concurrent.SynchronousQueue;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicLong;
 
 import lazerdoom.lazerdoom;
@@ -108,18 +111,63 @@ public class SequencerView extends QGraphicsView implements Client, TouchItemInt
 	
 	private class SequenceEventContainer {
 		SequenceEventListenerInterface seli;
+		SequenceEvalListenerInterface svali;
+		long tick;
 		SequenceEvent se;
-		public SequenceEventContainer(SequenceEventListenerInterface seli, SequenceEvent se) {
+		
+		boolean isSequenceEvent = true;
+		
+		public void setEventContainer(SequenceEventListenerInterface seli, SequenceEvent se) {
 			this.seli = seli;
 			this.se = se;
+			isSequenceEvent = true;
 		}
+		
+		public void setEventContainer(SequenceEvalListenerInterface svali, long tick) {
+			this.svali = svali;
+			this.tick = tick;
+			this.isSequenceEvent = false;
+		}
+		
 	}
+	
+	private int numSequenceContainers = 1000;
+	private AtomicInteger currentSequenceContainerIndex = new AtomicInteger();
+	private CopyOnWriteArrayList<SequenceEventContainer> sequenceEventContainers = new CopyOnWriteArrayList<SequenceEventContainer>();
+	
+	private void createSequenceEventContainers() {
+		for(int i = 0; i < numSequenceContainers; i++) {
+			sequenceEventContainers.add(new SequenceEventContainer());
+		}
+		
+		currentSequenceContainerIndex.set(0);
+	}
+	
+	private SequenceEventContainer getSequenceContainer() {
+		SequenceEventContainer container = sequenceEventContainers.get((currentSequenceContainerIndex.get()));
+		currentSequenceContainerIndex.set((currentSequenceContainerIndex.get()+1)% numSequenceContainers);
+		return container;
+	}
+	
 	
 	private LinkedBlockingQueue<SequenceEventContainer> sequenceEventContainerList = new LinkedBlockingQueue<SequenceEventContainer>();
 	
 	public void propagateSequenceEvent(SequenceEventListenerInterface seli, SequenceEvent se) {
 		try {
-			sequenceEventContainerList.put(new SequenceEventContainer(seli, se));
+			SequenceEventContainer container = this.getSequenceContainer();
+			container.setEventContainer(seli, se);
+			sequenceEventContainerList.put(container);
+		} catch (InterruptedException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+	}
+	
+	public void propagateSequenceEval(SequenceEvalListenerInterface svali, long tick) {
+		try {
+			SequenceEventContainer container = this.getSequenceContainer();
+			container.setEventContainer(svali, tick);
+			sequenceEventContainerList.put(container);
 		} catch (InterruptedException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -137,7 +185,11 @@ public class SequencerView extends QGraphicsView implements Client, TouchItemInt
 					sec = sequenceEventContainerList.take();
 					
 					if(sec != null) {
-						sec.seli.dispatchSequenceEvent(sec.se);
+						if(sec.isSequenceEvent) {
+							sec.seli.dispatchSequenceEvent(sec.se);
+						} else {
+							sec.svali.dispatchEvalEvent(sec.tick);
+						}
 					}
 				} catch (InterruptedException e) {
 					// TODO Auto-generated catch block
@@ -332,7 +384,11 @@ public class SequencerView extends QGraphicsView implements Client, TouchItemInt
 	private SequencerEditor sequencerEditor;
 	
 	public SequencerView(SequencerEditor editor, lazerdoom lzrdm) {
+		System.err.println("CPUs: "+Runtime.getRuntime().availableProcessors());
 	
+		this.createSequenceEventContainers();
+		
+		
 		this.sequencerEditor = editor;
 		this.lzrdm = lzrdm;
 		

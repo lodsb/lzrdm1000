@@ -1,6 +1,7 @@
 package Sequencer;
 
 import Sequencer.Native.LinuxClock.*;
+import com.frinika.priority.Priority;
 
 public class HighResolutionLinuxClock implements ClockInterface, Runnable{
 
@@ -79,18 +80,29 @@ public class HighResolutionLinuxClock implements ClockInterface, Runnable{
 	@Override
 	public void start() {
 		Thread clockThread = new Thread(this);
+		clockThread.setName("HPClock-rt");
 		clockThread.setPriority(Thread.MAX_PRIORITY);
 		clockThread.start();
 	}
 
+	private int priorityRequested = 80;
+	private int priority = 0;
+	
 	@Override
 	public void run() {
+		
 		while(true) {
-			clockStart = System.nanoTime();
+			//clockStart = System.nanoTime();
 			linuxclock.next_tick();
 			sequencer.processTick(currentTick++);
+			if (priorityRequested != priority) {
+				System.err.println(" Clock priority requested "
+						+ priorityRequested);
+				Priority.setPriorityRR(priorityRequested);
+				priority = priorityRequested;
+			}
 			
-			this.updateLatency(System.nanoTime()-clockStart);
+			//this.updateLatency(System.nanoTime()-clockStart);
 		}
 	}
 }

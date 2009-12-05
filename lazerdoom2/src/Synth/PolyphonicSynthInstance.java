@@ -1,5 +1,6 @@
 package Synth;
 
+import java.io.IOException;
 import java.util.LinkedList;
 
 import Session.SessionHandler;
@@ -19,7 +20,23 @@ public class PolyphonicSynthInstance extends SynthInstance implements LzrDmObjec
 	private SynthInfo info;
 	private ParameterControlBus[] controlBusses;
 	
+	private Synth[] synths = null;
+	
+	public void free() {
+		if(synths != null) {
+			for(Synth s: synths) {
+				try {
+					s.free();
+				} catch (IOException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+			}
+		}
+	}
+	
 	public PolyphonicSynthInstance(ControlServer server, SynthInfo info, Synth[] synths) {
+		this.synths = synths;
 		//SessionHandler.getInstance().registerObject(this);
 		this.info = info;
 		

@@ -410,6 +410,7 @@ public class SequencerView extends QGraphicsView implements Client, TouchItemInt
 		}
 		this.setViewportUpdateMode(ViewportUpdateMode.FullViewportUpdate);
 		
+		
 		SequencerView.instance = this;
 		
 		tect = new TeCommThread(this);	

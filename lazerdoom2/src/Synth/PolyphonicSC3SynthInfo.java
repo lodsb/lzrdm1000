@@ -24,9 +24,11 @@ public class PolyphonicSC3SynthInfo extends SynthInfo {
 		return this.polyphony;
 	}
 	
+	private Synth[] synths;
+	
 	@Override
 	public SynthInstance createNewInstance(ControlServer cs) {
-		Synth[] synths = new Synth[this.polyphony];
+		synths = new Synth[this.polyphony];
 		
 		System.out.println("[StaticSynthLoader] loading synth: "+this);
 			try {

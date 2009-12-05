@@ -87,6 +87,7 @@ public class LazerDoom extends QWidget {
 		synthManager = new SynthController(this.superColliderServer);
 		synthManager.init();
 		clock.start();
+		System.err.println("WHAT?!");
 		
 		
 		// GUI

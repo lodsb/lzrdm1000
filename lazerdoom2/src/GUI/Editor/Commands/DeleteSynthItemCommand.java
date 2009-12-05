@@ -30,6 +30,7 @@ public class DeleteSynthItemCommand extends BaseEditorCommand {
 		EditorScene scene = (EditorScene) this.scn;
 		
 		if(item.isInitialized()) {
+			
 			//System.out.println(item.getSynthesizer());
 			ret = Core.getInstance().getSynthController().remove(item.getSynthesizer());
 			//System.out.println(ret);
@@ -47,6 +48,7 @@ public class DeleteSynthItemCommand extends BaseEditorCommand {
 					}
 				}
 
+				item.getSynthesizer().free();
 				scene.removeItem(item);
 				item.undockAllCursors();
 			}

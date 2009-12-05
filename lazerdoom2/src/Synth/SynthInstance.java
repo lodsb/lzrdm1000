@@ -1,5 +1,6 @@
 package Synth;
 
+import java.io.IOException;
 import java.util.LinkedList;
 
 import Session.SessionHandler;
@@ -18,6 +19,19 @@ public class SynthInstance implements LzrDmObjectInterface {
 	private ParameterControlBus[] controlBusses;
 	
 	public SynthInstance() {}
+	
+	private Synth synth = null;
+	
+	public void free() {
+		if(synth != null) {
+			try {
+				synth.free();
+			} catch (IOException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+		}
+	}
 	
 	public SynthInstance(ControlServer server, SynthInfo info, Synth synth) {
 		//SessionHandler.getInstance().registerObject(this);

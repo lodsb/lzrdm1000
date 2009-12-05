@@ -1,5 +1,6 @@
 package Synth;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.LinkedList;
 
@@ -21,7 +22,23 @@ public class GroupedSynthInstance extends SynthInstance implements LzrDmObjectIn
 	private SynthInfo info;
 	private ParameterControlBus[] controlBusses;
 	
+	private Synth[] synths = null;
+	
+	public void free() {
+		if(synths != null) {
+			for(Synth s: synths) {
+				try {
+					s.free();
+				} catch (IOException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+			}
+		}
+	}
+	
 	public GroupedSynthInstance(ControlServer server, SynthInfo info, float[] switchingFreqs, Synth[] synths, boolean triggerOnly) {
+		this.synths = synths;
 		//SessionHandler.getInstance().registerObject(this);
 		this.info = info;
 		

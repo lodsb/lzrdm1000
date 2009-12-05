@@ -36,7 +36,8 @@ public class ControlServer {
 	
 	public void flushMessages() {
 		if(currentBundle.getPacketCount() != 0) {
-			currentBundle.setTimeTagAbsMillis(OSCBundle.NOW+serverLatency);
+			currentBundle.setTimeTagAbsMillis(System.currentTimeMillis()+100);
+			//currentBundle.setTimeTagRelSecs(1.0);
 			
 			try {
 				server.sendBundle(currentBundle);

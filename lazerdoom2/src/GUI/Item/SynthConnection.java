@@ -94,11 +94,23 @@ public class SynthConnection extends TouchableGraphicsItem {
 		return this.dst;
 	}
 	
-	private void updatePath() {
+	private QPointF currentSrcPos = new QPointF(-123123123.0,-1231231231.0);
+	private QPointF currentDstPos = new QPointF(-123123123.0,-1231231231.0);
+
+	
+	private void updatePath() {		
+		if(currentSrcPos.equals(src.posMapped()) && currentDstPos.equals(dst.posMapped())) {
+			return;
+		} else {
+			currentSrcPos = src.posMapped();
+			currentDstPos = dst.posMapped();
+		}
+		
 		QPainterPath path = new QPainterPath();
 		
 		QLineF srcLine = src.baseToTopLineInScene();
 		QLineF dstLine = dst.baseToTopLineInScene();
+
 		
 		srcLine.setLength(-75);
 		dstLine.setLength(-75);

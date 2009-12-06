@@ -288,6 +288,8 @@ public class SequenceItem extends BaseSequenceViewItem implements ConnectableSeq
 		} else if(se.getSequenceEventType() == SequenceEvent.SequenceEventType.STOPPED) {
 			this.isPlaying = false;
 		}
+		
+		this.update();
 	}
 
 	private boolean isInitialized = false;

@@ -211,7 +211,7 @@ public class SequencerView extends QGraphicsView implements Client, TouchItemInt
 		editors.remove(editor);
 	}
 	
-	Semaphore sema = new Semaphore(10);
+	//Semaphore sema = new Semaphore(1);
 	
 	private class TeCommThread extends QObject implements Runnable {
 		Signal2<TouchEventCommunicationContainer, Location> groupIDSignal = new Signal2<TouchEventCommunicationContainer, Location>();
@@ -244,21 +244,24 @@ public class SequencerView extends QGraphicsView implements Client, TouchItemInt
 			while(true) { 
 				
 				try {
-					sema.acquire();
+					//sema.acquire();
+					Thread.sleep(2);
 				} catch (InterruptedException e) {
 					// TODO Auto-generated catch block
 					e.printStackTrace();
 				}
 				
-				if((pe = processEventQueue.poll()) != null) {
-					processEventSignal.emit(pe.id, pe.event);
-				}
-				
-				if((tc = teCommContainerSendQueue.poll()) != null) {
-					if(tc.isGetGroupID) {
-						groupIDSignal.emit(tc, tc.loc);
-					} else {
-						gesturesSignal.emit(tc, tc.id);
+				while((!processEventQueue.isEmpty()) || (!teCommContainerSendQueue.isEmpty())) {
+					if((pe = processEventQueue.poll()) != null) {
+						processEventSignal.emit(pe.id, pe.event);
+					}
+
+					if((tc = teCommContainerSendQueue.poll()) != null) {
+						if(tc.isGetGroupID) {
+							groupIDSignal.emit(tc, tc.loc);
+						} else {
+							gesturesSignal.emit(tc, tc.id);
+						}
 					}
 				}
 			}
@@ -633,7 +636,7 @@ public class SequencerView extends QGraphicsView implements Client, TouchItemInt
 	private TouchEventCommunicationContainer postAndwaitUntilProcessed(TouchEventCommunicationContainer tc) {
 		teCommContainerSendQueue.add(tc);
 		
-		sema.release();
+		//sema.release();
 		
 		TouchEventCommunicationContainer currentTe;
 		while(true) {
@@ -642,7 +645,7 @@ public class SequencerView extends QGraphicsView implements Client, TouchItemInt
 				currentTe = it.next();
 				if(currentTe == tc) {
 					teCommContainerRecvQueue.remove(tc);
-					sema.release();
+					//sema.release();
 					return tc;
 				}
 			}
@@ -709,7 +712,7 @@ public class SequencerView extends QGraphicsView implements Client, TouchItemInt
 
 	@Override
 	public synchronized void processEvent(final int id, final Event event) {
-		sema.release();
+		//sema.release();
 		processEventQueue.add(new ProcessEvent(id, event));
 	}
 	

@@ -70,6 +70,10 @@ public class SynthConnector extends TouchableGraphicsItem implements LzrDmObject
 	}
 	
 	
+	public QPointF posMapped() {
+		return mapToScene(0,0);
+	}
+	
 	public QLineF baseToTopLineInScene() {
 
 		double x1 = boundingRect.topLeft().x()+boundingRect.width()/2;

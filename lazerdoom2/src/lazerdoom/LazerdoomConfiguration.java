@@ -10,6 +10,8 @@ public class LazerdoomConfiguration {
 	public double hStretch = 1.0;
 	public double vStretch = 1.0;
 	
+	public int maxPolyphony = 16;
+	
 	// std config-filename
 	public String configFileName = "lzrdmConfig.xml";
 	

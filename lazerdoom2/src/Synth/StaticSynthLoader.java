@@ -6,6 +6,8 @@ import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 
+import lazerdoom.LazerdoomConfiguration;
+
 import de.sciss.jcollider.Control;
 import de.sciss.jcollider.ControlDesc;
 import de.sciss.jcollider.GraphElem;
@@ -37,7 +39,7 @@ public class StaticSynthLoader implements SynthLoaderInterface {
 		try {
 			SynthDef synthDefs[] = SynthDef.readDefFile(new File(System.getProperty("user.dir")+"/src/Synth/SC3Synths/funklead.scsyndef"));
 			Control ck = Control.kr( new String[] {"freq","gate", "amp", "cutoff", "rez", "lfospeed"}, new float[] { 0.0f, 0.0f, 1.0f, 20000.0f, 1.0f, 0.0f});
-			SynthInfo synthInfo = new PolyphonicSC3SynthInfo(this.server, synthDefs[0].getName(), "TrashLead", new ControlDesc[]{ck.getDesc(0), ck.getDesc(1), ck.getDesc(2), ck.getDesc(3), ck.getDesc(4), ck.getDesc(5)}, 8);
+			SynthInfo synthInfo = new PolyphonicSC3SynthInfo(this.server, synthDefs[0].getName(), "TrashLead", new ControlDesc[]{ck.getDesc(0), ck.getDesc(1), ck.getDesc(2), ck.getDesc(3), ck.getDesc(4), ck.getDesc(5)}, LazerdoomConfiguration.getInstance().maxPolyphony);
 			synthInfoMap.put(synthInfo, synthDefs[0]);
 			
 			
@@ -51,7 +53,7 @@ public class StaticSynthLoader implements SynthLoaderInterface {
 		try {
 			SynthDef synthDefs[] = SynthDef.readDefFile(new File(System.getProperty("user.dir")+"/src/Synth/SC3Synths/strings.scsyndef"));
 			Control ck = Control.kr( new String[] {"freq","gate", "amp"}, new float[] { 0.0f, 0.0f, 1.0f});
-			SynthInfo synthInfo = new PolyphonicSC3SynthInfo(this.server, synthDefs[0].getName(), "StringMachine!", new ControlDesc[]{ck.getDesc(0), ck.getDesc(1), ck.getDesc(2)}, 8);
+			SynthInfo synthInfo = new PolyphonicSC3SynthInfo(this.server, synthDefs[0].getName(), "StringMachine!", new ControlDesc[]{ck.getDesc(0), ck.getDesc(1), ck.getDesc(2)}, LazerdoomConfiguration.getInstance().maxPolyphony);
 			synthInfoMap.put(synthInfo, synthDefs[0]);
 			
 			
@@ -64,7 +66,7 @@ public class StaticSynthLoader implements SynthLoaderInterface {
 		try {
 			SynthDef synthDefs[] = SynthDef.readDefFile(new File(System.getProperty("user.dir")+"/src/Synth/SC3Synths/piano.scsyndef"));
 			Control ck = Control.kr( new String[] {"freq","gate"}, new float[] { 0.0f, 0.0f});
-			SynthInfo synthInfo = new PolyphonicSC3SynthInfo(this.server, synthDefs[0].getName(), "Pianoooo!", new ControlDesc[]{ck.getDesc(0), ck.getDesc(1)}, 8);
+			SynthInfo synthInfo = new PolyphonicSC3SynthInfo(this.server, synthDefs[0].getName(), "Pianoooo!", new ControlDesc[]{ck.getDesc(0), ck.getDesc(1)}, LazerdoomConfiguration.getInstance().maxPolyphony);
 			synthInfoMap.put(synthInfo, synthDefs[0]);
 			
 			

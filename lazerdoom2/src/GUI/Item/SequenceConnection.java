@@ -92,8 +92,19 @@ public class SequenceConnection extends TouchableGraphicsItem {
 	public SequenceConnector getDestination() {
 		return this.dst;
 	}
+
+	private QPointF currentSrcPos = new QPointF(-123123123.0,-1231231231.0);
+	private QPointF currentDstPos = new QPointF(-123123123.0,-1231231231.0);
+
 	
-	private void updatePath() {
+	private void updatePath() {		
+		if(currentSrcPos.equals(src.posMapped()) && currentDstPos.equals(dst.posMapped())) {
+			return;
+		} else {
+			currentSrcPos = src.posMapped();
+			currentDstPos = dst.posMapped();
+		}
+		
 		QPainterPath path = new QPainterPath();
 		
 		QLineF srcLine = src.baseToTopLineInScene();

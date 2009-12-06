@@ -74,6 +74,10 @@ public class SequenceConnector extends TouchableGraphicsItem implements LzrDmObj
 
 		return new QLineF(mapToScene(x1, y1), mapToScene(x2,y2));
 	}
+	
+	public QPointF posMapped() {
+		return mapToScene(0,0);
+	}
 
 	@Override
 	public QRectF boundingRect() {

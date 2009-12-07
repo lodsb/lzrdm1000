@@ -371,8 +371,14 @@ public class SequenceEditor extends BaseSequencerItemEditor implements LzrDmObje
 		@Override
 		public void dispatchSequenceEvent(SequenceEvent se) {
 			if(se.getSequenceEventType() == SequenceEventType.EVALUATED_LOW_FREQ) {
-				long tick = (Long )se.getArgument();
-				this.scene.setPlayCursor(tick);
+				try {
+					long tick = new Long((Long )se.getArgument());
+					if(tick >= 0 && tick <= 10000) {
+						this.scene.setPlayCursor(tick);
+					}
+				} catch(Exception e) {
+					e.printStackTrace();
+				}
 			}
 		}
 		

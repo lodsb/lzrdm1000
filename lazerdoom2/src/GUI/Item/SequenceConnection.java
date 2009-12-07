@@ -1,5 +1,7 @@
 package GUI.Item;
 
+import java.util.concurrent.atomic.AtomicReference;
+
 import com.trolltech.qt.core.QPointF;
 import com.trolltech.qt.core.QRectF;
 import com.trolltech.qt.core.QSizeF;
@@ -139,13 +141,16 @@ public class SequenceConnection extends TouchableGraphicsItem {
 		//path.lineTo(p3);
 		//path.lineTo(p4);
 		
+		//FIXME: huge fuckup?
 		this.prepareGeometryChange();
 		this.path = path;
+		pathRef.set(this.path);
 	}
 	
+	private AtomicReference pathRef = new AtomicReference();
 	@Override
 	public QRectF boundingRect() {
-		return path.controlPointRect();
+		return ((QPainterPath)pathRef.get()).controlPointRect();
 	}
 	
 	@Override

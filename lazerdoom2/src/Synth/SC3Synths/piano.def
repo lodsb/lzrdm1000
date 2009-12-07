@@ -1,13 +1,13 @@
-(
-SynthDef("piano",{ arg freq = 700, gate = 0.0;
-	var igate = gate-0.5;
-     var son = MdaPiano.ar(
-	freq, // random note
-	stereo: 0.5, 
-	gate: igate, 
-	vel: 80, // varying velocity
-	mul: 0.6);
-     Out.ar(0, son);
-
+SynthDef(\piano, { arg outBus, freq=440, amp=0.5, dur=4, pan=0, gate=0.0; 
+var sig, in, n = 6, max = 0.04, min = 0.01, delay, pitch, detune, hammer, freq2, sig2;
+    //hammer = Decay2.ar(Impulse.ar(0.001), 0.008, 0.04, LFNoise2.ar([2000,4000].asSpec.map(amp), 0.25));
+    hammer = EnvGen.ar(Env.perc(0.02,0.008, 0.5, 4),gate)*LFNoise2.ar([2000,4000].asSpec.map(amp), 0.25);
+    sig2 = Mix.ar(Array.fill(6, { arg i;
+    detune = #[-0.04, 0, 0.03, -0.07, 0.1, 0.04].at(i);
+    freq2 = freq.cpsmidi.round(1);
+    delay = (1/(freq2 + detune).midicps);
+    CombL.ar(hammer, delay, delay, 50 * amp)}) );
+    sig = HPF.ar(sig2,50) * EnvGen.ar(Env.perc(0.0001,dur, amp, -1),gate);
+    Out.ar(0,1.2*Pan2.ar(sig,pan));
 }).load(s);
-)
+

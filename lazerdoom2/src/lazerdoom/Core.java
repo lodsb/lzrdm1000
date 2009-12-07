@@ -56,9 +56,9 @@ public class Core {
 			e.printStackTrace();
 		}
 		
-		if(LazerdoomConfiguration.getInstance().showSupercolliderConsole) {
+		/*if(LazerdoomConfiguration.getInstance().showSupercolliderConsole) {
 			core.createAndShowServerPanel();
-		}
+		}*/
 		
 		//for(int i = 0; i < 1000; i++) {
 			//System.out.println(core.getSynthManager().createSynthInstance(core.getSynthManager().getAvailableSynths().get(0)));
@@ -196,6 +196,7 @@ public class Core {
 		
 		try {
 			superColliderServer = new Server("localhost");
+			superColliderServer.start();
 		} catch (IOException e) {
 			System.err.println("Error creating SC3-Server:\n"+e.getMessage());
 			e.printStackTrace();
@@ -217,7 +218,7 @@ public class Core {
 		
 		Core.instance = this;
 		
-		this.createAndShowServerPanel();
+		//this.createAndShowServerPanel();
 	}
 
 	public SequenceController getSequenceController() {

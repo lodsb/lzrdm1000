@@ -186,7 +186,10 @@ public class SequencerView extends QGraphicsView implements Client, TouchItemInt
 					
 					if(sec != null) {
 						if(sec.isSequenceEvent) {
-							sec.seli.dispatchSequenceEvent(sec.se);
+							//maybe workaround...
+							SequenceEvent newEvent = sec.se.copy();
+							sec.seli.dispatchSequenceEvent(newEvent);
+							
 						} else {
 							sec.svali.dispatchEvalEvent(sec.tick);
 						}

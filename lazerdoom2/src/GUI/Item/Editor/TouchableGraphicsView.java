@@ -75,7 +75,7 @@ public class TouchableGraphicsView extends QGraphicsView implements TouchItemInt
 		this.scale(horizontalScale, verticalScale);
 		this.update();
 		this.repaint();
-		System.err.println("WHAAAT");
+		//System.err.println("WHAAAT");
 	}
 	
 	public void setEditorScene(EditorScene scene) {

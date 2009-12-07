@@ -67,6 +67,10 @@ public class SequenceEvent {
 		
 	}
 	
+	public SequenceEvent copy() {
+		return new SequenceEvent(this.sequenceInterface, this.sequenceEventType, this.sequenceEventSubtype, this.arg);
+	}
+	
 	public void setEvent(BaseSequence si, SequenceEventType sequenceEventType, SequenceEventSubtype subtype, Object arg) {
 		this.sequenceInterface = si;
 		this.sequenceEventType = sequenceEventType;

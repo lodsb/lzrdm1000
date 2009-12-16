@@ -4,15 +4,10 @@ import sparshui.client.Client;
 import sparshui.common.Event;
 import sparshui.common.Location;
 import sparshui.common.TouchState;
-import sparshui.common.messages.events.DblClkEvent;
-import sparshui.common.messages.events.DragEvent;
-import sparshui.common.messages.events.RotateEvent;
-import sparshui.common.messages.events.SpinEvent;
-import sparshui.common.messages.events.TouchEvent;
-import sparshui.common.messages.events.ZoomEvent;
+
 import sparshui.server.*;
 import java.util.HashMap;
-import java.util.LinkedList;
+
 import java.util.List;
 import java.util.Vector;
 

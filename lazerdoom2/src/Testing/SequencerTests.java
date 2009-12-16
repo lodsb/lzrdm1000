@@ -1,7 +1,7 @@
 package Testing;
 
-import Sequencer.EventPointsSequenceTest;
-import Sequencer.SequentialSequenceContainerTest;
+import sequencer.EventPointsSequenceTest;
+import sequencer.SequentialSequenceContainerTest;
 import junit.framework.Test;
 import junit.framework.TestCase;
 import junit.framework.TestSuite;

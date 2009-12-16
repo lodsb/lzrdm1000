@@ -8,7 +8,7 @@ import sparshui.gestures.GroupGesture;
 import sparshui.gestures.MultiPointDragGesture;
 import sparshui.gestures.RotateGesture;
 import sparshui.gestures.SinglePointDragGesture;
-import sparshui.gestures.SpinGesture;
+//import sparshui.gestures.SpinGesture;
 import sparshui.gestures.TapGesture;
 import sparshui.gestures.TouchGesture;
 import sparshui.gestures.ZoomGesture;
@@ -51,8 +51,8 @@ public class GestureFactory {
 			return new MultiPointDragGesture();
 		if (gestureID == GestureType.ROTATE_GESTURE.ordinal())
 			return new RotateGesture();
-		if (gestureID == GestureType.SPIN_GESTURE.ordinal())
-			return new SpinGesture();
+		//if (gestureID == GestureType.SPIN_GESTURE.ordinal())
+			//return new SpinGesture();
 		if (gestureID == GestureType.TOUCH_GESTURE.ordinal())
 			return new TouchGesture();
 		if (gestureID == GestureType.ZOOM_GESTURE.ordinal())

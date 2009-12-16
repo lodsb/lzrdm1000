@@ -5,7 +5,6 @@ import java.util.Vector;
 
 import sparshui.common.Event;
 import sparshui.common.TouchState;
-import sparshui.common.messages.events.DblClkEvent;
 import sparshui.server.TouchPoint;
 
 public class DblClkGesture implements Gesture {
@@ -117,10 +116,10 @@ public class DblClkGesture implements Gesture {
 							Math.abs(tpData[0].touchPt.getLocation().getY()-tpData[2].touchPt.getLocation().getY())<=0.1){ //comparing Y coordinates
 						
 
-						
-						retEvents.add(new DblClkEvent(changedTouchPoint.getID(),
+						//FIXME!!
+						/*retEvents.add(new DblClkEvent(changedTouchPoint.getID(),
 								changedTouchPoint.getLocation().getX(),
-								changedTouchPoint.getLocation().getY()));
+								changedTouchPoint.getLocation().getY()));*/
 				//		System.out.println("\nDouble click event occurred: change in TIME> "+ 
 				//				duration + " prev> " + tpData[0].touchPt.getID() + " curr> " + tpData[2].touchPt.getID());
 				//		System.out.println("Previous (X,Y): ("+tpData[0].touchPt.getLocation().getX()+","+tpData[0].touchPt.getLocation().getY()+")");

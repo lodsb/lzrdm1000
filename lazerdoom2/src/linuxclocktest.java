@@ -1,4 +1,4 @@
-import Sequencer.Native.LinuxClock.*;
+import sequencer.Native.LinuxClock.*;
 
 public class linuxclocktest {
    public static void main(String argv[]) {

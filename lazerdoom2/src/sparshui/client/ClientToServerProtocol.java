@@ -97,16 +97,16 @@ public class ClientToServerProtocol extends ClientProtocol {
 		Event event = null;
 
 		switch (eventType) {
-		case 0: // EventType.DRAG_EVENT.ordinal():
+		/*case 0: // EventType.DRAG_EVENT.ordinal():
 			event = new DragEvent(newData);
-			break;
+			break;*/
 		case 1: // EventType.ROTATE_EVENT.ordinal():
 			event = new RotateEvent(newData);
 			break;
 		case 2: // EventType.SPIN_EVENT.ordinal():
 			// TODO change from default constructor
-			event = new SpinEvent();
-			break;
+			/*event = new SpinEvent();
+			break;*/
 		case 3: // EventType.TOUCH_EVENT.ordinal():
 			event = new TouchEvent(newData);
 			break;
@@ -114,8 +114,8 @@ public class ClientToServerProtocol extends ClientProtocol {
 			event = new ZoomEvent(newData);
 			break;
 		case 5: // EventType.DBLCLICK_EVENT.ordinal();
-			event = new DblClkEvent(newData);
-			break;
+			/*event = new DblClkEvent(newData);
+			break;*/
 		}
 		
 		if (event != null)

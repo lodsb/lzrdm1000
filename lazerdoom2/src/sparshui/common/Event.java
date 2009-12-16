@@ -1,8 +1,9 @@
 package sparshui.common;
 
+import gui.multitouch.*;
+
 import java.io.Serializable;
 
-import GUI.Multitouch.*;
 
 import com.trolltech.qt.core.QPointF;
 

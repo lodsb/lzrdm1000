@@ -7,7 +7,6 @@ import java.util.Vector;
 import sparshui.common.Event;
 import sparshui.common.Location;
 import sparshui.common.messages.events.DragEvent;
-import sparshui.common.messages.events.FlickEvent;
 
 /**
  * 
@@ -145,7 +144,8 @@ public class Flick extends StandardDynamicGesture {
 	protected Vector<Event> processMove(TouchData touchData) {
 		Vector<Event> events = new Vector<Event>();
 		updateOffsetCentroid();
-		events.add(new DragEvent(_offsetCentroid.getX(), _offsetCentroid.getY()));
+	//FIXME!!!
+		//events.add(new DragEvent(_offsetCentroid.getX(), _offsetCentroid.getY()));
 		//--------------------
 		
 		
@@ -342,8 +342,8 @@ public class Flick extends StandardDynamicGesture {
 				yDirection = -1;
 			/***************************/
 			
-			
-			events.add(new FlickEvent(speedLevel, xDirection, yDirection));
+			//FIXME!!
+			//events.add(new FlickEvent(speedLevel, xDirection, yDirection));
 			String text;
 			if (speedLevel==1){
 				text = "SLOW!";

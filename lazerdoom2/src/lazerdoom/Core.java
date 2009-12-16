@@ -5,21 +5,23 @@ import java.util.Random;
 
 import javax.swing.JFrame;
 
+import sequencer.EventPointsSequence;
+import sequencer.HighResolutionLinuxClock;
+import sequencer.HighResolutionPollingClock;
+import sequencer.SequenceContainerInterface;
+import sequencer.SequenceController;
+import sequencer.SequencePlayer;
+import sequencer.Sequencer;
+import sequencer.graph.SequenceGraph;
+import synth.SynthController;
+import synth.SynthInfo;
+import synth.SynthInstance;
+
 import com.illposed.osc.OSCMessage;
 
-import Control.ControlServer;
-import Control.Types.DoubleType;
-import Sequencer.EventPointsSequence;
-import Sequencer.HighResolutionLinuxClock;
-import Sequencer.HighResolutionPollingClock;
-import Sequencer.SequenceContainerInterface;
-import Sequencer.SequenceController;
-import Sequencer.SequencePlayer;
-import Sequencer.Sequencer;
-import Sequencer.Graph.SequenceGraph;
-import Synth.SynthInfo;
-import Synth.SynthInstance;
-import Synth.SynthController;
+import control.ControlServer;
+import control.types.DoubleType;
+
 import de.sciss.jcollider.Server;
 import de.sciss.jcollider.Synth;
 import de.sciss.jcollider.gui.ServerPanel;

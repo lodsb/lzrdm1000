@@ -1,9 +1,9 @@
 package sparshui.common.messages.events;
 
-import SceneItems.TouchItemInterface;
 
 import com.trolltech.qt.core.QPointF;
 
+import gui.multitouch.TouchItemInterface;
 import sparshui.common.Event;
 import sparshui.common.Location;
 import sparshui.common.utils.Converter;
@@ -142,6 +142,21 @@ public class ZoomEvent implements Event {
 	@Override
 	public void setSource(TouchItemInterface it) {
 		item = it;
+	}
+	@Override
+	public boolean isFocused() {
+		// TODO Auto-generated method stub
+		return false;
+	}
+	@Override
+	public boolean isOngoing() {
+		// TODO Auto-generated method stub
+		return false;
+	}
+	@Override
+	public void setFocused() {
+		// TODO Auto-generated method stub
+		
 	}	
 
 }

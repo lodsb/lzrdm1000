@@ -1,9 +1,11 @@
 package Testing;
 
-import Control.Types.BaseType;
 import java.util.Random;
-import Control.Types.DoubleType;
-import Sequencer.EventPointsSequence;
+
+import sequencer.EventPointsSequence;
+
+import control.types.BaseType;
+import control.types.DoubleType;
 
 public class Util {
 	public static int hashSequenceEntry(long tick, BaseType value) {

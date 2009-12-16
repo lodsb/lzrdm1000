@@ -1,5 +1,16 @@
 package lazerdoom;
 
+import gui.editor.Editor;
+import gui.editor.SequencerEditor;
+import gui.item.Editor.PushButton;
+import gui.item.Editor.TouchableEditor;
+import gui.multitouch.TouchableGraphicsItemContainer;
+import gui.scene.editor.EditorScene;
+import gui.scene.editor.SequenceDataEditorScene;
+import gui.scene.editor.SynthesizerScene;
+import gui.view.SequencerView;
+import gui.view.SynthesizerView;
+
 import java.awt.Point;
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -13,20 +24,6 @@ import java.util.Vector;
 
 import lazerdoom.TUIOMouseEmulation.MouseCursor;
 
-import Control.Types.DoubleType;
-import GUI.Editor.Editor;
-import GUI.Editor.SequencerEditor;
-import GUI.Item.Editor.PushButton;
-import GUI.Item.Editor.TouchableEditor;
-import GUI.Multitouch.TouchableGraphicsItemContainer;
-import GUI.Scene.Editor.EditorScene;
-import GUI.Scene.Editor.SequenceDataEditorScene;
-import GUI.Scene.Editor.SynthesizerScene;
-import GUI.View.SequencerView;
-import GUI.View.SynthesizerView;
-import Sequencer.EventPointsSequence;
-import Sequencer.TestingSequencer;
-import Session.SessionHandler;
 
 import com.illposed.osc.OSCBundle;
 import com.illposed.osc.OSCMessage;
@@ -45,8 +42,13 @@ import com.trolltech.qt.gui.QPainter.RenderHint;
 import com.trolltech.qt.gui.QSizePolicy.Policy;
 import com.trolltech.qt.opengl.QGLWidget;
 
+import control.types.DoubleType;
+
 import de.sciss.net.OSCServer;
 
+import sequencer.EventPointsSequence;
+import sequencer.TestingSequencer;
+import session.SessionHandler;
 import sparshui.server.GestureServer;
 import sparshui.client.Client;
 import sparshui.client.ServerConnection;

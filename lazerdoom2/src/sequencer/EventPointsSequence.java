@@ -204,7 +204,6 @@ public class EventPointsSequence<EventType extends BaseType> extends BaseSequenc
 		if((eventList = events.get(tick)) != null) {
 			for(ControlBusInterface<EventType> bus: this.controlBuses) {
 				for(EventType event: eventList) {
-					System.out.println("@tick "+tick);
 					bus.setValue(this, tick, event);
 				}
 			}

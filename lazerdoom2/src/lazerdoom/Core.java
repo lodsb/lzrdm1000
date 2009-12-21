@@ -228,7 +228,7 @@ public class Core {
 	}
 	
 	public long beatMeasureToPPQ(int beat, int measure) {
-		long PPQbar = this.sequencer.PPQ*4;
+		long PPQbar = this.sequencer.PPQ*4*4;
 		return (PPQbar*beat)/measure;
 	}
 	

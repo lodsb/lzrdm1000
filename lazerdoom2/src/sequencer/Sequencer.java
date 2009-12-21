@@ -31,7 +31,7 @@ public class Sequencer extends QObject implements Runnable, SequencerInterface {
 	}
 	
 	public static long bpmToPPQNanos(double bpm) {
-		int PPQPerBar = 4*PPQ;
+		int PPQPerBar = 4*4*PPQ;
 		
 		return (long)(beatMeasureToMs(1, PPQPerBar, bpm)*1000000);
 	}

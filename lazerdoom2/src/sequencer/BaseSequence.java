@@ -102,7 +102,7 @@ public abstract class BaseSequence extends QObject implements SequenceInterface,
 	@Override
 	public abstract SequenceInterface deepCopy();
 
-	private long updateResolution = 5;
+	private long updateResolution = Sequencer.PPQ/16; // == 1/64
 	@Override
 	public boolean eval(long tick) {
 		if(tick % updateResolution == 0) {

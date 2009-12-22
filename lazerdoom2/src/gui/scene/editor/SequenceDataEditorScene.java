@@ -1,7 +1,7 @@
 package gui.scene.editor;
 
-import gui.item.Editor.TouchableEditorItem;
-import gui.item.Editor.SequenceDataEditor.*;
+import gui.item.editor.TouchableEditorItem;
+import gui.item.editor.sequencedataeditor.*;
 
 import com.trolltech.qt.QVariant;
 import com.trolltech.qt.core.QPointF;

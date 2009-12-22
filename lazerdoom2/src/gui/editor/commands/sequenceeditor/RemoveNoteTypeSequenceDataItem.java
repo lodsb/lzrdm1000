@@ -9,9 +9,9 @@ import control.types.BaseType;
 
 import edu.uci.ics.jung.graph.util.Pair;
 import gui.editor.BaseEditorCommand;
-import gui.item.Editor.SequenceDataEditor.TouchableDoubleTypeSequenceDataItem;
-import gui.item.Editor.SequenceDataEditor.TouchableNoteTypeSequenceDataItem;
-import gui.item.Editor.SequenceDataEditor.TouchableSequenceDataItem;
+import gui.item.editor.sequencedataeditor.TouchableDoubleTypeSequenceDataItem;
+import gui.item.editor.sequencedataeditor.TouchableNoteTypeSequenceDataItem;
+import gui.item.editor.sequencedataeditor.TouchableSequenceDataItem;
 
 
 public class RemoveNoteTypeSequenceDataItem<T extends BaseType> extends SequenceEditorCommand {

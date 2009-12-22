@@ -1,6 +1,6 @@
 package gui.scene.editor;
 
-import gui.item.Editor.TouchableEditorItem;
+import gui.item.editor.TouchableEditorItem;
 import lazerdoom.LzrDmObjectInterface;
 import sparshui.common.Event;
 import sparshui.common.messages.events.EventType;

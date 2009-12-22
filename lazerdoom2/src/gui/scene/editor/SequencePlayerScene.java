@@ -2,9 +2,9 @@ package gui.scene.editor;
 
 import gui.editor.SequencePlayerEditor;
 import gui.editor.SynthesizerEditor;
-import gui.item.Editor.PushButton;
-import gui.item.Editor.Slider;
-import gui.item.Editor.TextLabel;
+import gui.item.editor.PushButton;
+import gui.item.editor.Slider;
+import gui.item.editor.TextLabel;
 import gui.multitouch.TouchableGraphicsItemContainer;
 
 import com.sun.java.swing.plaf.gtk.GTKConstants.Orientation;

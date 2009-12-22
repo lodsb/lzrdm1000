@@ -72,10 +72,10 @@ import lazerdoom.lazerdoom;
 import edu.uci.ics.jung.graph.util.Pair;
 import gui.editor.*;
 import gui.item.*;
-import gui.item.Editor.TouchableEditor;
-import gui.item.Editor.TouchableEditorItem;
-import gui.item.Editor.TouchableGraphicsView;
 import gui.item.SequencerMenuButton.ActionType;
+import gui.item.editor.TouchableEditor;
+import gui.item.editor.TouchableEditorItem;
+import gui.item.editor.TouchableGraphicsView;
 import gui.multitouch.*;
 import gui.scene.editor.SequenceDataEditorScene;
 
@@ -91,6 +91,10 @@ import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicLong;
 
 import lazerdoom.lazerdoom;
+import message.Processor;
+import message.Scheduler;
+import message.ThreadComSlotted;
+import message.ThreadXBarSlotted;
 
 public class SequencerView extends QGraphicsView implements Client, TouchItemInterface {	
 
@@ -202,6 +206,42 @@ public class SequencerView extends QGraphicsView implements Client, TouchItemInt
 		
 	}
 	
+	private class ControlInputThread extends QObject implements Runnable {
+		Scheduler commIOScheduler = new Scheduler();
+		
+		@Override
+		public void run() {
+			while(true) {
+				commIOScheduler.process();
+			}
+		}
+		
+	}
+	
+	private class ProcessEvent {
+		ProcessEvent(int id, Event event) {
+			this.id = id;
+			this.event = event;
+		}
+		int id;
+		Event event;
+	}
+	
+	private ControlInputThread controlInputThread = new ControlInputThread();
+	private ThreadXBarSlotted<Location, Integer> groupIDXBar = new ThreadXBarSlotted<Location, Integer>();
+	private ThreadXBarSlotted<Integer, List<Integer>> allowedGesturesXBar = new ThreadXBarSlotted<Integer, List<Integer>>();
+	private ThreadComSlotted<ProcessEvent> processEventCom = new ThreadComSlotted<ProcessEvent>();
+	
+	private void setupControlInputThread() {
+		groupIDXBar.executeSignal.connect(this, "getGroupIDLocalThread(gui.view.SequencerView$TouchEventCommunicationContainer, sparshui.common.Location)");
+		allowedGesturesXBar.executeSignal.connect(this, "getAllowedGesturesLocalThread(gui.view.SequencerView$TouchEventCommunicationContainer, int)");
+		processEventCom.executeSignal.connect(this, "processEventLocalThread(Integer, Event)");
+		
+		this.controlInputThread.commIOScheduler.registerProcessor(groupIDXBar);
+		this.controlInputThread.commIOScheduler.registerProcessor(allowedGesturesXBar);
+		this.controlInputThread.commIOScheduler.registerProcessor(processEventCom);
+	}
+	
 	public static QGLWidget sharedGlWidget;
 	private LinkedList<TouchableEditor> editors = new LinkedList<TouchableEditor>();
 	
@@ -294,14 +334,6 @@ public class SequencerView extends QGraphicsView implements Client, TouchItemInt
 	}
 
 	ConcurrentLinkedQueue<ProcessEvent> processEventQueue = new ConcurrentLinkedQueue<ProcessEvent>();
-	private class ProcessEvent {
-		ProcessEvent(int id, Event event) {
-			this.id = id;
-			this.event = event;
-		}
-		int id;
-		Event event;
-	}
 	
 	private HashMap<Integer, TouchItemInterface> touchItemGroupIDMap = new HashMap<Integer, TouchItemInterface>();
 	

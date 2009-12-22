@@ -11,7 +11,7 @@ import control.types.DoubleType;
 import edu.uci.ics.jung.graph.util.Pair;
 import gui.editor.BaseEditorCommand;
 import gui.editor.Editor;
-import gui.item.Editor.SequenceDataEditor.TouchableDoubleTypeSequenceDataItem;
+import gui.item.editor.sequencedataeditor.TouchableDoubleTypeSequenceDataItem;
 
 public class CreateDoublePointSequenceDataItem<T extends BaseType> extends SequenceEditorCommand {
 

@@ -8,7 +8,7 @@ import control.types.BaseType;
 
 import edu.uci.ics.jung.graph.util.Pair;
 import gui.editor.BaseEditorCommand;
-import gui.item.Editor.SequenceDataEditor.*;
+import gui.item.editor.sequencedataeditor.*;
 
 
 public class SequenceDataItemMove<T extends BaseType> extends BaseEditorCommand {

@@ -2,7 +2,7 @@ package gui.editor;
 
 import gui.editor.SequenceEditor;
 import gui.item.*;
-import gui.item.Editor.TouchableEditor;
+import gui.item.editor.TouchableEditor;
 
 import java.util.*;
 

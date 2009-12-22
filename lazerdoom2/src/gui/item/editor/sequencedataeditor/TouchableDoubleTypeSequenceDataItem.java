@@ -1,4 +1,4 @@
-package gui.item.Editor.SequenceDataEditor;
+package gui.item.editor.sequencedataeditor;
 
 import java.util.Map.Entry;
 

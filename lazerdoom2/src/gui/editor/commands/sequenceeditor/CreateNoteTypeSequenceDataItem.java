@@ -12,8 +12,8 @@ import control.types.NoteType;
 import edu.uci.ics.jung.graph.util.Pair;
 import gui.editor.BaseEditorCommand;
 import gui.editor.Editor;
-import gui.item.Editor.SequenceDataEditor.TouchableDoubleTypeSequenceDataItem;
-import gui.item.Editor.SequenceDataEditor.TouchableNoteTypeSequenceDataItem;
+import gui.item.editor.sequencedataeditor.TouchableDoubleTypeSequenceDataItem;
+import gui.item.editor.sequencedataeditor.TouchableNoteTypeSequenceDataItem;
 
 public class CreateNoteTypeSequenceDataItem<T extends NoteType> extends SequenceEditorCommand {
 

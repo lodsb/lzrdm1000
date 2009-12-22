@@ -1,7 +1,7 @@
 package gui.item;
 
 import gui.editor.BaseSequencerItemEditor;
-import gui.item.Editor.TouchableEditor;
+import gui.item.editor.TouchableEditor;
 import gui.multitouch.TouchableGraphicsItem;
 import gui.view.SequencerView;
 

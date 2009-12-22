@@ -1,4 +1,4 @@
-package gui.item.Editor;
+package gui.item.editor;
 
 import gui.editor.Editor;
 import gui.multitouch.TouchableGraphicsItem;

@@ -6,9 +6,11 @@ import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.atomic.AtomicInteger;
 
-public abstract class ThreadXBar<In, Out> implements Processor{
+import com.trolltech.qt.core.QObject;
+
+public abstract class ThreadXBar<In, Out> extends QObject implements Processor{
 	
-	private class Container<T1, T2> {
+	protected class Container<T1, T2> {
 		T1 in;
 		T2 out;
 	}
@@ -23,7 +25,15 @@ public abstract class ThreadXBar<In, Out> implements Processor{
 	public ThreadXBar() {
 		this._prealloc(100);
 	}
-
+	
+	protected ConcurrentLinkedQueue<Container<In,Out>> getSendQueue() {
+		return this.sendQueue;
+	}
+	
+	protected LinkedBlockingQueue<Container<In,Out>> getRecvQueue() {
+		return this.recvQueue;
+	} 
+	
 	public ThreadXBar(int prealloc) {
 		this._prealloc(prealloc);
 	}

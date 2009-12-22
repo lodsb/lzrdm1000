@@ -9,8 +9,8 @@ import control.types.DoubleType;
 
 import edu.uci.ics.jung.graph.util.Pair;
 import gui.editor.BaseEditorCommand;
-import gui.item.Editor.SequenceDataEditor.TouchableDoubleTypeSequenceDataItem;
-import gui.item.Editor.SequenceDataEditor.TouchableSequenceDataItem;
+import gui.item.editor.sequencedataeditor.TouchableDoubleTypeSequenceDataItem;
+import gui.item.editor.sequencedataeditor.TouchableSequenceDataItem;
 
 
 public class MoveSequenceDataItem<T extends BaseType> extends SequenceEditorCommand {

@@ -1,4 +1,4 @@
-package gui.item.Editor;
+package gui.item.editor;
 
 import java.awt.Paint;
 import java.util.LinkedList;

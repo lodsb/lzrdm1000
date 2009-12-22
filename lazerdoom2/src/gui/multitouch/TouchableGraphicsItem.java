@@ -1,6 +1,6 @@
 package gui.multitouch;
 
-import gui.item.Editor.TouchableItemGroupItem;
+import gui.item.editor.TouchableItemGroupItem;
 import gui.multitouch.*;
 
 import java.util.LinkedList;

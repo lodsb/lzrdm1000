@@ -1,4 +1,4 @@
-package gui.item.Editor;
+package gui.item.editor;
 
 import gui.multitouch.TouchItemInterface;
 
@@ -8,24 +8,24 @@ import java.util.List;
 import sceneitems.Util;
 import sparshui.common.Event;
 
-import com.trolltech.qt.gui.QGraphicsProxyWidget;
+import com.trolltech.qt.core.QRectF;
+import com.trolltech.qt.gui.QGraphicsItemInterface;
+import com.trolltech.qt.gui.QGraphicsWidget;
+import com.trolltech.qt.gui.QPainter;
+import com.trolltech.qt.gui.QStyleOptionGraphicsItem;
+import com.trolltech.qt.gui.QWidget;
 
-public class TouchableProxy extends QGraphicsProxyWidget implements TouchItemInterface {
+public class TouchableGraphicsWidget extends QGraphicsWidget implements TouchItemInterface {
+
 	private TouchItemInterface parent = null;
 	private int id = Util.getGroupID();
 	private LinkedList<Integer> allowedGestures = new LinkedList<Integer>();
 	private boolean enableTouchEvents = true;
 	
-	public TouchableProxy() {
-		allowedGestures.add(sparshui.gestures.GestureType.TOUCH_GESTURE.ordinal());
-		System.out.println("proxy " +this);
-	}
-	
-	
 	public void enableTouchEvents(boolean enableTouchEvents) {
 		this.enableTouchEvents = enableTouchEvents;
 	}
-
+		
 	@Override
 	public List<Integer> getAllowedGestures() {
 		// TODO Auto-generated method stub
@@ -37,13 +37,11 @@ public class TouchableProxy extends QGraphicsProxyWidget implements TouchItemInt
 
 	@Override
 	public int getGroupID() {
-		System.out.println("!!!!!!!!!!!!!!KSDFSDLFLSDFKSDKLFSDFLKÖ");
 		return id;
 	}
 
 	@Override
 	public boolean processEvent(Event event) {
-		System.out.println("KSDFSDLFLSDFKSDKLFSDFLKÖ");
 		if(parent != null && enableTouchEvents) {
 			event.setSource(this);
 			return parent.processEvent(event);
@@ -51,5 +49,5 @@ public class TouchableProxy extends QGraphicsProxyWidget implements TouchItemInt
 		
 		return false;
 	}
-}
 
+}

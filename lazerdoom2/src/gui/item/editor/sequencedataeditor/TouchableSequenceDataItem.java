@@ -1,4 +1,4 @@
-package gui.item.Editor.SequenceDataEditor;
+package gui.item.editor.sequencedataeditor;
 
 import java.util.Map.Entry;
 
@@ -8,7 +8,7 @@ import control.types.BaseType;
 
 import edu.uci.ics.jung.graph.util.Pair;
 import gui.editor.Editor;
-import gui.item.Editor.TouchableEditorItem;
+import gui.item.editor.TouchableEditorItem;
 
 public abstract class TouchableSequenceDataItem<T extends BaseType> extends TouchableEditorItem {
 	

@@ -6,7 +6,7 @@ import gui.item.SequenceConnection;
 import gui.item.SequenceItem;
 import gui.item.SynthConnection;
 import gui.item.SynthesizerItem;
-import gui.item.Editor.TouchableItemGroupItem;
+import gui.item.editor.TouchableItemGroupItem;
 import gui.multitouch.TouchItemInterface;
 import gui.multitouch.TouchableGraphicsItem;
 import gui.scene.editor.EditorScene;

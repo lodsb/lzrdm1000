@@ -1,7 +1,7 @@
 package gui.editor;
 
 import gui.item.BaseSequencerItem;
-import gui.item.Editor.TouchableGraphicsView;
+import gui.item.editor.TouchableGraphicsView;
 import gui.scene.editor.EditorScene;
 
 import java.util.List;

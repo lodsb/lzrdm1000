@@ -1,7 +1,7 @@
 package gui.editor.commands;
 
 import gui.editor.BaseEditorCommand;
-import gui.item.Editor.TouchableItemGroupItem;
+import gui.item.editor.TouchableItemGroupItem;
 import gui.multitouch.TouchableGraphicsItem;
 import lazerdoom.LzrDmObjectInterface;
 

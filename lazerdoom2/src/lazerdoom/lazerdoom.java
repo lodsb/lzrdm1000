@@ -2,8 +2,8 @@ package lazerdoom;
 
 import gui.editor.Editor;
 import gui.editor.SequencerEditor;
-import gui.item.Editor.PushButton;
-import gui.item.Editor.TouchableEditor;
+import gui.item.editor.PushButton;
+import gui.item.editor.TouchableEditor;
 import gui.multitouch.TouchableGraphicsItemContainer;
 import gui.scene.editor.EditorScene;
 import gui.scene.editor.SequenceDataEditorScene;

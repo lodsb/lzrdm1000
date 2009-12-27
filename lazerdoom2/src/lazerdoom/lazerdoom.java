@@ -23,6 +23,7 @@ import java.util.List;
 import java.util.Vector;
 
 import lazerdoom.TUIOMouseEmulation.MouseCursor;
+import message.Intercom;
 
 
 import com.illposed.osc.OSCBundle;
@@ -279,7 +280,7 @@ public class lazerdoom extends QWidget {
 			e.printStackTrace();
 		}
 	*/
-        TUIOTouchHandler handler = new TUIOTouchHandler(view);
+        TUIOTouchHandler handler = new TUIOTouchHandler(Intercom.getInstance().system.gestureInput);
         
 		this.setLayout(layout);
 		layout.addWidget(view);	

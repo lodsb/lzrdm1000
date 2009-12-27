@@ -2,7 +2,7 @@ package message;
 
 public class ThreadXBarSlotted<In, Out> extends ThreadXBar<In, Out> { 
 	
-	public Signal2<Object, In> executeSignal = new Signal2<Object, In>();
+	public Signal2<Object, Object> executeSignal = new Signal2<Object, Object>();
 	
 	public ThreadXBarSlotted() {
 		super();
@@ -13,14 +13,14 @@ public class ThreadXBarSlotted<In, Out> extends ThreadXBar<In, Out> {
 	}
 
 	/**
-	 * post result of calc
+	 * post result of calcThreadXBarSlotted
 	 * @param c -- return the first argument from the signal as token! 
 	 * @param out -- result
 	 */
 	
-	public void post(Object c ,Out out) {
+	public void post(Object c , Object out) {
 		Container<In,Out> container = (message.ThreadXBar<In,Out>.Container<In, Out>) c;
-		container.out = out;
+		container.out = (Out)out;
 		this.getRecvQueue().add(container);
 	}
 	

@@ -56,6 +56,7 @@ public abstract class ThreadXBar<In, Out> extends QObject implements Processor{
 	
 	public Out get(In input) {
 		Container<In, Out> container = this.getContainer();
+		container.in = input;
 		sendQueue.add(container);
 		
 		Container<In, Out> recvContainer = null;

@@ -91,12 +91,14 @@ import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicLong;
 
 import lazerdoom.lazerdoom;
+import message.Intercom;
 import message.Processor;
 import message.Scheduler;
 import message.ThreadComSlotted;
 import message.ThreadXBarSlotted;
+import message.Intercom.System.GestureInput.ProcessEvent;
 
-public class SequencerView extends QGraphicsView implements Client, TouchItemInterface {	
+public class SequencerView extends QGraphicsView implements TouchItemInterface {	
 
 	private BaseSequencerItemEditorController sequenceEditorController = new BaseSequencerItemEditorController();
 	public BaseSequencerItemEditorController getItemEditorController() {
@@ -206,40 +208,28 @@ public class SequencerView extends QGraphicsView implements Client, TouchItemInt
 		
 	}
 	
-	private class ControlInputThread extends QObject implements Runnable {
-		Scheduler commIOScheduler = new Scheduler();
-		
-		@Override
-		public void run() {
-			while(true) {
-				commIOScheduler.process();
-			}
-		}
-		
+	private void setupIntercomGestureIntput() {
+		Intercom.getInstance().system.gestureInput.groupIDXBar.executeSignal.connect(this, "getGroupIDSlot(Object, Object)");
+		Intercom.getInstance().system.gestureInput.allowedGesturesXBar.executeSignal.connect(this, "getAllowedGesturesSlot(Object, Object)");
+		Intercom.getInstance().system.gestureInput.processEventCom.executeSignal.connect(this, "processEventSlot(Object)");
 	}
 	
-	private class ProcessEvent {
-		ProcessEvent(int id, Event event) {
-			this.id = id;
-			this.event = event;
-		}
-		int id;
-		Event event;
+	private void processEventSlot(Object processEvent) {
+		ProcessEvent pE = (ProcessEvent) processEvent;
+		this.processEventLocalThread(pE.id, pE.event);
 	}
 	
-	private ControlInputThread controlInputThread = new ControlInputThread();
-	private ThreadXBarSlotted<Location, Integer> groupIDXBar = new ThreadXBarSlotted<Location, Integer>();
-	private ThreadXBarSlotted<Integer, List<Integer>> allowedGesturesXBar = new ThreadXBarSlotted<Integer, List<Integer>>();
-	private ThreadComSlotted<ProcessEvent> processEventCom = new ThreadComSlotted<ProcessEvent>();
-	
-	private void setupControlInputThread() {
-		groupIDXBar.executeSignal.connect(this, "getGroupIDLocalThread(gui.view.SequencerView$TouchEventCommunicationContainer, sparshui.common.Location)");
-		allowedGesturesXBar.executeSignal.connect(this, "getAllowedGesturesLocalThread(gui.view.SequencerView$TouchEventCommunicationContainer, int)");
-		processEventCom.executeSignal.connect(this, "processEventLocalThread(Integer, Event)");
+	private void getGroupIDSlot(Object container, Object loc) {
+		System.err.println(container+" "+loc);
+		int retVal = this.getGroupIDLocalThread((Location)loc);
 		
-		this.controlInputThread.commIOScheduler.registerProcessor(groupIDXBar);
-		this.controlInputThread.commIOScheduler.registerProcessor(allowedGesturesXBar);
-		this.controlInputThread.commIOScheduler.registerProcessor(processEventCom);
+		Intercom.getInstance().system.gestureInput.groupIDXBar.post(container, retVal);
+	}
+	
+	private void getAllowedGesturesSlot(Object container, Object id) {
+		List<Integer> ret = this.getAllowedGesturesLocalThread((Integer) (id));
+		
+		Intercom.getInstance().system.gestureInput.allowedGesturesXBar.post(container, ret);
 	}
 	
 	public static QGLWidget sharedGlWidget;
@@ -252,88 +242,6 @@ public class SequencerView extends QGraphicsView implements Client, TouchItemInt
 	public void unregisterEditor(TouchableEditor editor) {
 		editors.remove(editor);
 	}
-	
-	//Semaphore sema = new Semaphore(1);
-	
-	private class TeCommThread extends QObject implements Runnable {
-		Signal2<TouchEventCommunicationContainer, Location> groupIDSignal = new Signal2<TouchEventCommunicationContainer, Location>();
-		Signal2<TouchEventCommunicationContainer, Integer> gesturesSignal = new Signal2<TouchEventCommunicationContainer,Integer>();
-		Signal2<Integer, Event> processEventSignal = new Signal2<Integer, Event>();
-		
-		SequencerView sc;
-		public TeCommThread(SequencerView sc) {
-			this.sc = sc;
-			
-			groupIDSignal.connect(sc, "getGroupIDLocalThread(gui.view.SequencerView$TouchEventCommunicationContainer, sparshui.common.Location)");
-			gesturesSignal.connect(sc, "getAllowedGesturesLocalThread(gui.view.SequencerView$TouchEventCommunicationContainer, int)");
-			processEventSignal.connect(sc, "processEventLocalThread(Integer, Event)");
-		}
-		
-		void setGroupID(TouchEventCommunicationContainer tc, int id) {
-			tc.returnGroupID = id;
-			teCommContainerRecvQueue.add(tc);
-		}
-		
-		void setAllowedGestures(TouchEventCommunicationContainer tc, List<Integer> list) {
-			tc.returnAllowedGestures= list;
-			teCommContainerRecvQueue.add(tc);
-		}
-		
-		@Override
-		public void run() {
-			ProcessEvent pe;
-			TouchEventCommunicationContainer tc;
-			while(true) { 
-				
-				try {
-					//sema.acquire();
-					Thread.sleep(2);
-				} catch (InterruptedException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
-				}
-				
-				while((!processEventQueue.isEmpty()) || (!teCommContainerSendQueue.isEmpty())) {
-					if((pe = processEventQueue.poll()) != null) {
-						processEventSignal.emit(pe.id, pe.event);
-					}
-
-					if((tc = teCommContainerSendQueue.poll()) != null) {
-						if(tc.isGetGroupID) {
-							groupIDSignal.emit(tc, tc.loc);
-						} else {
-							gesturesSignal.emit(tc, tc.id);
-						}
-					}
-				}
-			}
-		}
-		
-	} 
-	// ugly!
-	QThread thread;
-	TeCommThread tect;
-	ConcurrentLinkedQueue<TouchEventCommunicationContainer> teCommContainerSendQueue = new ConcurrentLinkedQueue<TouchEventCommunicationContainer>();
-	ConcurrentLinkedQueue<TouchEventCommunicationContainer> teCommContainerRecvQueue = new ConcurrentLinkedQueue<TouchEventCommunicationContainer>();
-	
-	private class TouchEventCommunicationContainer {
-		TouchEventCommunicationContainer(Location l, int id, boolean isGetGroup) {
-			this.loc = l;
-			this.id = id;
-			this.isGetGroupID = isGetGroup;
-		}
-		
-		Location loc;
-		int id;
-		boolean isGetGroupID;
-		
-		
-		int returnGroupID = 0;
-		List<Integer> returnAllowedGestures;
-		
-	}
-
-	ConcurrentLinkedQueue<ProcessEvent> processEventQueue = new ConcurrentLinkedQueue<ProcessEvent>();
 	
 	private HashMap<Integer, TouchItemInterface> touchItemGroupIDMap = new HashMap<Integer, TouchItemInterface>();
 	
@@ -450,11 +358,6 @@ public class SequencerView extends QGraphicsView implements Client, TouchItemInt
 		
 		SequencerView.instance = this;
 		
-		tect = new TeCommThread(this);	
-		this.thread = new QThread(tect);
-		tect.moveToThread(thread);
-		thread.start();
-		
 		this.setRenderHint(LazerdoomConfiguration.getInstance().viewRenderHint);
 		
 		this.registerTouchItem(this);
@@ -463,7 +366,8 @@ public class SequencerView extends QGraphicsView implements Client, TouchItemInt
 		QThread sequenceEventThread = new QThread(st);
 		sequenceEventThread.start();
 		st.moveToThread(sequenceEventThread);
-		
+
+		this.setupIntercomGestureIntput();
 		
 		//updateTimer.timeout.connect(this, "update()");
 		//updateTimer.start(1000/60);
@@ -644,14 +548,7 @@ public class SequencerView extends QGraphicsView implements Client, TouchItemInt
 		touchItemGroupIDMap.remove(it.getGroupID());
 	}
 	
-	@Override
-	public List<Integer> getAllowedGestures(int id) {
-		System.out.println("gestures");
-		TouchEventCommunicationContainer tc = new TouchEventCommunicationContainer(null, id, false);
-		return postAndwaitUntilProcessed(tc).returnAllowedGestures;
-	}
-	
-	public void getAllowedGesturesLocalThread(TouchEventCommunicationContainer tc, int id) {
+	public List<Integer> getAllowedGesturesLocalThread(int id) {
 		TouchItemInterface it = null;
 		List<Integer> ret = null;
 		
@@ -664,40 +561,15 @@ public class SequencerView extends QGraphicsView implements Client, TouchItemInt
 			ret = it.getAllowedGestures();
 		}
 		
-		tect.setAllowedGestures(tc, ret);
-	}
-
-	private TouchEventCommunicationContainer postAndwaitUntilProcessed(TouchEventCommunicationContainer tc) {
-		teCommContainerSendQueue.add(tc);
-		
-		//sema.release();
-		
-		TouchEventCommunicationContainer currentTe;
-		while(true) {
-			Iterator<TouchEventCommunicationContainer> it = teCommContainerRecvQueue.iterator();
-			while(it.hasNext()) {
-				currentTe = it.next();
-				if(currentTe == tc) {
-					teCommContainerRecvQueue.remove(tc);
-					//sema.release();
-					return tc;
-				}
-			}
-		}
+		return ret;
 	}
 	
-	@Override
-	public int getGroupID(Location pos) {		
-		TouchEventCommunicationContainer tc = new TouchEventCommunicationContainer(pos, -1, true);
-		return postAndwaitUntilProcessed(tc).returnGroupID;
-	}
-
-	
-	public void getGroupIDLocalThread(TouchEventCommunicationContainer tc, Location pos) {
+	public int getGroupIDLocalThread(Location pos) {
 		double x = pos.getX();
 		double y = pos.getY();
 		int getGroupIDReturnValue = 0;
 		
+		int retVal = -1;
 		
 		QGraphicsItemInterface it = this.scene().itemAt(convertScreenPos(x,y));
 
@@ -709,7 +581,6 @@ public class SequencerView extends QGraphicsView implements Client, TouchItemInt
 			}
 			
 		} else {
-			int retVal = -1;
 			
 			for(TouchableEditor editor: editors) {
 				System.out.println("size "+editors);
@@ -741,13 +612,9 @@ public class SequencerView extends QGraphicsView implements Client, TouchItemInt
 				getGroupIDReturnValue = retVal;
 			}
 		}
-		tect.setGroupID(tc, getGroupIDReturnValue);
-	}
-
-	@Override
-	public synchronized void processEvent(final int id, final Event event) {
-		//sema.release();
-		processEventQueue.add(new ProcessEvent(id, event));
+		//tect.setGroupID(tc, getGroupIDReturnValue);
+		
+		return getGroupIDReturnValue;
 	}
 	
 	public QPointF convertScreenPos(double x, double y) {

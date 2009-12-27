@@ -5,6 +5,8 @@ import java.util.Random;
 
 import javax.swing.JFrame;
 
+import message.Intercom;
+
 import sequencer.EventPointsSequence;
 import sequencer.HighResolutionLinuxClock;
 import sequencer.HighResolutionPollingClock;
@@ -39,150 +41,12 @@ public class Core {
 	private JFrame serverPanel;
 	private SequenceGraph sequenceGraph;
 	
+	
+	private Intercom intercom = new Intercom();
+	
 	private static Core instance;
 	public static Core getInstance() {
 		return instance;
-	}
-	
-	public static void main(String[] args) {
-		Core core = new Core();
-		core.start();
-		//while(true);
-		
-		//System.out.println(core.getSynthManager().getAvailableSynths());
-		//Synth synth = core.getSynthManager().createSynthInstance(core.getSynthManager().getAvailableSynths().get(0));
-		try {
-			Thread.sleep(1000);
-		} catch (InterruptedException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-		
-		/*if(LazerdoomConfiguration.getInstance().showSupercolliderConsole) {
-			core.createAndShowServerPanel();
-		}*/
-		
-		//for(int i = 0; i < 1000; i++) {
-			//System.out.println(core.getSynthManager().createSynthInstance(core.getSynthManager().getAvailableSynths().get(0)));
-		//}
-		Random random = new Random();
-		
-		SequencePlayer sp = core.getSequenceController().createSequencePlayer();
-		EventPointsSequence<DoubleType> e1 = core.getSequenceController().createDoubleTypeEventPointsSequence();
-		EventPointsSequence<DoubleType> e2 = core.getSequenceController().createDoubleTypeEventPointsSequence();
-		EventPointsSequence<DoubleType> e3 = core.getSequenceController().createDoubleTypeEventPointsSequence();
-		EventPointsSequence<DoubleType> e4 = core.getSequenceController().createDoubleTypeEventPointsSequence();
-		
-		core.getSequenceController().connectSequences(sp, e1);
-		core.getSequenceController().connectSequences(e1, e2);
-		core.getSequenceController().connectSequences(sp, e3);
-		core.getSequenceController().connectSequences(e3, e4);
-		
-		SynthInstance si = core.getSynthController().createSynthInstance((core.getSynthController().getAvailableSynths().get(0)));
-		SynthInstance si2 = core.getSynthController().createSynthInstance((core.getSynthController().getAvailableSynths().get(1)));
-		
-		
-		
-		int j = 0;
-		while(j < 12) {
-			try {
-				/*de.sciss.net.OSCMessage msg = synth.setMsg(core.getSynthManager().getAvailableSynths().get(0).getControlParameters()[0].getName(), 22000*random.nextFloat());
-				System.out.println(msg.getName()+" "+msg.getArgCount()+" "+msg.getArg(0)+" "+msg.getArg(1)+" "+msg.getArg(2));
-				core.getScServer().sendMsg(msg);
-				*/
-				//Thread.sleep(100);
-				
-				e1.insert(new DoubleType(1000+5000*random.nextDouble()), j*Sequencer.PPQ*4);
-				
-				
-			} catch (Exception e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
-			
-			j++;
-		}
-		
-		j = 0;
-		while(j < 12) {
-			try {
-				/*de.sciss.net.OSCMessage msg = synth.setMsg(core.getSynthManager().getAvailableSynths().get(0).getControlParameters()[0].getName(), 22000*random.nextFloat());
-				System.out.println(msg.getName()+" "+msg.getArgCount()+" "+msg.getArg(0)+" "+msg.getArg(1)+" "+msg.getArg(2));
-				core.getScServer().sendMsg(msg);
-				*/
-				//Thread.sleep(100);
-				
-				e2.insert(new DoubleType(440*random.nextDouble()), j*Sequencer.PPQ*10);
-				
-				
-			} catch (Exception e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
-			
-			j++;
-		}
-		
-		j = 0;
-		while(j < 12) {
-			try {
-				/*de.sciss.net.OSCMessage msg = synth.setMsg(core.getSynthManager().getAvailableSynths().get(0).getControlParameters()[0].getName(), 22000*random.nextFloat());
-				System.out.println(msg.getName()+" "+msg.getArgCount()+" "+msg.getArg(0)+" "+msg.getArg(1)+" "+msg.getArg(2));
-				core.getScServer().sendMsg(msg);
-				*/
-				//Thread.sleep(100);
-				
-				e3.insert(new DoubleType(880+220*random.nextDouble()), j*Sequencer.PPQ*3);
-				
-				
-			} catch (Exception e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
-			
-			j++;
-		}
-		
-		j = 0;
-		while(j < 12) {
-			try {
-				/*de.sciss.net.OSCMessage msg = synth.setMsg(core.getSynthManager().getAvailableSynths().get(0).getControlParameters()[0].getName(), 22000*random.nextFloat());
-				System.out.println(msg.getName()+" "+msg.getArgCount()+" "+msg.getArg(0)+" "+msg.getArg(1)+" "+msg.getArg(2));
-				core.getScServer().sendMsg(msg);
-				*/
-				//Thread.sleep(100);
-				
-				e4.insert(new DoubleType(1000+880*random.nextDouble()), j*Sequencer.PPQ*4);
-				
-				
-			} catch (Exception e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
-			
-			j++;
-		}
-		
-		//core.start();
-		System.out.println(core.sequenceController);
-		
-		e1.addControlBus(si.getControlBusses()[0]);
-		e1.setLength(2000);
-		
-		e2.addControlBus(si.getControlBusses()[0]);
-		e2.setLength(2000);
-
-		e3.addControlBus(si2.getControlBusses()[0]);
-		e3.setLength(2000);
-
-		e4.addControlBus(si2.getControlBusses()[0]);
-		e4.setLength(2000);
-
-		
-		sp.startSequenceImmidiately();
-		//System.out.println(core.sequenceController);
-		core.start();
-		
 	}
 	
 	public Core() {

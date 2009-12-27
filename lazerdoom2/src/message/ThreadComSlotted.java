@@ -10,7 +10,7 @@ import com.trolltech.qt.core.QObject;
 
 public class ThreadComSlotted<In> extends QObject implements Processor{
 
-	public Signal1<In> executeSignal = new Signal1<In>();
+	public Signal1<Object> executeSignal = new Signal1<Object>();
 	
 	private ConcurrentLinkedQueue<In> sendQueue = new ConcurrentLinkedQueue<In>();
 		

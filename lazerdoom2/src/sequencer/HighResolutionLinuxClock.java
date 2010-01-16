@@ -96,12 +96,12 @@ public class HighResolutionLinuxClock implements ClockInterface, Runnable{
 			//clockStart = System.nanoTime();
 			linuxclock.next_tick();
 			sequencer.processTick(currentTick++);
-			if (priorityRequested != priority) {
+			/*if (priorityRequested != priority) {
 				System.err.println(" Clock priority requested "
 						+ priorityRequested);
 				Priority.setPriorityRR(priorityRequested);
 				priority = priorityRequested;
-			}
+			}*/
 			
 			//this.updateLatency(System.nanoTime()-clockStart);
 		}

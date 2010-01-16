@@ -5,6 +5,7 @@ import java.util.LinkedList;
 import java.util.List;
 
 import sceneitems.Util;
+import sequencer.Sequencer;
 import sparshui.common.Event;
 import sparshui.common.messages.events.DeleteEvent;
 import sparshui.common.messages.events.DragEvent;
@@ -50,8 +51,9 @@ public class TouchableGraphicsView extends QGraphicsView implements TouchItemInt
 	private boolean enableTouchEvents = true;
 	private TouchableEditor editor;
 	
+	private double defaultHorizontalScale = (double)350/ (double)(Sequencer.PPQ*4);
 	private double verticalScale = 1.0;
-	private double horizontalScale = 1.0;
+	private double horizontalScale = defaultHorizontalScale;
 	
 	private EditorScene currentEditorScene = null;
 	
@@ -81,7 +83,7 @@ public class TouchableGraphicsView extends QGraphicsView implements TouchItemInt
 	public void setEditorScene(EditorScene scene) {
 		this.currentEditorScene = scene;
 		this.verticalScale = 1.0;
-		this.horizontalScale = 1.0;
+		this.horizontalScale = defaultHorizontalScale;
 		//this.scale(2.0,2.0);
 		this.setScene(scene);
 		//QGraphicsEllipseItem ei = new QGraphicsEllipseItem();

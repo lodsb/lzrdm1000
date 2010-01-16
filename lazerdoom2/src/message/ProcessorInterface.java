@@ -1,5 +1,5 @@
 package message;
 
-public interface Processor {
+public interface ProcessorInterface {
 	public void process();
 }

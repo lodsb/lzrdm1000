@@ -41,16 +41,16 @@ implements ServerListener
 	private EZSlider[]					ez;
 	private boolean						defSent		= false;
 
-	public static void main( String args[] )
-	{
-		SwingUtilities.invokeLater( new Runnable() {
-			public void run()
-			{
-				new MotoRevCtrl();
-			}
-		});
-
-}	
+//	public static void main( String args[] )
+//	{
+//		SwingUtilities.invokeLater( new Runnable() {
+//			public void run()
+//			{
+//				new MotoRevCtrl();
+//			}
+//		});
+//	}
+	
 	public MotoRevCtrl()
 	{
 		final String fs = File.separator;

@@ -92,7 +92,7 @@ import java.util.concurrent.atomic.AtomicLong;
 
 import lazerdoom.lazerdoom;
 import message.Intercom;
-import message.Processor;
+import message.ProcessorInterface;
 import message.Scheduler;
 import message.ThreadComSlotted;
 import message.ThreadXBarSlotted;
@@ -353,7 +353,7 @@ public class SequencerView extends QGraphicsView implements TouchItemInterface {
 			SequencerView.sharedGlWidget = new QGLWidget();
 			this.setViewport(SequencerView.sharedGlWidget);
 		}
-		this.setViewportUpdateMode(ViewportUpdateMode.FullViewportUpdate);
+		this.setViewportUpdateMode(ViewportUpdateMode.NoViewportUpdate);
 		
 		
 		SequencerView.instance = this;
@@ -369,9 +369,12 @@ public class SequencerView extends QGraphicsView implements TouchItemInterface {
 
 		this.setupIntercomGestureIntput();
 		
-		//updateTimer.timeout.connect(this, "update()");
-		//updateTimer.start(1000/60);
+		// Fixed framerate
+		updateGuiTimer.timeout.connect(this.viewport(), "update()");
+		updateGuiTimer.start(1000/30);
 	}
+	
+	private QTimer updateGuiTimer = new QTimer();
 	
 	public void setUp(double scale) {
 		QRectF sceneRect = this.scene().sceneRect();

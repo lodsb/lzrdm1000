@@ -3,21 +3,21 @@ package message;
 import java.util.concurrent.CopyOnWriteArrayList;
 
 
-public class Scheduler implements Processor {
+public class Scheduler implements ProcessorInterface {
 
-	private CopyOnWriteArrayList<Processor> processors = new CopyOnWriteArrayList<Processor>();
+	private CopyOnWriteArrayList<ProcessorInterface> processors = new CopyOnWriteArrayList<ProcessorInterface>();
 	
-	public void registerProcessor(Processor processor) {
+	public void registerProcessor(ProcessorInterface processor) {
 		processors.add(processor);
 	}
 	
-	public void removeProcessor(Processor processor) {
+	public void removeProcessor(ProcessorInterface processor) {
 		processors.remove(processor);
 	}
 	
 	@Override
 	public void process() {
-		for(Processor processor: processors) {
+		for(ProcessorInterface processor: processors) {
 			processor.process();
 		}
 	}

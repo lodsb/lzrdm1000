@@ -8,7 +8,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 import com.trolltech.qt.core.QObject;
 
-public abstract class ThreadXBar<In, Out> extends QObject implements Processor{
+public abstract class ThreadXBar<In, Out> extends QObject implements ProcessorInterface{
 	
 	protected class Container<T1, T2> {
 		T1 in;

@@ -8,7 +8,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 import com.trolltech.qt.core.QObject;
 
-public class ThreadComSlotted<In> extends QObject implements Processor{
+public class ThreadComSlotted<In> extends QObject implements ProcessorInterface{
 
 	public Signal1<Object> executeSignal = new Signal1<Object>();
 	

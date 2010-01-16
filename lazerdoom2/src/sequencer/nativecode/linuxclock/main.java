@@ -1,5 +1,5 @@
-package sequencer.nativecode.linux;
-import sequencer.nativecode.linux.*;
+package sequencer.nativecode.linuxclock;
+import sequencer.nativecode.linuxclock.*;
 public class main {
    public static void main(String argv[]) {
 	 System.out.println("PATH : " + System.getProperty("java.library.path"));

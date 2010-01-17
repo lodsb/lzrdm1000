@@ -9,7 +9,7 @@ import gui.scene.editor.EditorScene;
 import gui.scene.editor.SequenceDataEditorScene;
 import gui.scene.editor.SynthesizerScene;
 import gui.view.SequencerView;
-import gui.view.SynthesizerView;
+
 
 import java.awt.Point;
 import java.io.File;

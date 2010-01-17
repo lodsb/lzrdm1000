@@ -1,7 +1,11 @@
 package message;
 
 import java.util.List;
+import java.util.concurrent.Semaphore;
 
+import sequencer.SequenceEvalListenerInterface;
+import sequencer.SequenceEvent;
+import sequencer.SequenceEventListenerInterface;
 import sparshui.client.Client;
 import sparshui.common.Event;
 import sparshui.common.Location;
@@ -16,13 +20,13 @@ public class Intercom extends QObject {
 		instance = this;
 	}
 	
-	public System system = new System();
+	public IntercomSystem system = new IntercomSystem();
 	
 	public static Intercom getInstance() {
 		return instance;
 	}
 
-	public class System extends QObject {
+	public class IntercomSystem extends QObject {
 		
 		public class GestureInput extends QObject implements Client {
 			
@@ -31,13 +35,17 @@ public class Intercom extends QObject {
 			}
 			
 			private class ControlInputThread extends QObject implements Runnable {
-				Scheduler commIOScheduler = new Scheduler();
+				private Semaphore sema = new Semaphore(1);
+				Scheduler commIOScheduler = new Scheduler(sema);
+				
 				
 				@Override
 				public void run() {
 					while(true) {
 						try {
-							Thread.sleep(2);
+							//synchronized(monitor) {
+								sema.acquire();
+							//}
 						} catch (InterruptedException e) {
 							// TODO Auto-generated catch block
 							e.printStackTrace();
@@ -99,5 +107,80 @@ public class Intercom extends QObject {
 		}
 	
 		public GestureInput gestureInput = new GestureInput();
+		
+		
+		public class SequenceEventDispatcher extends QObject {
+			
+			public SequenceEventDispatcher() {
+				this.setupSequenceEventDispatchThread();
+			}
+			
+			private class SequenceEventThread extends QObject implements Runnable {
+				private Semaphore sema = new Semaphore(1);
+				Scheduler seqEventScheduler = new Scheduler(sema);
+				
+				
+				@Override
+				public void run() {
+					while(true) {
+						try {
+							//synchronized(monitor) {
+								sema.acquire();
+							//}
+						} catch (InterruptedException e) {
+							// TODO Auto-generated catch block
+							e.printStackTrace();
+						}
+						seqEventScheduler.process();
+					}
+				}
+				
+			}
+	
+			public class SequenceEventContainer {
+				public SequenceEventContainer(SequenceEventListenerInterface s, SequenceEvent e) {
+					this.se = e;
+					this.seli = s;
+				} 
+				
+				public SequenceEventContainer(SequenceEvalListenerInterface s, long t) {
+					this.svali = s;
+					this.tick = t;
+				}
+				
+				public SequenceEventListenerInterface seli;
+				public SequenceEvalListenerInterface svali;
+				public long tick;
+				public SequenceEvent se;
+			}
+			
+			private SequenceEventThread sequenceEventThread = new SequenceEventThread();
+			//public ThreadXBarSlotted<Location, Integer> groupIDXBar = new ThreadXBarSlotted<Location, Integer>();
+			//public ThreadXBarSlotted<Integer, List<Integer>> allowedGesturesXBar = new ThreadXBarSlotted<Integer, List<Integer>>();
+			public ThreadComSlotted<SequenceEventContainer> sequenceEventCom = new ThreadComSlotted<SequenceEventContainer>();
+			public ThreadComSlotted<SequenceEventContainer> sequenceEvalCom = new ThreadComSlotted<SequenceEventContainer>();
+			
+			private void setupSequenceEventDispatchThread() {
+				this.sequenceEventThread.seqEventScheduler.registerProcessor(sequenceEvalCom);
+				this.sequenceEventThread.seqEventScheduler.registerProcessor(sequenceEventCom);
+				
+				QThread seqEventThread = new QThread(sequenceEventThread);
+				sequenceEvalCom.moveToThread(seqEventThread);
+				sequenceEventCom.moveToThread(seqEventThread);
+				
+				seqEventThread.start();
+			}
+
+			public void propagateSequenceEvent(SequenceEventListenerInterface seli, SequenceEvent se) {
+				this.sequenceEventCom.post(new SequenceEventContainer(seli, se));
+			}
+			
+			public void propagateSequenceEval(SequenceEvalListenerInterface svali, long tick) {
+				this.sequenceEvalCom.post(new SequenceEventContainer(svali, tick));
+			}
+			
+		}
+
+		public SequenceEventDispatcher sequenceEventDispatch = new SequenceEventDispatcher();
 	}
 }

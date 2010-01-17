@@ -96,7 +96,8 @@ import message.ProcessorInterface;
 import message.Scheduler;
 import message.ThreadComSlotted;
 import message.ThreadXBarSlotted;
-import message.Intercom.System.GestureInput.ProcessEvent;
+import message.Intercom.IntercomSystem.GestureInput.ProcessEvent;
+import message.Intercom.IntercomSystem.SequenceEventDispatcher.SequenceEventContainer;
 
 public class SequencerView extends QGraphicsView implements TouchItemInterface {	
 
@@ -114,98 +115,19 @@ public class SequencerView extends QGraphicsView implements TouchItemInterface {
 		return SequencerView.instance;
 	}
 	
-	private class SequenceEventContainer {
-		SequenceEventListenerInterface seli;
-		SequenceEvalListenerInterface svali;
-		long tick;
-		SequenceEvent se;
-		
-		boolean isSequenceEvent = true;
-		
-		public void setEventContainer(SequenceEventListenerInterface seli, SequenceEvent se) {
-			this.seli = seli;
-			this.se = se;
-			isSequenceEvent = true;
-		}
-		
-		public void setEventContainer(SequenceEvalListenerInterface svali, long tick) {
-			this.svali = svali;
-			this.tick = tick;
-			this.isSequenceEvent = false;
-		}
-		
+	private void setupSequenceEventDispatch() {
+		Intercom.getInstance().system.sequenceEventDispatch.sequenceEvalCom.executeSignal.connect(this, "propagateSequenceEval(Object)");
+		Intercom.getInstance().system.sequenceEventDispatch.sequenceEventCom.executeSignal.connect(this, "propagateSequenceEvent(Object)");
 	}
 	
-	private int numSequenceContainers = 1000;
-	private AtomicInteger currentSequenceContainerIndex = new AtomicInteger();
-	private CopyOnWriteArrayList<SequenceEventContainer> sequenceEventContainers = new CopyOnWriteArrayList<SequenceEventContainer>();
-	
-	private void createSequenceEventContainers() {
-		for(int i = 0; i < numSequenceContainers; i++) {
-			sequenceEventContainers.add(new SequenceEventContainer());
-		}
-		
-		currentSequenceContainerIndex.set(0);
+	public void propagateSequenceEvent(Object container) {
+		SequenceEventContainer sc = (SequenceEventContainer) container;
+		sc.seli.dispatchSequenceEvent(sc.se);
 	}
 	
-	private SequenceEventContainer getSequenceContainer() {
-		SequenceEventContainer container = sequenceEventContainers.get((currentSequenceContainerIndex.get()));
-		currentSequenceContainerIndex.set((currentSequenceContainerIndex.get()+1)% numSequenceContainers);
-		return container;
-	}
-	
-	
-	private LinkedBlockingQueue<SequenceEventContainer> sequenceEventContainerList = new LinkedBlockingQueue<SequenceEventContainer>();
-	
-	public void propagateSequenceEvent(SequenceEventListenerInterface seli, SequenceEvent se) {
-		try {
-			SequenceEventContainer container = this.getSequenceContainer();
-			container.setEventContainer(seli, se);
-			sequenceEventContainerList.put(container);
-		} catch (InterruptedException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-	}
-	
-	public void propagateSequenceEval(SequenceEvalListenerInterface svali, long tick) {
-		try {
-			SequenceEventContainer container = this.getSequenceContainer();
-			container.setEventContainer(svali, tick);
-			sequenceEventContainerList.put(container);
-		} catch (InterruptedException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-	}
-	
-	private class SequenceEventThread extends QObject implements Runnable {
-
-		@Override
-		public void run() {
-			SequenceEventContainer sec;
-			
-			while(true) {
-				try {
-					sec = sequenceEventContainerList.take();
-					
-					if(sec != null) {
-						if(sec.isSequenceEvent) {
-							//maybe workaround...
-							SequenceEvent newEvent = sec.se.copy();
-							sec.seli.dispatchSequenceEvent(newEvent);
-							
-						} else {
-							sec.svali.dispatchEvalEvent(sec.tick);
-						}
-					}
-				} catch (InterruptedException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
-				}
-			}
-		}
-		
+	public void propagateSequenceEval(Object container) {
+		SequenceEventContainer sc = (SequenceEventContainer) container;
+		sc.svali.dispatchEvalEvent(sc.tick);
 	}
 	
 	private void setupIntercomGestureIntput() {
@@ -330,8 +252,6 @@ public class SequencerView extends QGraphicsView implements TouchItemInterface {
 	
 	public SequencerView(SequencerEditor editor, lazerdoom lzrdm) {
 		System.err.println("CPUs: "+Runtime.getRuntime().availableProcessors());
-	
-		this.createSequenceEventContainers();
 		
 		
 		this.sequencerEditor = editor;
@@ -362,12 +282,13 @@ public class SequencerView extends QGraphicsView implements TouchItemInterface {
 		
 		this.registerTouchItem(this);
 	
-		SequenceEventThread st = new SequenceEventThread();
+		/*SequenceEventThread st = new SequenceEventThread();
 		QThread sequenceEventThread = new QThread(st);
 		sequenceEventThread.start();
-		st.moveToThread(sequenceEventThread);
+		st.moveToThread(sequenceEventThread);*/
 
 		this.setupIntercomGestureIntput();
+		this.setupSequenceEventDispatch();
 		
 		// Fixed framerate
 		updateGuiTimer.timeout.connect(this.viewport(), "update()");

@@ -10,6 +10,7 @@ import sequencer.SequenceEvent.SequenceEventSubtype;
 import sequencer.SequenceEvent.SequenceEventType;
 
 import lazerdoom.LzrDmObjectInterface;
+import message.Intercom;
 
 
 import com.trolltech.qt.QSignalEmitter;
@@ -38,7 +39,7 @@ public abstract class BaseSequence extends QObject implements SequenceInterface,
 	
 	void _pumpSequenceEvent(SequenceEvent se) {
 		for(SequenceEventListenerInterface seli: eventListeners) {
-			SequencerView.getInstance().propagateSequenceEvent(seli, se);
+			Intercom.getInstance().system.sequenceEventDispatch.propagateSequenceEvent(seli, se);
 		}
 	}
 	

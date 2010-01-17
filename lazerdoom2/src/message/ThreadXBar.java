@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.LinkedBlockingQueue;
+import java.util.concurrent.Semaphore;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import com.trolltech.qt.core.QObject;
@@ -15,6 +16,7 @@ public abstract class ThreadXBar<In, Out> extends QObject implements ProcessorIn
 		T2 out;
 	}
 
+	private Semaphore sema;
 	private AtomicInteger containerCounter = new AtomicInteger();	
 	private int numPreallocContainers;
 	private ArrayList<Container<In, Out>> containers = new ArrayList<Container<In, Out>>();
@@ -61,6 +63,11 @@ public abstract class ThreadXBar<In, Out> extends QObject implements ProcessorIn
 		
 		Container<In, Out> recvContainer = null;
 		Iterator<Container<In,Out>> iterator;
+		
+		if(this.sema !=  null) {
+			this.sema.release();
+		}
+		
 		while(true) {
 			recvContainer = recvQueue.peek();
 			
@@ -92,6 +99,10 @@ public abstract class ThreadXBar<In, Out> extends QObject implements ProcessorIn
 		this.recvQueue.add(container);
 	}
 	
+	@Override
+	public void setSemaphore(Semaphore s) {
+		this.sema = s;
+	}
 	
 }
 

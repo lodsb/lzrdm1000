@@ -14,6 +14,7 @@ public abstract class ThreadXBar<In, Out> extends QObject implements ProcessorIn
 	protected class Container<T1, T2> {
 		T1 in;
 		T2 out;
+		int id;
 	}
 
 	private Semaphore sema;
@@ -49,9 +50,13 @@ public abstract class ThreadXBar<In, Out> extends QObject implements ProcessorIn
 	}
 	
 	private Container<In, Out> getContainer() {
-		Container<In,Out> container = containers.get((containerCounter.get()));
+		//FIXME: bug?
+		/*Container<In,Out> container = containers.get((containerCounter.get()));
 		containerCounter.set((containerCounter.get()+1)% numPreallocContainers);
-		return container;
+		container.id = this.containerCounter.get();
+		return container;*/
+		
+		return new Container<In, Out>();
 	}
 
 	abstract protected Out execute(In in); 

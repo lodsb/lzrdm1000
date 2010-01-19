@@ -34,6 +34,10 @@ public class BaseSequenceScene extends EditorScene {
 	public Signal2<Long, Boolean> startMoved = new Signal2<Long, Boolean>();
 	public Signal2<Long, Boolean> lengthMoved = new Signal2<Long, Boolean>();
 	
+	double oldVerticalScale = -1337.0;
+	int oldVerticalSnapGridResolution = 1000; 
+	
+	
 	private int fontSize = 40;
 	private QFont captionFont = new QFont("Helvetica [Cronyx]", fontSize);
 	
@@ -247,9 +251,6 @@ public class BaseSequenceScene extends EditorScene {
 	public String getVerticalGridCaption(double verticalScale) {
 		return "bar 1/"+lazerdoom.Util.nearestPowerOfTwo((int)(8.0*(verticalScale)));
 	}
-	
-	double oldVerticalScale = -1337.0;
-	int oldVerticalSnapGridResolution = 1000; 
 	
 	@Override
 	public int verticalSnapToGridResolution(double verticalScale) {

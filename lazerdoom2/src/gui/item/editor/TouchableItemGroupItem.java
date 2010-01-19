@@ -147,8 +147,8 @@ public class TouchableItemGroupItem extends TouchableGraphicsItem implements Lzr
 		
 		this.zoomNodeDistance = (((zoomNode1.pos().x() - zoomNode2.pos().x())) * ((zoomNode1.pos().x() - zoomNode2.pos().x()))) + (((zoomNode1.pos().y() - zoomNode2.pos().y()))*((zoomNode1.pos().y() - zoomNode2.pos().y())));
 		
-		this.zoomNode1.dragged.connect(this, "zoomNodeDragged(GUI.Item.Editor.TouchableItemGroupItem$ZoomNode, com.trolltech.qt.core.QPointF)");
-		this.zoomNode2.dragged.connect(this, "zoomNodeDragged(GUI.Item.Editor.TouchableItemGroupItem$ZoomNode, com.trolltech.qt.core.QPointF)");
+		this.zoomNode1.dragged.connect(this, "zoomNodeDragged(gui.item.editor.TouchableItemGroupItem$ZoomNode, com.trolltech.qt.core.QPointF)");
+		this.zoomNode2.dragged.connect(this, "zoomNodeDragged(gui.item.editor.TouchableItemGroupItem$ZoomNode, com.trolltech.qt.core.QPointF)");
 		
 		this.sideRatio = 1/(this.boundingRect.width()/this.boundingRect.height());
 	}

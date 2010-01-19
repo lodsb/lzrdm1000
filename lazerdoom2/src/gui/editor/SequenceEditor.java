@@ -463,6 +463,10 @@ public class SequenceEditor extends BaseSequencerItemEditor implements LzrDmObje
 				if((label = labelMap.get(item)) == null) {
 					label = new QGraphicsTextItem();
 					label.setFont(labelFont);
+					
+					//FIXME: handle in basesequencescene... rescaled for h-zoom
+					label.scale(1.0/0.35, 1.0);
+					
 					labelMap.put(item, label);
 					this.getScene().addItem(label);
 				}
@@ -644,6 +648,11 @@ public class SequenceEditor extends BaseSequencerItemEditor implements LzrDmObje
 						if((label = labelMap.get(item)) == null) {
 							label = new QGraphicsTextItem();
 							label.setFont(labelFont);
+							
+							//FIXME: handle in basesequencescene... rescaled for h-zoom
+							label.scale(1.0/0.35, 1.0);
+							
+							
 							labelMap.put(item, label);
 							this.getScene().addItem(label);
 						}
@@ -771,7 +780,9 @@ public class SequenceEditor extends BaseSequencerItemEditor implements LzrDmObje
 				pen.setWidth(4);
 				p.setPen(pen);
 				QPainterPath path = new QPainterPath();
-				path.addEllipse(point, 50,50);
+				
+				//FIXME: handle non-transform path items differently...
+				path.addEllipse(point, 50*(1.0/0.4),50);
 				path.moveTo(point);
 				p.setPath(path);
 				gestureVisualizationsMap.put(event.getTouchID(), p);

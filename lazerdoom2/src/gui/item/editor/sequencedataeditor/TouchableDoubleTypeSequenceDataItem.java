@@ -58,7 +58,7 @@ public class TouchableDoubleTypeSequenceDataItem extends TouchableSequenceDataIt
 	private static String svgFileName = System.getProperty("user.dir")+"/src/gui/item/SVG/node-icons.svg";
 	private static QSvgRenderer sharedRenderer = new QSvgRenderer(svgFileName);
 	
-	private QRectF boundingRect = new QRectF(-30,-30,80,80);
+	private QRectF boundingRect = new QRectF(-50,-50,100,100);
 	private QRectF SVGboundingRect = new QRectF(-20,-20,40,40);
 	
 	private class Line extends QGraphicsLineItem {

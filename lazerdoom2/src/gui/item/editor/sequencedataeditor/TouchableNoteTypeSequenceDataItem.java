@@ -8,6 +8,7 @@ import sparshui.common.messages.events.DragEvent;
 import com.trolltech.qt.core.QPointF;
 import com.trolltech.qt.core.QRectF;
 import com.trolltech.qt.core.Qt;
+import com.trolltech.qt.gui.QBrush;
 import com.trolltech.qt.gui.QColor;
 import com.trolltech.qt.gui.QGraphicsLineItem;
 import com.trolltech.qt.gui.QLineF;
@@ -71,7 +72,9 @@ public TouchableNoteTypeSequenceDataItem(long tick, NoteType value, Editor edito
 		
 		linePen.setWidth(5);
 		//line.setParentItem(this);
+		
 		this.setFlag(GraphicsItemFlag.ItemIgnoresTransformations, true);
+		
 		if(parentItem != null) {
 			this.isNoteOff = true;
 			this.parent = parentItem;
@@ -118,7 +121,8 @@ public TouchableNoteTypeSequenceDataItem(long tick, NoteType value, Editor edito
 	private static String svgFileName = System.getProperty("user.dir")+"/src/gui/item/SVG/node-icons.svg";
 	private static QSvgRenderer sharedRenderer = new QSvgRenderer(svgFileName);
 	
-	private QRectF boundingRect = new QRectF(-30,-30,80,80);
+	//FIXME: 2.5 hack to rescale std view scaling
+	private QRectF boundingRect = new QRectF(-40*2.5,-40,80*2.5,80);
 	private QRectF SVGboundingRect = new QRectF(-20,-20,40,40);
 	private QRectF SVGboundingRect2 = new QRectF(-15,-15,30,30);
 	private Line line = null; 
@@ -166,6 +170,8 @@ public TouchableNoteTypeSequenceDataItem(long tick, NoteType value, Editor edito
 			
 			line.updateLine(this.pos(),this.parent.pos());
 		}
+		//painter.setBrush(new QBrush(QColor.blue));
+		//painter.drawRect(this.boundingRect());
 	}
 	
 	//private Line line = new Line(this);

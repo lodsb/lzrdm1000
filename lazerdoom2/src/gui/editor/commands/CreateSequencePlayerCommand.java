@@ -35,7 +35,10 @@ public class CreateSequencePlayerCommand extends BaseEditorCommand {
 		SequencePlayerItem item = new SequencePlayerItem(sequencePlayer);
 		
 		((EditorScene)this.scene).addItem(item);
-		item.setPos(pos);
+		
+		QPointF position = new QPointF(pos.x()-item.boundingRect().width()/2, pos.y()-item.boundingRect().height()/2);
+		item.setPos(position);
+
 		
 		SessionHandler.getInstance().registerObject(item);
 		

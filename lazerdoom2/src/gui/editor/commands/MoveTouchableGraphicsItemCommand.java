@@ -20,8 +20,12 @@ public class MoveTouchableGraphicsItemCommand extends BaseEditorCommand {
 
 	@Override
 	public boolean execute() {
-		((TouchableGraphicsItem)this.item).setPosition(pos);
+		if(item != null) {
+			((TouchableGraphicsItem)this.item).setPosition(pos);
 		
-		return true;
+			return true;
+		} 
+		
+		return false;
 	}
 }

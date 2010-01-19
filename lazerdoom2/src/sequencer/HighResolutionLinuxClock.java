@@ -89,21 +89,27 @@ public class HighResolutionLinuxClock implements ClockInterface, Runnable{
 	private int priorityRequested = 80;
 	private int priority = 0;
 	
+	private boolean run = true;
+	
+	
+	public void stopClock() {
+		run = false;
+	}
 	@Override
 	public void run() {
 		
-		while(true) {
-			//clockStart = System.nanoTime();
+		while(run) {
+			clockStart = System.nanoTime();
 			linuxclock.next_tick();
 			sequencer.processTick(currentTick++);
-			/*if (priorityRequested != priority) {
+			if (priorityRequested != priority) {
 				System.err.println(" Clock priority requested "
 						+ priorityRequested);
 				Priority.setPriorityRR(priorityRequested);
 				priority = priorityRequested;
-			}*/
+			}
 			
-			//this.updateLatency(System.nanoTime()-clockStart);
+			this.updateLatency(System.nanoTime()-clockStart);
 		}
 	}
 }

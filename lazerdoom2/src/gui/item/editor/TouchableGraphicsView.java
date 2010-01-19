@@ -41,6 +41,7 @@ import gui.item.SynthesizerItem;
 import gui.item.TouchPointCursor;
 import gui.multitouch.TouchItemInterface;
 import gui.multitouch.TouchableGraphicsItem;
+import gui.scene.editor.BaseSequenceScene;
 import gui.scene.editor.EditorScene;
 import gui.view.SequencerView;
 
@@ -51,7 +52,7 @@ public class TouchableGraphicsView extends QGraphicsView implements TouchItemInt
 	private boolean enableTouchEvents = true;
 	private TouchableEditor editor;
 	
-	private double defaultHorizontalScale = (double)350/ (double)(Sequencer.PPQ*4);
+	private double defaultHorizontalScale = 1.0;//(double)350/ (double)(Sequencer.PPQ*4);
 	private double verticalScale = 1.0;
 	private double horizontalScale = defaultHorizontalScale;
 	
@@ -83,7 +84,15 @@ public class TouchableGraphicsView extends QGraphicsView implements TouchItemInt
 	public void setEditorScene(EditorScene scene) {
 		this.currentEditorScene = scene;
 		this.verticalScale = 1.0;
-		this.horizontalScale = defaultHorizontalScale;
+
+		//System.err.println("dsddsd "+scene);
+		//FXIME: quick hack, add this properly to the basesequencescene
+		if(scene instanceof BaseSequenceScene) {
+			this.horizontalScale = 0.4;
+		} else {
+			this.horizontalScale = defaultHorizontalScale;
+		}
+		
 		//this.scale(2.0,2.0);
 		this.setScene(scene);
 		//QGraphicsEllipseItem ei = new QGraphicsEllipseItem();
@@ -101,19 +110,22 @@ public class TouchableGraphicsView extends QGraphicsView implements TouchItemInt
 		//this.scale(currentZoomX, currentZoomY);
 		
 		this.scene().invalidate();
-		this.centerOn(currentCenterX, currentCenterY);
-		this.scale(horizontalScale, verticalScale);
+		//this.centerOn(currentCenterX, currentCenterY);
+		//this.scale(horizontalScale, verticalScale);
 		
 		//this.zoomTo(0.5, 2.456);
 		
 		this.repaint();
 		this.updateEditorCaption();
 		
-		this.scene().invalidate();
+		//this.scene().invalidate();
 		this.centerOn(currentCenterX, currentCenterY);
 		this.scale(horizontalScale, verticalScale);
 		
-		
+/* else {
+			this.scale(horizontalScale, verticalScale);
+		}*/
+
 	}
 	
 	public void zoomTo(double x, double y) {
@@ -146,8 +158,8 @@ public class TouchableGraphicsView extends QGraphicsView implements TouchItemInt
 			this.currentCenterX = this.currentCenterX +x;
 		}
 		this.currentCenterY = this.currentCenterY +y;
-		this.centerOn(this.currentCenterX, this.currentCenterY);
-		System.out.println("cx cy" + this.currentCenterX+" "+this.currentCenterY);
+		this.centerOn(this.currentCenterX+1000, this.currentCenterY);
+		System.err.println("cx cy" + this.currentCenterX+" "+this.currentCenterY);
 		this.update();
 	}
 	

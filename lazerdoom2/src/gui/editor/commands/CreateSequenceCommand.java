@@ -33,9 +33,10 @@ public class CreateSequenceCommand extends BaseEditorCommand {
 		/*EventPointsSequence<DoubleType> sequence = core.getSequenceController().createDoubleTypeEventPointsSequence();
 		sequence.setLength(100);*/
 		SequenceItem item = new SequenceItem();
-		
 		((EditorScene)this.scene).addItem(item);
-		item.setPos(pos);
+		
+		QPointF position = new QPointF(pos.x()-item.boundingRect().width()/2, pos.y()-item.boundingRect().height()/2);
+		item.setPos(position);
 		
 		SessionHandler.getInstance().registerObject(item);
 		

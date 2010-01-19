@@ -37,6 +37,7 @@ import com.trolltech.qt.core.QEvent;
 import com.trolltech.qt.core.QTimer;
 import com.trolltech.qt.core.Qt;
 import com.trolltech.qt.core.Qt.FocusPolicy;
+import com.trolltech.qt.core.Qt.MouseButton;
 import com.trolltech.qt.gui.*;
 import com.trolltech.qt.gui.QGraphicsView.ViewportUpdateMode;
 import com.trolltech.qt.gui.QPainter.RenderHint;
@@ -114,14 +115,25 @@ public class lazerdoom extends QWidget {
         lazerdoom lazerdoomApp = new lazerdoom(null);
         lazerdoomApp.show();
 
-        QShortcut shortcut = new QShortcut(new QKeySequence("Ctrl+Q"),lazerdoomApp);
-        shortcut.activated.connect(QApplication.instance(), "quit()");
+        QShortcut quitShortcut = new QShortcut(new QKeySequence("Ctrl+Q"),lazerdoomApp);
+        quitShortcut.activated.connect(QApplication.instance(), "quit()");
+        
+        QShortcut safeShortcut = new QShortcut(new QKeySequence("Ctrl+S"),lazerdoomApp);
+        safeShortcut.activated.connect(lazerdoomApp, "safeSession()");
+
+        
         lazerdoomApp.loadSession();
         QApplication.exec();
         
-        SessionHandler.getInstance().safeSession(LazerdoomConfiguration.getInstance().baseLzrdmPath+LazerdoomConfiguration.getInstance().sessionFileName);
+        lazerdoomApp.safeSession();
+        
+        Core.getInstance().terminate();
         
         System.exit(0);
+    }
+    
+    private void safeSession() {
+    	SessionHandler.getInstance().safeSession(LazerdoomConfiguration.getInstance().baseLzrdmPath+LazerdoomConfiguration.getInstance().sessionFileName);
     }
 
     private QCursor cursor = new QCursor(Qt.CursorShape.PointingHandCursor);
@@ -129,30 +141,43 @@ public class lazerdoom extends QWidget {
     
     private int currentID = 0;
     private MouseCursor currentCursor = null;
+    private MouseCursor secondCursor = null;
     
-    public void handleMouseMoveEvent(QMouseEvent event) {
-    	if(currentCursor == null) {
-    		return;
-    	}
-    	
+    public void handleMouseMoveEvent(QMouseEvent event) {    
+		MouseCursor c = null;
+		
+		if(event.buttons().isSet(MouseButton.LeftButton)) {
+			c = currentCursor;
+		} else if(event.buttons().isSet(MouseButton.RightButton)) {
+			c = secondCursor;
+		} else {
+			return;
+		}
+		
 		OSCBundle cursorBundle = new OSCBundle();
 		OSCMessage aliveMessage = new OSCMessage("/tuio/2Dcur");
 		aliveMessage.addArgument("alive");
-		aliveMessage.addArgument(currentID);
-		currentCursor.update(cursor.pos().x(), cursor.pos().y());
-		Point point = currentCursor.getPosition();
 		
+		if(currentCursor != null) {
+			aliveMessage.addArgument(currentCursor.session_id);
+		}
+		if(secondCursor != null) {
+			aliveMessage.addArgument(secondCursor.session_id);
+		} 
+		
+		c.update(cursor.pos().x(), cursor.pos().y());
+		Point point = c.getPosition();
 		float xpos = (point.x)/(float)QApplication.desktop().screenGeometry().width();
 		float ypos = (point.y)/(float)QApplication.desktop().screenGeometry().height();
 		
 		OSCMessage setMessage = new OSCMessage("/tuio/2Dcur");
 		setMessage.addArgument("set");
-		setMessage.addArgument(currentCursor.session_id);
+		setMessage.addArgument(c.session_id);
 		setMessage.addArgument(xpos);
 		setMessage.addArgument(ypos);
-		setMessage.addArgument(currentCursor.xspeed);
-		setMessage.addArgument(currentCursor.yspeed);
-		setMessage.addArgument(currentCursor.maccel);
+		setMessage.addArgument(c.xspeed);
+		setMessage.addArgument(c.yspeed);
+		setMessage.addArgument(c.maccel);
 
 		currentFrame++;
 		OSCMessage frameMessage = new OSCMessage("/tuio/2Dcur");
@@ -167,29 +192,52 @@ public class lazerdoom extends QWidget {
     }
     
     private int currentFrame = 0;
+    private int secondID = 0;
     
     public void handleMousePressEvent(QMouseEvent event) {
 		OSCBundle cursorBundle = new OSCBundle();
 		OSCMessage aliveMessage = new OSCMessage("/tuio/2Dcur");
-		aliveMessage.addArgument("alive");
-		aliveMessage.addArgument(currentID);
-
-		currentCursor = new MouseCursor(currentID, cursor.pos().x(), cursor.pos().y());
+		aliveMessage.addArgument("alive"); 
 		
-		Point point = currentCursor.getPosition();
+		MouseCursor c = null;
+		
+		if(event.button() == MouseButton.LeftButton) {
+			currentCursor = new MouseCursor(currentID, cursor.pos().x(), cursor.pos().y());
+			c = currentCursor;
+    	} else {
+    		if(secondCursor == null) {
+    			secondCursor = new MouseCursor(currentID, cursor.pos().x(), cursor.pos().y());
+    			c = secondCursor;
+    		} else {
+    			secondCursor = null;
+    			
+    			return;
+    		}
+    	}
+		
+		currentID++;
+		
+		if(currentCursor != null) {
+			aliveMessage.addArgument(currentCursor.session_id);
+		}
+		if(secondCursor != null) {
+			aliveMessage.addArgument(secondCursor.session_id);
+		}
+		
+		Point point = c.getPosition();
 		
 		float xpos = (point.x)/(float)QApplication.desktop().screenGeometry().width();
 		float ypos = (point.y)/(float)QApplication.desktop().screenGeometry().height();
 		
 		OSCMessage setMessage = new OSCMessage("/tuio/2Dcur");
 		setMessage.addArgument("set");
-		setMessage.addArgument(currentCursor.session_id);
+		setMessage.addArgument(c.session_id);
 		setMessage.addArgument(xpos);
 		setMessage.addArgument(ypos);
-		setMessage.addArgument(currentCursor.xspeed);
-		setMessage.addArgument(currentCursor.yspeed);
-		setMessage.addArgument(currentCursor.maccel);
-
+		setMessage.addArgument(c.xspeed);
+		setMessage.addArgument(c.yspeed);
+		setMessage.addArgument(c.maccel);
+		
 		currentFrame++;
 		OSCMessage frameMessage = new OSCMessage("/tuio/2Dcur");
 		frameMessage.addArgument("fseq");
@@ -200,7 +248,7 @@ public class lazerdoom extends QWidget {
 		cursorBundle.addPacket(frameMessage);
 
 		this.sendOSC(cursorBundle);
-    	
+		
     	/*OSCBundle test = new OSCBundle();
     	
        	System.out.println("******* "+cursor.pos());
@@ -218,7 +266,18 @@ public class lazerdoom extends QWidget {
 		OSCBundle cursorBundle = new OSCBundle();
 		OSCMessage aliveMessage = new OSCMessage("/tuio/2Dcur");
 		aliveMessage.addArgument("alive");
-
+		
+		if(event.button() == MouseButton.LeftButton) {
+			currentCursor = null;
+		} 
+		
+		if(currentCursor != null) {
+			aliveMessage.addArgument(currentCursor.session_id);
+		}
+		if(secondCursor != null) {
+			aliveMessage.addArgument(secondCursor.session_id);
+		} 
+		
 		currentFrame++;
 		OSCMessage frameMessage = new OSCMessage("/tuio/2Dcur");
 		frameMessage.addArgument("fseq");
@@ -229,8 +288,7 @@ public class lazerdoom extends QWidget {
 
 		sendOSC(cursorBundle);
     	
-       	currentID++;
-       	currentCursor = null;
+       	currentID = currentID+2;
     }
     
     public void stopCommunication() {

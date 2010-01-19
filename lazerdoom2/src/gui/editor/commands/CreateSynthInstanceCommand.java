@@ -26,7 +26,9 @@ public class CreateSynthInstanceCommand extends BaseEditorCommand {
 	public boolean execute() {
 		SynthesizerItem item = new SynthesizerItem();
 		((EditorScene)this.scene).addItem(item);
-		item.setPos(this.pos);
+		
+		QPointF position = new QPointF(pos.x()-item.boundingRect().width()/2, pos.y()-item.boundingRect().height()/2);
+		item.setPos(position);
 		
 		SessionHandler.getInstance().registerObject(item);
 		

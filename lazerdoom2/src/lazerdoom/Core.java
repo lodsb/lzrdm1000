@@ -49,6 +49,10 @@ public class Core {
 		return instance;
 	}
 	
+	public void terminate() {
+		clock.stopClock();
+	}
+	
 	public Core() {
 		
 		//this.startJack();

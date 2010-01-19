@@ -66,11 +66,11 @@ public class MouseCursor {
 		this.mspeed = 0.0f;
 	}
  
-	public final Point getPosition() {
+	public Point getPosition() {
 		return path.lastElement();	
 	}
 
-	public final Vector<Point> getPath() {
+	public Vector<Point> getPath() {
 		return path;	
 	}
 

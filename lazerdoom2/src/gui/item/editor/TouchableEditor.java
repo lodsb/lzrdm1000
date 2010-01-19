@@ -568,6 +568,7 @@ public class TouchableEditor extends TouchableGraphicsWidget {
 	}
 	
 	public void updateViewScene() {
+		System.err.println("AHAHAHAHAHAHAHHASDA SDKKASDH KASDH AKSDH AKSDH ASKDH ");
 		this.graphicsView.setEditorScene(this.editor.getScene());
 	}
 	

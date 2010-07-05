@@ -48,7 +48,8 @@ public class BaseSequenceScene extends EditorScene {
 
 		public Signal2<Long, Boolean> moved = new Signal2<Long, Boolean>();
 		
-		QRectF boundingRect = new QRectF(0,-1000, 50, 2000);
+		//FIXME: 2.5 hack to rescale std view scaling
+		QRectF boundingRect = new QRectF(0,-1000, 50*2.5, 2000);
 		protected QColor color = new QColor(QColor.green);
 		QPen pen = new QPen(color);
 		QBrush brush = new QBrush(color);
@@ -74,6 +75,7 @@ public class BaseSequenceScene extends EditorScene {
 
 		
 		public boolean processEvent(Event e) {
+			System.err.println("move move!!");
 			if(e instanceof DragEvent) {
 				this.moved.emit((long) (e.getSceneLocation().x()/tickMultiplyer), ((DragEvent) e).isSuccessful());
 			}

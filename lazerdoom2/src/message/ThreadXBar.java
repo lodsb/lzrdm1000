@@ -2,6 +2,7 @@ package message;
 
 import java.util.ArrayList;
 import java.util.Iterator;
+import java.util.Random;
 import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.Semaphore;
@@ -49,14 +50,16 @@ public abstract class ThreadXBar<In, Out> extends QObject implements ProcessorIn
 		this.numPreallocContainers = containers;
 	}
 	
+	private Random rnd = new Random();
+	
 	private Container<In, Out> getContainer() {
 		//FIXME: bug?
-		/*Container<In,Out> container = containers.get((containerCounter.get()));
+		Container<In,Out> container = containers.get((containerCounter.get()));
 		containerCounter.set((containerCounter.get()+1)% numPreallocContainers);
-		container.id = this.containerCounter.get();
-		return container;*/
+		container.id = rnd.nextInt(); //this.containerCounter.get();
+		return container;
 		
-		return new Container<In, Out>();
+		//return new Container<In, Out>();
 	}
 
 	abstract protected Out execute(In in); 

@@ -23,7 +23,7 @@ public class ParameterControlBus<T extends BaseType> implements ControlBusInterf
 	
 	@Override
 	public void setValue(BaseSequence si, long tick, T baseType) {
-		server.appendMessage(si, tick, synth.setMsg(this.controlDescription.getName(), baseType.getFloatValue()));		
+		server.appendMessage(si, tick, synth.setMsg(this.controlDescription.getName(), baseType.getFloatValue()));
 	}
 
 	@Override

@@ -25,6 +25,7 @@ import sparshui.common.messages.events.ExtendedGestureEvent;
 import sparshui.common.messages.events.GroupEvent;
 import sparshui.common.messages.events.RotateEvent;
 import sparshui.common.messages.events.TouchEvent;
+import synth.event.SynthEventServer;
 
 import com.trolltech.qt.QThread;
 import com.trolltech.qt.core.QCoreApplication;
@@ -98,6 +99,7 @@ import message.ThreadComSlotted;
 import message.ThreadXBarSlotted;
 import message.Intercom.IntercomSystem.GestureInput.ProcessEvent;
 import message.Intercom.IntercomSystem.SequenceEventDispatcher.SequenceEventContainer;
+import message.Intercom.IntercomSystem.SynthEventDispatcher.SynthEventContainer;
 
 public class SequencerView extends QGraphicsView implements TouchItemInterface {	
 
@@ -113,6 +115,16 @@ public class SequencerView extends QGraphicsView implements TouchItemInterface {
 	
 	public static SequencerView getInstance() {
 		return SequencerView.instance;
+	}
+	
+	private void setupSynthEventDispatch() {
+		Intercom.getInstance().system.synthEventDispatch.synthEventCom.executeSignal.connect(this, "propagateSynthEvent(Object)");
+	}
+	
+	public void propagateSynthEvent(Object container) {
+		SynthEventContainer sec = (SynthEventContainer) container;
+		//sec.syneli.dispatchSynthEvent(sec.event);
+		System.err.println("GUI--eve "+sec.event);
 	}
 	
 	private void setupSequenceEventDispatch() {
@@ -289,10 +301,11 @@ public class SequencerView extends QGraphicsView implements TouchItemInterface {
 
 		this.setupIntercomGestureIntput();
 		this.setupSequenceEventDispatch();
+		this.setupSynthEventDispatch();
 		
 		// Fixed framerate
 		updateGuiTimer.timeout.connect(this.viewport(), "update()");
-		updateGuiTimer.start(1000/30);
+		updateGuiTimer.start(1000/(LazerdoomConfiguration.getInstance().frameRate));
 	}
 	
 	private QTimer updateGuiTimer = new QTimer();
@@ -618,15 +631,20 @@ public class SequencerView extends QGraphicsView implements TouchItemInterface {
 	
 	
 	
-	private QColor bgColor1 = new QColor(38,50,62);
-	private QColor bgColor2 = new QColor(bgColor1.lighter(155));
+	private QColor bgColor1 = new QColor(255,255,255);//new QColor(38,50,62);
+	private QColor bgColor2 = new QColor(255,255,255);//new QColor(bgColor1.lighter(155));
+	
+	
+	private QBrush currentBG = new QBrush(new QColor(38,50,62));
 	
     protected void drawBackground(QPainter painter, QRectF rect) {
         // Fill
-        QRadialGradient gradient = new QRadialGradient(0,0,rect.width());
-        gradient.setColorAt(0, bgColor2);
-        gradient.setColorAt(1, bgColor1);
-        painter.fillRect(rect, new QBrush(gradient));
+        
+    	//QRadialGradient gradient = new QRadialGradient(0,0,rect.width());
+        //gradient.setColorAt(0, bgColor2);
+        //gradient.setColorAt(1, bgColor1);
+        
+    	painter.fillRect(rect, currentBG);// new QBrush(gradient));
     }
 
 	@Override

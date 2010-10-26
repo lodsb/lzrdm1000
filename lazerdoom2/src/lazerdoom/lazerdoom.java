@@ -116,7 +116,7 @@ public class lazerdoom extends QWidget {
         lazerdoomApp.show();
 
         QShortcut quitShortcut = new QShortcut(new QKeySequence("Ctrl+Q"),lazerdoomApp);
-        quitShortcut.activated.connect(QApplication.instance(), "quit()");
+        quitShortcut.activated.connect(lazerdoomApp, "quit()");
         
         QShortcut safeShortcut = new QShortcut(new QKeySequence("Ctrl+S"),lazerdoomApp);
         safeShortcut.activated.connect(lazerdoomApp, "safeSession()");
@@ -130,6 +130,11 @@ public class lazerdoom extends QWidget {
         Core.getInstance().terminate();
         
         System.exit(0);
+    }
+    
+    private void quit() {
+    	this.core.quit();
+    	QApplication.instance().quit();
     }
     
     private void safeSession() {

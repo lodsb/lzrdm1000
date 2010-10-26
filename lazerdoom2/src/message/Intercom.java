@@ -9,6 +9,8 @@ import sequencer.SequenceEventListenerInterface;
 import sparshui.client.Client;
 import sparshui.common.Event;
 import sparshui.common.Location;
+import synth.event.SynthEvent;
+import synth.event.SynthEventListenerInterface;
 
 import com.trolltech.qt.QThread;
 import com.trolltech.qt.core.QObject;
@@ -23,6 +25,9 @@ public class Intercom extends QObject {
 	public IntercomSystem system = new IntercomSystem();
 	
 	public static Intercom getInstance() {
+		if(instance == null) {
+			instance = new Intercom();
+		}
 		return instance;
 	}
 
@@ -182,5 +187,66 @@ public class Intercom extends QObject {
 		}
 
 		public SequenceEventDispatcher sequenceEventDispatch = new SequenceEventDispatcher();
+		
+		public class SynthEventDispatcher extends QObject {
+			
+			public class SynthEventContainer {
+				public SynthEventListenerInterface syneli;
+				public SynthEvent event;
+				
+				public SynthEventContainer(SynthEventListenerInterface syneli, SynthEvent event) {
+					this.event = event;
+					this.syneli = syneli;
+				}
+			}
+			
+			public SynthEventDispatcher() {
+				this.setupSynthEventDispatchThread();
+			}
+			
+			private class SynthEventThread extends QObject implements Runnable {
+				private Semaphore sema = new Semaphore(1);
+				Scheduler synEventScheduler = new Scheduler(sema);
+				
+				
+				@Override
+				public void run() {
+					while(true) {
+						try {
+							//synchronized(monitor) {
+								sema.acquire();
+							//}
+						} catch (InterruptedException e) {
+							// TODO Auto-generated catch block
+							e.printStackTrace();
+						}
+						synEventScheduler.process();
+					}
+				}
+				
+			}
+			
+			private SynthEventThread synthEventThread = new SynthEventThread();
+			//public ThreadXBarSlotted<Location, Integer> groupIDXBar = new ThreadXBarSlotted<Location, Integer>();
+			//public ThreadXBarSlotted<Integer, List<Integer>> allowedGesturesXBar = new ThreadXBarSlotted<Integer, List<Integer>>();
+			public ThreadComSlotted<SynthEventContainer> synthEventCom = new ThreadComSlotted<SynthEventContainer>();
+
+			
+			private void setupSynthEventDispatchThread() {
+				this.synthEventThread.synEventScheduler.registerProcessor(synthEventCom);
+				
+				QThread synEventThread = new QThread(synthEventThread);
+				synthEventCom.moveToThread(synEventThread);
+				
+				synEventThread.start();
+			}
+
+			public void propagateSynthEvent(SynthEventListenerInterface syneli, SynthEvent event) {
+				this.synthEventCom.post(new SynthEventContainer(syneli, event));
+			}
+						
+		}
+
+		public SynthEventDispatcher synthEventDispatch = new SynthEventDispatcher();
 	}
 }

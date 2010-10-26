@@ -50,13 +50,6 @@ public class SynthEventServer implements OSCListener {
 		}
 	}
 	
-	/*
-	 * triggered by SequencerView!
-	 * */
-	public void processMessageGuiThread(Object seIntermediate) {
-		
-	}
-	
 	public void addSynthEventListener(Synth synth, SynthEventListenerInterface synthInterface) {
 		Integer synthId = synth.getNodeID();
 		synchronized(eventListeners) {

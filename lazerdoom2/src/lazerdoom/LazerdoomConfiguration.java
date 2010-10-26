@@ -12,6 +12,8 @@ public class LazerdoomConfiguration {
 	
 	public int maxPolyphony = 16;
 	
+	public int frameRate = 25;
+	
 	// std config-filename
 	public String configFileName = "lzrdmConfig.xml";
 	

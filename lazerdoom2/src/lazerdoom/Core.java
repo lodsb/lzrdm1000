@@ -1,6 +1,9 @@
 package lazerdoom;
 
 import java.io.IOException;
+import java.io.PrintStream;
+import java.net.InetSocketAddress;
+import java.net.SocketAddress;
 import java.util.Random;
 
 import javax.swing.JFrame;
@@ -18,15 +21,24 @@ import sequencer.graph.SequenceGraph;
 import synth.SynthController;
 import synth.SynthInfo;
 import synth.SynthInstance;
+import synth.event.SynthEventListenerInterface;
+import synth.event.SynthEventServer;
 
 import com.illposed.osc.OSCMessage;
 
 import control.ControlServer;
 import control.types.DoubleType;
 
+import de.sciss.jcollider.OSCResponderNode;
 import de.sciss.jcollider.Server;
+import de.sciss.jcollider.ServerEvent;
+import de.sciss.jcollider.ServerListener;
 import de.sciss.jcollider.Synth;
 import de.sciss.jcollider.gui.ServerPanel;
+import de.sciss.net.OSCListener;
+import de.sciss.net.OSCPacket;
+import de.sciss.net.OSCPacketCodec;
+import de.sciss.net.OSCServer;
 
 public class Core {
 	private HighResolutionLinuxClock clock;
@@ -35,14 +47,14 @@ public class Core {
 	private ControlServer controlServer;
 	private SynthController synthController; 
 	private Server superColliderServer;
-	private Process jackProcess; 
+
 	
 	private double stdTempo = 120.0;
 	private JFrame serverPanel;
 	private SequenceGraph sequenceGraph;
 	
 	
-	private Intercom intercom = new Intercom();
+	//private Intercom intercom = new Intercom();
 	
 	private static Core instance;
 	public static Core getInstance() {
@@ -66,7 +78,7 @@ public class Core {
 		
 		try {
 			superColliderServer = new Server("localhost");
-			superColliderServer.start();
+			//superColliderServer.start();
 		} catch (IOException e) {
 			System.err.println("Error creating SC3-Server:\n"+e.getMessage());
 			e.printStackTrace();
@@ -116,12 +128,21 @@ public class Core {
 		clock.start();
 	} 
 	
+	public void quit() {
+		try {
+			superColliderServer.quit();
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+	}
+	
 	public void createAndShowServerPanel() {
 		serverPanel = ServerPanel.makeWindow( superColliderServer , ServerPanel.MIMIC | ServerPanel.CONSOLE | ServerPanel.DUMP );
 		serverPanel.setVisible(true);
 	}
 	
-	private void startJack() {
+/*	private void startJack() {
 		ProcessBuilder pb = new ProcessBuilder("jackd", "-d", "dummy");
 		pb.redirectErrorStream(true);
 		try {
@@ -132,6 +153,9 @@ public class Core {
 			e.printStackTrace();
 		}
 	}
+	*/
+	
+	private OSCResponderNode responder;
 	
 	private void startSupercolliderServer() {
 		try {
@@ -139,6 +163,14 @@ public class Core {
 			superColliderServer.startAliveThread();
 			superColliderServer.boot();
 			superColliderServer.sync(4f);
+			
+			responder = new OSCResponderNode(superColliderServer, "/tr", SynthEventServer.getInstance());
+			responder.add();
+			
+			System.err.println("OSCResponder.isListening() "+responder.isListening());
+			
+			
+			superColliderServer.notify(true);
 		} catch (IOException e) {
 			System.err.println("Error starting SC3-Server:\n"+e.getMessage());
 			e.printStackTrace();

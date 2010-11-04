@@ -1,3 +1,4 @@
+(
 SynthDef(\piano, { arg outBus, freq=440, amp=0.5, dur=4, pan=0, gate=0.0; 
 var sig, in, n = 6, max = 0.04, min = 0.01, delay, pitch, detune, hammer, freq2, sig2;
     //hammer = Decay2.ar(Impulse.ar(0.001), 0.008, 0.04, LFNoise2.ar([2000,4000].asSpec.map(amp), 0.25));
@@ -8,6 +9,7 @@ var sig, in, n = 6, max = 0.04, min = 0.01, delay, pitch, detune, hammer, freq2,
     delay = (1/(freq2 + detune).midicps);
     CombL.ar(hammer, delay, delay, 50 * amp)}) );
     sig = HPF.ar(sig2,50) * EnvGen.ar(Env.perc(0.0001,dur, amp, -1),gate);
+    SendTrig.kr(Impulse.kr(25),0,Amplitude.kr(sig));
     Out.ar(0,1.2*Pan2.ar(sig,pan));
 }).load(s);
-
+)

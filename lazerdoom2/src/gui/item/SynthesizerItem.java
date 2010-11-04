@@ -9,6 +9,9 @@ import java.util.Random;
 
 import sequencer.BaseSequence;
 import synth.SynthInstance;
+import synth.event.SynthEvent;
+import synth.event.SynthEventListenerInterface;
+import synth.event.SynthEventServer;
 
 import lazerdoom.LzrDmObjectInterface;
 
@@ -30,7 +33,7 @@ import com.trolltech.qt.svg.QSvgRenderer;
 import control.ParameterControlBus;
 
 
-public class SynthesizerItem extends BaseSynthesizerItem implements ConnectableSynthInterface, LzrDmObjectInterface {
+public class SynthesizerItem extends BaseSynthesizerItem implements ConnectableSynthInterface, LzrDmObjectInterface, SynthEventListenerInterface {
 	private QRectF contentsRect = new QRectF(39.5,39.5, 121, 121);
 	private QRectF iconRect = contentsRect.adjusted(20, 20, -20, -20);
 	private static QColor normalColor = new QColor(130,130,130); 
@@ -45,6 +48,9 @@ public class SynthesizerItem extends BaseSynthesizerItem implements ConnectableS
 	private double currentControlValue = 0.0;
 
 	private static QRectF boundingRect = new QRectF(0,0,200,200);
+	
+	private static QRectF meterBoundingRect = new QRectF(-100,-100,400,400);
+	
 	private static String svgFileName = System.getProperty("user.dir")+"/src/gui/item/SVG/speaker-icon.svg";
 	private static QSvgRenderer sharedRenderer = new QSvgRenderer(svgFileName);
 	
@@ -186,6 +192,15 @@ public class SynthesizerItem extends BaseSynthesizerItem implements ConnectableS
 			frameColor = actionColor;
 		}
 
+        if(this.currentMeterValue > 0.1){// && this.meterBoundingRect != null) {
+        	painter.setPen(QPen.NoPen);
+        	painter.setBrush(meterGradient);
+        	painter.drawEllipse(currentMeterBoundingRect);
+        }
+        
+        painter.setPen(QColor.white);
+        painter.drawText(-100, -100, ""+10.0f*this.currentMeterValue);
+		
 		painter.drawImage(0,0, mnemonic);	
 		
 		// outer circle
@@ -203,12 +218,12 @@ public class SynthesizerItem extends BaseSynthesizerItem implements ConnectableS
 
 		//painter.setBrush(actionColor);
 		//painter.drawPie(contentsRect, 16*90, -5000);
-		if(currentControlValue > 0.0) {
+		/*if(currentControlValue > 0.0) {
 			painter.setBrush(controlValueColor);
 			double width = contentsRect.width()*currentControlValue;
 			QRectF rect = new QRectF((boundingRect.width()-width)/2, (boundingRect.width()-width)/2, width, width);
 			painter.drawRoundedRect(rect, 25.0*currentControlValue,25.0*currentControlValue);
-		} 
+		} */
 
 		painter.setBrush(gradientBrush);
 		painter.setPen(frameColor);
@@ -253,9 +268,15 @@ public class SynthesizerItem extends BaseSynthesizerItem implements ConnectableS
 	@Override
 	public void setSynthesizer(SynthInstance synth) {
 		if(synth != null) {
+			if(this.synth != null) {
+				this.synth.removeSynthEventListener(this);
+			}
+			
 			this.isInitialized = true;
 			this.synth = synth;
 			this.addPorts();		
+			
+			this.synth.addSynthEventListener(this);
 		}
 		
 	}
@@ -272,5 +293,105 @@ public class SynthesizerItem extends BaseSynthesizerItem implements ConnectableS
 			this.setSynthesizer((SynthInstance) object);			
 		}
 		
+	}
+	
+	private Random rnd = new Random();
+	private float currentMeterValue = 0.0f;
+	private boolean hasMeterValue = false;
+	private QRectF currentMeterBoundingRect = null;
+	private QRadialGradient meterGradient = null;
+	private QColor meterColor = new QColor(rnd.nextInt(255),rnd.nextInt(255),rnd.nextInt(255),80);
+	
+	private void setMeterValue(float meter) {
+		hasMeterValue = false;
+		meter = Math.abs(meter);
+		if(meter > 0.0f) {
+			//System.err.println("meter "+meter);
+			meter = meter+0.01f;
+			//meter = (float) (20.0*Math.log10((double)meter));
+			if(meter > 1.0) {
+				meter = 1.0f;
+			}else if(meter < 0.1f) {
+				meter = 0.1f;
+			}
+	
+			meter = meter*0.7999f;
+			
+			this.hasMeterValue = true;
+			this.currentMeterValue = meter;
+			
+			//System.err.println("meter "+meter);
+			
+			currentMeterBoundingRect = new QRectF(meterBoundingRect.left()*meter,
+											meterBoundingRect.top()*meter,
+											meterBoundingRect.width()*meter,
+											meterBoundingRect.height()*meter);
+			
+			meterGradient = new QRadialGradient(100,
+														 100,
+														 meterBoundingRect.width()/2.0);
+			
+			currentMeterBoundingRect = meterBoundingRect;
+			
+			meterGradient.setColorAt(meter+0.2, QColor.transparent);
+			meterGradient.setColorAt(0.65*meter+0.2, meterColor.lighter(170));
+			meterGradient.setColorAt(0, meterColor);
+		}
+	}
+
+	@Override
+	public void dispatchSynthEvent(SynthEvent se) {
+		if(se.getID() == 0) {
+			this.setMeterValue((Float) se.getEvent());
+		} 
+	}
+	
+	private Random rnd = new Random();
+	private float currentMeterValue = 0.0f;
+	private boolean hasMeterValue = false;
+	private QRectF currentMeterBoundingRect = null;
+	private QRadialGradient meterGradient = null;
+	private QColor meterColor = new QColor(rnd.nextInt(255),rnd.nextInt(255),rnd.nextInt(255),80);
+	
+	private void setMeterValue(float meter) {
+		hasMeterValue = false;
+		meter = Math.abs(meter);
+		if(meter > 0.0f) {
+			//System.err.println("meter "+meter);
+			meter = meter+0.01f;
+			//meter = (float) (20.0*Math.log10((double)meter));
+			if(meter > 1.0) {
+				meter = 1.0f;
+			}else if(meter < 0.1f) {
+				meter = 0.1f;
+			}
+	
+
+			this.hasMeterValue = true;
+			this.currentMeterValue = meter;
+			
+			//System.err.println("meter "+meter);
+			
+			currentMeterBoundingRect = new QRectF(meterBoundingRect.left()*meter,
+											meterBoundingRect.top()*meter,
+											meterBoundingRect.width()*meter,
+											meterBoundingRect.height()*meter);
+			
+			meterGradient = new QRadialGradient(100,
+														 100,
+														 meterBoundingRect.width()/2.0);
+			
+			currentMeterBoundingRect = meterBoundingRect;
+			meterGradient.setColorAt(meter+0.2, QColor.transparent);
+			meterGradient.setColorAt(0.65*meter+0.2, meterColor.lighter(170));
+			meterGradient.setColorAt(0, meterColor);
+		}
+	}
+
+	@Override
+	public void dispatchSynthEvent(SynthEvent se) {
+		if(se.getID() == 0) {
+			this.setMeterValue((Float) se.getEvent());
+		} 
 	}
 }

@@ -121,10 +121,13 @@ public class SequencerView extends QGraphicsView implements TouchItemInterface {
 		Intercom.getInstance().system.synthEventDispatch.synthEventCom.executeSignal.connect(this, "propagateSynthEvent(Object)");
 	}
 	
+	ConcurrentLinkedQueue<SynthEventContainer> propagateSynthEvent = new ConcurrentLinkedQueue<SynthEventContainer>(); 
 	public void propagateSynthEvent(Object container) {
 		SynthEventContainer sec = (SynthEventContainer) container;
-		//sec.syneli.dispatchSynthEvent(sec.event);
-		System.err.println("GUI--eve "+sec.event);
+		
+		//propagateSynthEvent.add(sec);
+		sec.syneli.dispatchSynthEvent(sec.event);
+		//System.err.println("GUI--eve "+sec.event.getEvent());
 	}
 	
 	private void setupSequenceEventDispatch() {
@@ -135,6 +138,15 @@ public class SequencerView extends QGraphicsView implements TouchItemInterface {
 	public void propagateSequenceEvent(Object container) {
 		SequenceEventContainer sc = (SequenceEventContainer) container;
 		sc.seli.dispatchSequenceEvent(sc.se);
+	}
+	
+	private void updateGfx() {
+		for(SynthEventContainer cnt: propagateSynthEvent) {
+			cnt.syneli.dispatchSynthEvent(cnt.event);
+		}
+		propagateSynthEvent.clear();
+		
+		this.viewport().update();
 	}
 	
 	public void propagateSequenceEval(Object container) {
@@ -304,6 +316,7 @@ public class SequencerView extends QGraphicsView implements TouchItemInterface {
 		this.setupSynthEventDispatch();
 		
 		// Fixed framerate
+		//updateGuiTimer.timeout.connect(this, "updateGfx()");
 		updateGuiTimer.timeout.connect(this.viewport(), "update()");
 		updateGuiTimer.start(1000/(LazerdoomConfiguration.getInstance().frameRate));
 	}

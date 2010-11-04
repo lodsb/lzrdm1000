@@ -32,8 +32,18 @@ public class StaticSynthLoader implements SynthLoaderInterface {
 		this.group = this.server.asTarget();
 	}
 	
+	private Synth clock;
+	
 	public void init() {
 		this.createSynthDefs();
+		try {
+			SynthDef synthDefs[] = SynthDef.readDefFile(new File(System.getProperty("user.dir")+"/src/synth/SC3Synths/clocksynth.scsyndef"));
+			clock = Synth.head(this.group,synthDefs[0].getName());
+			System.err.println("Loaded ClockSynth for UI updates");
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 	}
 	
 	private void createAndRegisterFunkLead() {

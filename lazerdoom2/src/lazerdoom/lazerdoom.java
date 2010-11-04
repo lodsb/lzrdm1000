@@ -228,11 +228,14 @@ public class lazerdoom extends QWidget {
 		if(secondCursor != null) {
 			aliveMessage.addArgument(secondCursor.session_id);
 		}
+
 		
 		Point point = c.getPosition();
 		
 		float xpos = (point.x)/(float)QApplication.desktop().screenGeometry().width();
 		float ypos = (point.y)/(float)QApplication.desktop().screenGeometry().height();
+		
+		System.err.println(c.session_id+" sdsfsdfsfd");
 		
 		OSCMessage setMessage = new OSCMessage("/tuio/2Dcur");
 		setMessage.addArgument("set");

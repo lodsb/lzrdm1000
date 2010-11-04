@@ -25,6 +25,7 @@ public class TUIOTouchHandler extends TouchHandler implements TuioListener {
 
 	@Override
 	public void addTuioCursor(TuioCursor tcur) {
+		System.err.println(tcur.getCursorID()+" eeeesdsfsdfeeeeeeeeeeesfd");
 		this.addTouchPoint(tcur.getCursorID(), tcur.getX(), tcur.getY());
 	}
 

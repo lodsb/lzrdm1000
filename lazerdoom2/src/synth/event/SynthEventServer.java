@@ -30,17 +30,17 @@ public class SynthEventServer implements OSCListener {
 	 * 
 	 * @see de.sciss.net.OSCListener#messageReceived(de.sciss.net.OSCMessage, java.net.SocketAddress, long)
 	 */
+	int shit = 0;
 	@Override
 	public void messageReceived(OSCMessage arg0, SocketAddress arg1, long arg2) {
 		Integer synthId = (Integer) arg0.getArg(0);
 		Integer eventId = (Integer)(arg0.getArg(1));
 		Object event = (arg0.getArg(2));
-
-		System.err.println("evvv "+event);
+		
 		synchronized(eventListeners) {
 			LinkedList<SynthEventListenerInterface> entries = null;
 		
-			if((entries = eventListeners.get(synthId)) != null) {				
+			if((entries = eventListeners.get(synthId)) != null) {	
 				for(SynthEventListenerInterface entry: entries) {
 					SynthEvent se = new SynthEvent(eventId, event);
 					Intercom.getInstance().system.synthEventDispatch.propagateSynthEvent(entry, se);
@@ -57,6 +57,7 @@ public class SynthEventServer implements OSCListener {
 		
 			if((entries = eventListeners.get(synthId)) == null) {
 				entries = new LinkedList<SynthEventListenerInterface>();
+				eventListeners.put(synthId, entries);
 			}
 			
 			entries.add(synthInterface);

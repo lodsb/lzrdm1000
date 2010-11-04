@@ -4,6 +4,8 @@ import java.io.IOException;
 import java.util.LinkedList;
 
 import session.SessionHandler;
+import synth.event.SynthEventListenerInterface;
+import synth.event.SynthEventServer;
 
 import control.ControlServer;
 import control.ParameterControlBus;
@@ -23,6 +25,14 @@ public class SynthInstance implements LzrDmObjectInterface {
 	public SynthInstance() {}
 	
 	private Synth synth = null;
+	
+	public void addSynthEventListener(SynthEventListenerInterface listener) {
+		SynthEventServer.getInstance().addSynthEventListener(this.synth, listener);
+	}
+	
+	public void removeSynthEventListener(SynthEventListenerInterface listener) {
+		SynthEventServer.getInstance().removeSynthEventListener(this.synth, listener);
+	}
 	
 	public void free() {
 		if(synth != null) {
@@ -91,6 +101,10 @@ public class SynthInstance implements LzrDmObjectInterface {
 	
 	public SynthInfo getSynthInfo() {
 		return this.info;
+	}
+	
+	public Synth getSCSynth() {
+		return this.synth;
 	}
 	
 	public ParameterControlBus[] getControlBusses() {

@@ -19,6 +19,9 @@ public class MouseCursor {
 
 	private int screenWidth;
 	private int screenHeight;
+
+	
+	private int touchID = 0;
 	
 	public MouseCursor(int s_id, int xpos, int ypos) {
 	

@@ -5,6 +5,8 @@ import java.util.ArrayList;
 import java.util.LinkedList;
 
 import session.SessionHandler;
+import synth.event.SynthEventListenerInterface;
+import synth.event.SynthEventServer;
 
 import control.ControlServer;
 import control.FreqSwitchingTwoParameterControlBus;
@@ -36,6 +38,18 @@ public class GroupedSynthInstance extends SynthInstance implements LzrDmObjectIn
 					e.printStackTrace();
 				}
 			}
+		}
+	}
+	
+	public void addSynthEventListener(SynthEventListenerInterface listener) {
+		for(Synth s: synths) {
+			SynthEventServer.getInstance().addSynthEventListener(s, listener);
+		}
+	}
+	
+	public void removeSynthEventListener(SynthEventListenerInterface listener) {
+		for(Synth s: synths) {
+			SynthEventServer.getInstance().removeSynthEventListener(s, listener);
 		}
 	}
 	

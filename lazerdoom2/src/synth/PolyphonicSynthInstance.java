@@ -4,6 +4,8 @@ import java.io.IOException;
 import java.util.LinkedList;
 
 import session.SessionHandler;
+import synth.event.SynthEventListenerInterface;
+import synth.event.SynthEventServer;
 
 import control.ControlServer;
 import control.MultiplexParameterControlBus;
@@ -34,6 +36,18 @@ public class PolyphonicSynthInstance extends SynthInstance implements LzrDmObjec
 					e.printStackTrace();
 				}
 			}
+		}
+	}
+	
+	public void addSynthEventListener(SynthEventListenerInterface listener) {
+		for(Synth s: synths) {
+			SynthEventServer.getInstance().addSynthEventListener(s, listener);
+		}
+	}
+	
+	public void removeSynthEventListener(SynthEventListenerInterface listener) {
+		for(Synth s: synths) {
+			SynthEventServer.getInstance().removeSynthEventListener(s, listener);
 		}
 	}
 	

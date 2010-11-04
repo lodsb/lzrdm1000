@@ -53,13 +53,13 @@ public abstract class ThreadXBar<In, Out> extends QObject implements ProcessorIn
 	private Random rnd = new Random();
 	
 	private Container<In, Out> getContainer() {
-		//FIXME: bug?
-		Container<In,Out> container = containers.get((containerCounter.get()));
-		containerCounter.set((containerCounter.get()+1)% numPreallocContainers);
-		container.id = rnd.nextInt(); //this.containerCounter.get();
-		return container;
+		//FIXME: bug? i think so!
+		//Container<In,Out> container = containers.get((containerCounter.get()));
+		//containerCounter.set((containerCounter.get()+1)% numPreallocContainers);
+		//container.id = rnd.nextInt(); //this.containerCounter.get();
+		//return container;
 		
-		//return new Container<In, Out>();
+		return new Container<In, Out>();
 	}
 
 	abstract protected Out execute(In in); 

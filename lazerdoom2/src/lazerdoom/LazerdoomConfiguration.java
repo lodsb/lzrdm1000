@@ -6,6 +6,8 @@ public class LazerdoomConfiguration {
 	// constants for gesture-"callibration"
 	public int gestureRecognitionPathUpdateResolution = 2;
 	public double minimumDeleteGestureLength = 0.40;
+	public boolean garbageCollectZombieTuioBlobs = false;
+	public long maxUpdateIntervalUntilGarbageCollect = 5000;
 	
 	public double hStretch = 1.0;
 	public double vStretch = 1.0;

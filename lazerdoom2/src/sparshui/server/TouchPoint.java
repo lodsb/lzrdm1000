@@ -35,6 +35,22 @@ public class TouchPoint {
 	 */
 	private TouchState _state;
 	
+	private long updateInterval = 0;
+	private long lastTimestamp = System.currentTimeMillis();
+	private boolean checked = false;
+	
+	public boolean garbageCollectChecked() {
+		if(!checked) {
+			checked = true;
+			
+			return false;
+		}
+		
+		return true;
+	}
+	
+	
+	
 	/**
 	 * 
 	 */
@@ -49,10 +65,21 @@ public class TouchPoint {
 	 * 
 	 * @param location
 	 */
-	public TouchPoint(Location location) {
+	/*public TouchPoint(Location location) {
 		synchronized(idLock) {
 			_id = nextID++;
 		}
+		_location = location;
+		_state = TouchState.BIRTH;
+	}*/
+	
+	
+	public TouchPoint(int id, Location location) {
+		/*synchronized(idLock) {
+			_id = nextID++;
+		}*/
+		
+		_id = id;
 		_location = location;
 		_state = TouchState.BIRTH;
 	}
@@ -115,18 +142,29 @@ public class TouchPoint {
 	 * 		The new state.
 	 */
 	public void update(Location location, TouchState state) {
+		long ctm = System.currentTimeMillis();
+		
 		_location = location;
 		_state = state;
 		_changed = true;
+		
+		
+		this.updateInterval = ctm - this.lastTimestamp;
+		this.lastTimestamp = ctm;
 		if(_group != null) _group.update(this);
+	}
+	
+	
+	public long getUpdateIntervallMillis() {
+		return this.updateInterval;
 	}
 	
 	/**
 	 * Reset the changed flag.
 	 */
-	public void resetChanged() {
+	/*public void resetChanged() {
 		_changed = false;
-	}
+	}*/
 	
 	/**
 	 * Get the value of the changed flag.

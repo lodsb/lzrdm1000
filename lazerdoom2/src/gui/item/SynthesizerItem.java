@@ -315,57 +315,6 @@ public class SynthesizerItem extends BaseSynthesizerItem implements ConnectableS
 				meter = 0.1f;
 			}
 	
-			meter = meter*0.7999f;
-			
-			this.hasMeterValue = true;
-			this.currentMeterValue = meter;
-			
-			//System.err.println("meter "+meter);
-			
-			currentMeterBoundingRect = new QRectF(meterBoundingRect.left()*meter,
-											meterBoundingRect.top()*meter,
-											meterBoundingRect.width()*meter,
-											meterBoundingRect.height()*meter);
-			
-			meterGradient = new QRadialGradient(100,
-														 100,
-														 meterBoundingRect.width()/2.0);
-			
-			currentMeterBoundingRect = meterBoundingRect;
-			
-			meterGradient.setColorAt(meter+0.2, QColor.transparent);
-			meterGradient.setColorAt(0.65*meter+0.2, meterColor.lighter(170));
-			meterGradient.setColorAt(0, meterColor);
-		}
-	}
-
-	@Override
-	public void dispatchSynthEvent(SynthEvent se) {
-		if(se.getID() == 0) {
-			this.setMeterValue((Float) se.getEvent());
-		} 
-	}
-	
-	private Random rnd = new Random();
-	private float currentMeterValue = 0.0f;
-	private boolean hasMeterValue = false;
-	private QRectF currentMeterBoundingRect = null;
-	private QRadialGradient meterGradient = null;
-	private QColor meterColor = new QColor(rnd.nextInt(255),rnd.nextInt(255),rnd.nextInt(255),80);
-	
-	private void setMeterValue(float meter) {
-		hasMeterValue = false;
-		meter = Math.abs(meter);
-		if(meter > 0.0f) {
-			//System.err.println("meter "+meter);
-			meter = meter+0.01f;
-			//meter = (float) (20.0*Math.log10((double)meter));
-			if(meter > 1.0) {
-				meter = 1.0f;
-			}else if(meter < 0.1f) {
-				meter = 0.1f;
-			}
-	
 
 			this.hasMeterValue = true;
 			this.currentMeterValue = meter;
